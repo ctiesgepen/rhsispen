@@ -171,6 +171,7 @@ class AfastamentoForm(forms.ModelForm):
     class Meta:
         model = HistAfastamento
         fields = '__all__'
+        
     
     def __init__(self, *args, **kwargs):
         super(AfastamentoForm, self).__init__(*args, **kwargs)
