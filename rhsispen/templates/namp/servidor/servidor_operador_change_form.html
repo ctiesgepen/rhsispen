@@ -10,9 +10,7 @@
         {% translate 'Home' %}
     </a> &rsaquo; {% translate 'Servidores' %}
 </div>
-{% endblock %} 
-
-{% block content %}
+{% endblock %} {% block content %}
 <div class="content">
     <h5 class="text-center">{{ user.fk_setor }}</h5>
 </div>
@@ -25,7 +23,13 @@
         <form action="{% url 'namp:servidor_operador_change_form' servidor.id_matricula %}" method="post">
             {% csrf_token %} {% for field in form %}
             <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %}
-             {% if field.name == 'fk_setor' %} hidden {% endif %}  {% if field.name == 'fk_user' %} hidden {% endif %}">
+             {% if field.name == 'fk_setor' %} hidden {% endif %}
+             {% if field.name == 'sexo' %} hidden {% endif %}
+             {% if field.name == 'cargo' %} hidden {% endif %}
+             {% if field.name == 'cf' %} hidden {% endif %}
+             {% if field.name == 'tipo_vinculo' %} hidden {% endif %}
+             {% if field.name == 'regime_juridico' %} hidden {% endif %}
+             {% if field.name == 'fk_user' %} hidden {% endif %}">
                 <div>
                     <label>{{ field.label }}</label> {{ field }}
                 </div>

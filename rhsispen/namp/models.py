@@ -3,6 +3,8 @@ from django.contrib.auth.models import User
 from django import forms
 from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date
 
+from django.db.models.fields import AutoField
+
 # Create your models here.
 '''CLASSES SEM CHAVE ESTRANGEIRA'''
 
@@ -194,6 +196,7 @@ class Servidor(models.Model):
 	CHOICES_JURIDICO = [('CLT','CLT'),('Estatutário','Estatutário')]
 	regime_juridico = models.CharField('Regime Jurídico',max_length=25, choices=CHOICES_JURIDICO)
 	situacao = models.BooleanField('Servidor Ativo', default=False)
+	contato = models.CharField('Número para contato: ', max_length=11, blank=True, null=True)
 	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
 	fk_equipe = models.ForeignKey(Equipe, on_delete = models.RESTRICT, verbose_name='Equipe')
 	fk_user = models.OneToOneField(User, on_delete=models.CASCADE, blank=True, null=True)
@@ -237,24 +240,6 @@ class HistFuncao(models.Model):
 		verbose_name = "Função"
 		verbose_name_plural = "Funções"
 
-class ContatoServ(models.Model):
-	CELULAR = 'Telefone Celular'
-	FIXO = 'Telefone Fixo'
-	CONTATOS_CHOICES = (
-	    (CELULAR,'Telefone Celular'), 
-	    (FIXO,'Telefone Fixo'),
-	)
-	id_contato_serv = models.AutoField(primary_key=True)
-	tipo_contato = models.CharField('Tipo de contato', max_length=50,choices=CONTATOS_CHOICES)
-	contato = models.CharField(max_length=50)
-	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Servidor')
-	
-	def __str__(self):
-		return ''
-	
-	class Meta:
-		verbose_name = "Contato do Servidor"
-		verbose_name_plural = "Contatos de Servidor"
 
 class HistAfastamento(models.Model):
 	id_hist_afastamento = models.AutoField(primary_key=True)
@@ -311,3 +296,11 @@ class Jornada(models.Model):
 		verbose_name = "Jornada"
 		verbose_name_plural = "Jornadas"
 		unique_together = ('fk_servidor','data_jornada',)
+
+class Periodo(models.Model):
+	id_periodo_acao = models.AutoField(primary_key=True)
+	data_inicial = models.DateField()
+	data_final = models.DateField()
+	descricao = models.CharField(max_length=25)
+
+class Acao

@@ -239,7 +239,7 @@ def servidor_operador_att_form(request,id_matricula):
 	form = ServidorForm(instance=servidor)
 
 	if request.method == 'POST':
-		form = ServidorForm(request.POST,instance=servidor)
+		form = ServidorForm(request.POST, instance=servidor)
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Servidor editado com suceso!')
@@ -297,9 +297,16 @@ def servidor_operador_change_form(request,id_matricula):
 			
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def frequencias_operador(request,template_name='namp/frequencia/frequencias_operador.html'):
+def frequencias_operador_list(request,template_name='namp/frequencia/frequencias_operador_list.html'):
 	print('Acesso view de frequencias_operador!')
 	return render(request,template_name, {})
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def add_noturno_list(request,template_name='namp/jornada/add_noturno_list.html'):
+	print('entrei em LISTA DE ADD NOTURNO')
+	return render(request,template_name, {})
+
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -373,11 +380,6 @@ def afastamento_change_form(request,template_name='namp/afastamento/afastamento_
 		}
 		return render(request, template_name, contexto)
 
-
-
-
-
-
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def afastamento_att_form(request, id_hist_afastamento):
@@ -392,7 +394,7 @@ def afastamento_att_form(request, id_hist_afastamento):
 	form = AfastamentoForm(instance=afastamento)
 
 	if request.method == 'POST':
-		form = AfastamentoForm(request.POST)
+		form = AfastamentoForm(request.POST, instance=afastamento)
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Afastamento editado com suceso!')
@@ -412,6 +414,13 @@ def afastamento_att_form(request, id_hist_afastamento):
 			'afastamento': afastamento,
 		}
 		return render(request, 'namp/afastamento/afastamento_att_form.html',contexto)
+
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def jornadas_operador_list(request,template_name='namp/jornada/jornadas_operador_list.html'):
+	print('entrei em LISTA DE JORNADAS')
+	return render(request,template_name, {})
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -633,7 +642,6 @@ def exportar_pdf(request):
 		html_string = render_to_string('pdf_template.html', {'servidores': servidores})
 		html = HTML(string=html_string)
 		result = html.write_pdf(target='/tmp/servidores.pdf')
-
 		fs = FileSystemStorage('/tmp')
 		with fs.open('servidores.pdf') as pdf:
 			response = HttpResponse(pdf, content_type='application/pdf')

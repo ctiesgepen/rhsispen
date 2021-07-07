@@ -23,7 +23,10 @@
         <form action="{% url 'namp:servidor_operador_att_form' servidor.id_matricula %}" method="post">
             {% csrf_token %} {% for field in form %}
             <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %}
-             {% if field.name == 'fk_setor' %} hidden {% endif %}  {% if field.name == 'fk_user' %} hidden {% endif %}">
+             {% if field.name == 'fk_setor' %} hidden {% endif %}
+             {% if field.name == 'fk_user' %} hidden {% endif %}
+             ">
+
                 <div>
                     <label>{{ field.label }}</label> {{ field }}
                 </div>

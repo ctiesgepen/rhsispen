@@ -10,7 +10,6 @@ app_name = 'namp'
 urlpatterns = [
 	path('', views.home, name='home'),
 	#Tela do Operador
-	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('equipe_operador_change_form/', views.equipe_operador_change_form, name='equipe_operador_change_form'),
 	path('equipe_operador_change_list/', views.equipe_operador_change_list, name='equipe_operador_change_list'),
 	path('equipe_operador_att_form/<int:id_equipe>/', views.equipe_operador_att_form, name='equipe_operador_att_form'),
@@ -24,7 +23,12 @@ urlpatterns = [
 	path('afastamento_change_list/', views.afastamento_change_list, name='afastamento_change_list'),
 	path('afastamento_att_form/<int:id_hist_afastamento>/', views.afastamento_att_form, name='afastamento_att_form'),
 
-	path('frequencias_operador', views.frequencias_operador, name='frequencias_operador'),
+	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
+	path('jornadas_operador_list', views.jornadas_operador_list, name='jornadas_operador_list'),
+	
+	path('frequencias_operador_list', views.frequencias_operador_list, name='frequencias_operador_list'),
+
+	path('add_noturno_list', views.add_noturno_list, name='add_noturno_list'),
 	#Calculos
 	url('getEquipes/$', views.get_equipes),
 	url('getEquipes24h/$', views.get_equipes24h),

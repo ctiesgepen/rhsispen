@@ -5,7 +5,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.core.serializers.json import DjangoJSONEncoder
-from namp.models import Afastamento, ContatoEquipe, ContatoServ, EnderecoServ, EnderecoSetor, Equipe, Funcao, HistAfastamento, HistFuncao, HistLotacao, HistStatusFuncional, Jornada, Regiao, Servidor, Setor, StatusFuncional, TipoJornada
+from namp.models import Afastamento, ContatoEquipe, EnderecoServ, EnderecoSetor, Equipe, Funcao, HistAfastamento, HistFuncao, HistLotacao, HistStatusFuncional, Jornada, Regiao, Servidor, Setor, StatusFuncional, TipoJornada, Escala
 from namp.forms import *
 
 from django.core.files.storage import FileSystemStorage
@@ -35,9 +35,9 @@ class ContatoEquipeInline(admin.TabularInline):
     model = ContatoEquipe
     extra = 0
 
-class ContatoServInline(admin.TabularInline):
-    model = ContatoServ
-    extra = 0
+#class ContatoServInline(admin.TabularInline):
+#    model = ContatoServ
+#    extra = 0
 
 class EnderecoServInline(admin.StackedInline):
 	model=EnderecoServ
@@ -201,11 +201,14 @@ class ServidorAdmin(admin.ModelAdmin):
 				'fields': (('nome','cpf'), ('sexo','dt_nasc'))
 		}),
 		('Dados Funcionais',{
-				'fields': (('id_matricula','vinculo'), ('tipo_vinculo', 'regime_juridico'), ('cargo','cf', 'situacao'),'fk_setor', 'fk_equipe')
+				'fields': (('id_matricula','vinculo'), ('tipo_vinculo', 'regime_juridico'), ('cargo','cf', 'situacao'),'fk_setor', 'fk_equipe', 'fk_user')
+		}),
+		('Contato ',{
+				'fields': (('contato'),)
 		}),
 	)
 
-	inlines = [EnderecoServInline, ContatoServInline]
+	inlines = [EnderecoServInline ]
 
 	def change_view(self, request, object_id, form_url='', extra_context=None):
 		try:
@@ -252,3 +255,7 @@ class StatusFuncionalAdmin(admin.ModelAdmin):
 @admin.register(TipoJornada)
 class TipoJornadaAdmin(admin.ModelAdmin):
 	list_display = ('carga_horaria', 'tipificacao', 'descricao')
+
+@admin.register(Escala)
+class EscalaAdmin(admin.ModelAdmin):
+	list_display = ('data_inicial', 'data_final')
