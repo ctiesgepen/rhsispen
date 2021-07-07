@@ -25,13 +25,36 @@ from django.core.paginator import Paginator
 
 from django.contrib.admin.views.decorators import staff_member_required
 
-
-
 @login_required(login_url='/autenticacao/login/')
 def home(request,template_name='home.html'):
-    return render(request,template_name, {'servidor':Servidor.objects.get(fk_user=request.user.id)})
 
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+	mensagens = {}
+	
+	#Verificando se tem período para consolidar escalas
+	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	
+	if periodo_escala:
+		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
+		if not escalas_geradas:
+			mensagens['mensagem_escalas'] = 'O período para consolidar as escalas do mês de ' + periodo_escala.data_inicial.strftime('%B') + ' encontra-se em aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M')
+			#mensagens.append(mensagem_escalas)
+	if periodo_frequencia:
+		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+		if not frequencia_gerada:
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
+			#mensagens.append(mensagem_frequencia)
+	contexto = {
+		'servidor':servidor,
+		'mensagens':mensagens
+	}
+	return render(request,template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -418,9 +441,36 @@ def afastamento_att_form(request, id_hist_afastamento):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def jornadas_operador_list(request,template_name='namp/jornada/jornadas_operador_list.html'):
-	print('entrei em LISTA DE JORNADAS')
-	return render(request,template_name, {})
+def escalas_operador_list(request,template_name='namp/escala/escalas_operador_list.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
+	mensagens = {}
+	
+	#Verificando se tem período para consolidar escalas
+	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	
+	if periodo_escala:
+		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
+		if not escalas_geradas:
+			mensagens['mensagem_escalas'] = 'O período para consolidar as escalas do mês de ' + periodo_escala.data_inicial.strftime('%B') + ' encontra-se em aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M')
+			#mensagens.append(mensagem_escalas)
+	if periodo_frequencia:
+		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+		if not frequencia_gerada:
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
+			#mensagens.append(mensagem_frequencia)
+
+	contexto = {
+		'mensagens':mensagens,
+		'servidor': servidor,
+	}	
+
+	return render(request,template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')

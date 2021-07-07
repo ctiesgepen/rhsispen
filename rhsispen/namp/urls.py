@@ -24,9 +24,10 @@ urlpatterns = [
 	path('afastamento_att_form/<int:id_hist_afastamento>/', views.afastamento_att_form, name='afastamento_att_form'),
 
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
-	path('jornadas_operador_list', views.jornadas_operador_list, name='jornadas_operador_list'),
+
+	path('escalas_operador_list/', views.escalas_operador_list, name='escalas_operador_list'),
 	
-	path('frequencias_operador_list', views.frequencias_operador_list, name='frequencias_operador_list'),
+	path('frequencias_operador_list/', views.frequencias_operador_list, name='frequencias_operador_list'),
 
 	path('add_noturno_list', views.add_noturno_list, name='add_noturno_list'),
 	#Calculos

@@ -196,6 +196,7 @@ class Servidor(models.Model):
 	CHOICES_JURIDICO = [('CLT','CLT'),('Estatutário','Estatutário')]
 	regime_juridico = models.CharField('Regime Jurídico',max_length=25, choices=CHOICES_JURIDICO)
 	situacao = models.BooleanField('Servidor Ativo', default=False)
+
 	contato = models.CharField('Número para contato: ', max_length=11, blank=True, null=True)
 	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
 	fk_equipe = models.ForeignKey(Equipe, on_delete = models.RESTRICT, verbose_name='Equipe')
@@ -297,6 +298,7 @@ class Jornada(models.Model):
 		verbose_name_plural = "Jornadas"
 		unique_together = ('fk_servidor','data_jornada',)
 
+<<<<<<< HEAD
 class Periodo(models.Model):
 	id_periodo_acao = models.AutoField(primary_key=True)
 	data_inicial = models.DateField()
@@ -304,3 +306,29 @@ class Periodo(models.Model):
 	descricao = models.CharField(max_length=25)
 
 class Acao
+=======
+class PeriodoAcao(models.Model):
+	id_periodo_acao = models.AutoField(primary_key=True)
+	data_inicial = models.DateTimeField()
+	data_final = models.DateTimeField()
+	CHOICES_DESCRICAO = [
+		('1', 'CONSOLIDAR ESCALAS'),
+		('2', 'CONSOLIDAR FREQUENCIAS'),
+	]
+	descricao = models.CharField('Descrição',max_length=25, choices=CHOICES_DESCRICAO)
+
+	class Meta:
+		ordering = ["data_inicial"]
+		verbose_name = "Período"
+		verbose_name_plural = "Períodos"
+
+class EscalaFrequencia(models.Model):
+	id_escala_frequencia = models.AutoField(primary_key=True)
+	data = models.DateField(verbose_name='Criado Em')
+	fk_periodo_acao = models.ForeignKey(PeriodoAcao, on_delete = models.RESTRICT, verbose_name='Período')
+	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Operador')
+	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
+
+
+
+>>>>>>> 2d015c00c4d7a1bd0a7bb3b580f141c5fd2074a3

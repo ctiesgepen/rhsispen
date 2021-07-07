@@ -32,30 +32,26 @@
              <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
                   <div class="col-md-9 ms-md-auto text-center">
                       <div class="dropdown">
-                          Selecione o Setor:
-                          <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdown-setores" data-bs-toggle="dropdown" aria-expanded="false">
-                          UNIDADE PENAL DE PALMAS
-                          </button>
-                          <ul class="dropdown-menu" aria-labelledby="dropdown-setores">
-                              <li><a class="dropdown-item" href="#">UNIDADE PENAL DE ARAGUAÍNA</a></li>
-                              <li><a class="dropdown-item" href="#">UNIDADE PENAL DE GURUPI</a></li>
-                              <li><a class="dropdown-item" href="#">UNIDADE PENAL DE CARIRI</a></li>
-                          </ul>
+                          Crie e envie a escala do mês "Tal" em:
                       </div>
                   </div>
+                  {% if mensagens.mensagem_escalas %}
                   <div class="col-md-3 ms-md-auto text-center">
-                      <input type="submit" value="{% translate 'Gerar Escalas' %}">
-                      <!--<button type="button" class="btn btn-secondary" id="botao-gerar-escala">Gerar Escala Regular</button>-->
+                      <button type="button" class="btn btn-secondary" id="botao-gerar-escala"><a href="{% url 'namp:jornadas_operador' %}" style="color: white; text-decoration-line: none;">Gerar Escala Regular</a></button>
                   </div>
+                  {% endif %}
               </div>
-              
+             
+              {% if mensagens.mensagem_escalas %}
               <div class="row gx-2 p-1 bg-light" id="div-alerta-prazo-escala">
                   <div class="col text-center">
                       <div class="alert alert-warning" role="alert" id="alert-prazo">
-                        Prazo para gerar escala regular do mês de referência 08/2021: <b>05/07/2021 a 20/07/2021</b>
+                        {{ mensagens.mensagem_escalas }}
                       </div>
                   </div>
               </div>
+              {% endif %}
+
               <div class="row gx-2 p-1 bg-light" id="div-tabela-escala">
                   <table class="table" id="table-escala">
                       <thead>

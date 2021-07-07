@@ -5,7 +5,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.core.serializers.json import DjangoJSONEncoder
-from namp.models import Afastamento, ContatoEquipe, EnderecoServ, EnderecoSetor, Equipe, Funcao, HistAfastamento, HistFuncao, HistLotacao, HistStatusFuncional, Jornada, Regiao, Servidor, Setor, StatusFuncional, TipoJornada, Escala
+from namp.models import PeriodoAcao, Afastamento, ContatoEquipe, EnderecoServ, EnderecoSetor, Equipe, Funcao, HistAfastamento, HistFuncao, HistLotacao, HistStatusFuncional, Jornada, Regiao, Servidor, Setor, StatusFuncional, TipoJornada
 from namp.forms import *
 
 from django.core.files.storage import FileSystemStorage
@@ -256,6 +256,12 @@ class StatusFuncionalAdmin(admin.ModelAdmin):
 class TipoJornadaAdmin(admin.ModelAdmin):
 	list_display = ('carga_horaria', 'tipificacao', 'descricao')
 
-@admin.register(Escala)
-class EscalaAdmin(admin.ModelAdmin):
-	list_display = ('data_inicial', 'data_final')
+@admin.register(PeriodoAcao)
+class PeriodoAcaoAdmin(admin.ModelAdmin):
+	list_display = ('getDescricao', 'data_inicial', 'data_final')
+
+	def getDescricao(self, obj):
+		if obj.descricao == '1':
+			return 'CONSOLIDAR ESCALAS - MÊS DE ' + (obj.data_inicial + TimeDelta(days=30)).strftime('%B')
+		elif obj.descricao == '2':
+			return 'CONSOLIDAR FREQUÊNCIAS - MÊS DE ' + (obj.data_inicial - TimeDelta(days=30)).strftime('%B')
