@@ -91,7 +91,9 @@
                                         <td> {{ escalafrequencia.mes }} </td>
                                         <td> {{ escalafrequencia.qtd_equipes }} </td>
                                         <td> {{ escalafrequencia.qtd_servidores }} </td>
-                                        <td> {{ escalafrequencia.serv_exp }} </td>
+                                        {% for equipe in equipes %}{% if equipe.categoria == "Expediente" %}
+                                        <td> {{ equipe.get_servidores }} </td>
+                                        {% endif %} {% endfor %}
                                         <td> {{ escalafrequencia.serv_plantao }} </td>
                                         <td> {{ escalafrequencia.qtd_afastamento }} </td>
                                         <td> EDITAR </td>
