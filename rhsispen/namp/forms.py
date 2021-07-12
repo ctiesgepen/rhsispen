@@ -187,3 +187,11 @@ class AfastamentoSearchForm(forms.Form):
             'servidor': forms.TextInput(attrs={'placeholder': 'Digite um nome de servidor'}),
         }
 
+class EscalaFrequenciaForm(forms.ModelForm):
+    class Meta:
+        model = EscalaFrequencia
+        fields = ('data',)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['data'].required = False

@@ -29,7 +29,8 @@ urlpatterns = [
 	
 	path('frequencias_operador_list/', views.frequencias_operador_list, name='frequencias_operador_list'),
 	path('frequencias_admin_list/', views.frequencias_admin_list, name='frequencias_admin_list'),
-	
+
+
 	path('add_noturno_list', views.add_noturno_list, name='add_noturno_list'),
 	#Calculos
 	url('getEquipes/$', views.get_equipes),

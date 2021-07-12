@@ -1,4 +1,5 @@
-{% extends 'base.html' %} {% load i18n static %} {% load static %} {% block extrahead %} {{ block.super }}
+{% extends 'base.html' %} {% load i18n static %} {% load static %} {% block extrahead %} {{ block.super }} {% load namp_extras %}
+
 <scrip src="{% url 'admin:jsi18n' %}">
     </script>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -26,14 +27,16 @@
                         </div>
                         <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
                             {% if mensagens.mensagem_frequencia %}
-                            <div class="col-md-9 ms-md-auto text-center">
-                                <div class="dropdown">
-                                    ENVIE A FREQUÊNCIA DO MÊS ( ANTERIOR ) NO BOTÃO AO LADO:
+                            <form action="{% url 'namp:frequencias_operador_list' %}" method="post">{% csrf_token %}
+                                <div class="col-md-9 ms-md-auto text-center">
+                                    <div class="dropdown">
+                                        ENVIE A FREQUÊNCIA DO MÊS NO BOTÃO AO LADO:<br> ATENÇÃO: AO APERTAR O BOTÃO DE 'GERAR FREQUÊNCIA' O SISTEMA JÁ ESTÁ LEVANDO EM CONSIDERAÇÃO, <br> OS AFASTAMENTOS CADASTRADOS NAQUELE MÊS.
+                                    </div>
+                                    <div class="submit-row col-md-3 ms-md-auto text-center">
+                                        <input type="submit" class="default" name="_save" value="{% translate 'Consolidar Frequência' %}">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-md-3 ms-md-auto text-center">
-                                <button type="button" class="btn btn-secondary" id="botao-gerar-frequencia"><a href="{% url 'namp:frequencias_operador_list' %}" style="color: white; text-decoration-line: none;">Gerar Frequência</a></button>
-                            </div>
+                            </form>
                             {% endif %}
                         </div>
 
@@ -81,23 +84,24 @@
                                                 <a scope="col">QTD DE AFASTAMENTOS</a>
                                             </div>
                                         </th>
-
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">AÇÕES</a>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
                                     {% for escalafrequencia in page_obj %}
                                     <tr class="{% cycle 'row1' 'row2' %}">
-                                        <td> {{ escalafrequencia.mes }} </td>
-                                        <td> {{ escalafrequencia.qtd_equipes }} </td>
-                                        <td> {{ escalafrequencia.qtd_servidores }} </td>
-                                        {% for equipe in equipes %}{% if equipe.categoria == "Expediente" %}
-                                        <td> {{ equipe.get_servidores }} </td>
-                                        {% endif %} {% endfor %}
-                                        <td> {{ escalafrequencia.serv_plantao }} </td>
-                                        <td> {{ escalafrequencia.qtd_afastamento }} </td>
-                                        <td> EDITAR </td>
-                                        <td> BAIXAR </td>
+                                        <td> {{ escalafrequencia.data|less_month|date:"F Y" }} </td>
+                                        <td> {{ escalafrequencia.qtd_equipes_frequencia|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_servidores_frequencia|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_expediente_frequencia|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_plantonista_frequencia|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_afastamento_frequencia|length }} </td>
+                                        <td> EDITAR - BAIXAR</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

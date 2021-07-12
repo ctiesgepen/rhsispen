@@ -45,44 +45,53 @@
                 <div class="row gx-2 p-1 bg-light" id="div-tabela-prazos">
                     <table class="table" id="table-prazos">
                         <thead>
-                          <tr class="table-dark">
-                            <th scope="col">#</th>
-                            <th scope="col">MÊS DE REFERÊNCIA</th>
-                            <th scope="col">ATIVIDADE</th>
-                            <th scope="col">INÍCIO</th>
-                            <th scope="col">FIM</th>
-                            <th scope="col">STATUS</th>
-                            <th scope="col">AÇÕES</th>
-                          </tr>
+                          <th>
+                            <div class="text">
+                                <a scope="col">MÊS DE REFERÊNCIA</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">ATIVIDADE</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">DATA INÍCIO</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">DATA FINAL</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">STATUS</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">AÇÕES</a>
+                            </div>
+                          </th>
                         </thead>
+
+
                         <tbody>
-                          <tr class="table-warning">
-                            <th scope="row">1</th>
-                            <td>04/2021</td>
-                            <td>Consolidar Frequência</td>
-                            <td>01/05/2021</td>
-                            <td>05/05/2021</td>
-                            <td><a href="#" class="text-decoration-underline">Faltam 9 Setores</a></td>
-                            <td>
-                              <button type="button" id="botao-editar-prazo" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-editar-prazo">
+                          {% for escalafrequencia in page_obj %}
+                          <tr class="{% cycle 'row1' 'row2' %}">
+                              <td> {{ escalafrequencia.data }} </td>
+                              <td> {{ escalafrequencia.descricao }} </td>
+                              <td> {{ escalafrequencia.dt_inicio }} </td>
+                              <td> {{ escalafrequencia.dt_final }} </td>
+                              <td> {{ escalafrequencia.status }} </td>
+                              <td> {{ escalafrequencia.acoes }} </td>
+                              <td><button type="button" id="botao-editar-prazo" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-editar-prazo">
                                 Editar
-                              </button>
-                            </td>
+                                </button></td>
                           </tr>
-                          <tr class="table-success">
-                            <th scope="row">2</th>
-                            <td>04/2021</td>
-                            <td>Gerar Escala Regular</td>
-                            <td>05/03/2021</td>
-                            <td>20/03/2021</td>
-                            <td><a href="#" class="text-decoration-underline">Finalizado</a></td>
-                            <td>
-								<button type="button" id="botao-editar-prazo" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-editar-prazo">
-                                Editar
-                                </button>
-							</td>
-                          </tr>
-                        </tbody>
+                          {% endfor %}
                       </table>
                 </div>
                </div>

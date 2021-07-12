@@ -1,4 +1,7 @@
 {% extends 'base.html' %} {% load i18n static %} {% load static %} {% block extrahead %}{{ block.super }}
+
+{% load namp_extras %}
+
 <scrip src="{% url 'admin:jsi18n' %}">
     </script>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
@@ -17,6 +20,7 @@
             <h5 class="text-center">{{ servidor.fk_setor }}</h5>
         </div>
 
+
         <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
             <div class="container px-1" id="conteudo">
                 <div class="row gx-2">
@@ -24,6 +28,16 @@
                         <div class="p-3 bg-white text-center" id="titulo-atividade">
                             <h4>Escala Regular - Lista</h4>
                         </div>
+
+                        <div id="toolbar">
+                            <form method="POST" action="{% url 'namp:escalas_operador_list' %}">{% csrf_token %}
+                                <div>
+                                    {{ form.data }}
+                                    <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
+                                </div>
+                            </form>
+                        </div><br>
+
                         <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
                             {% if mensagens.mensagem_escalas %}
                             <div class="col-md-9 ms-md-auto text-center">
@@ -58,12 +72,12 @@
                                         </th>
                                         <th>
                                             <div class="text">
-                                                <a scope="col">QTDE EQUIPES</a>
+                                                <a scope="col">QTD EQUIPES</a>
                                             </div>
                                         </th>
                                         <th>
                                             <div class="text">
-                                                <a scope="col">QTDE SERVIDORES</a>
+                                                <a scope="col">QTD SERVIDORES</a>
                                             </div>
                                         </th>
                                         <th>
@@ -76,19 +90,23 @@
                                                 <a scope="col">SERVIDORES EM PLANTÃO</a>
                                             </div>
                                         </th>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">AÇÕES</a>
+                                            </div>
+                                        </th>
                                     </tr>
                                 </thead>
 
                                 <tbody>
                                     {% for escalafrequencia in page_obj %}
                                     <tr class="{% cycle 'row1' 'row2' %}">
-                                        <td> {{ escalafrequencia.mes }} </td>
-                                        <td> {{ escalafrequencia.qte_equipes }} </td>
-                                        <td> {{ escalafrequencia.qte_servidores }} </td>
-                                        <td> {{ escalafrequencia.serv_exp }} </td>
-                                        <td> {{ escalafrequencia.serv_plantao }} </td>
-                                        <td> EDITAR </td>
-                                        <td> BAIXAR </td>
+                                        <td> {{ escalafrequencia.data|add_month|date:"F Y"}} </td>
+                                        <td> {{ escalafrequencia.qtd_equipes|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_servidores|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_expediente|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_plantonista|length }} </td>
+                                        <td> EDITAR - BAIXAR</td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>
