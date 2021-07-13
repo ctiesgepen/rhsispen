@@ -1,0 +1,35 @@
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+
+{% block content %}
+<!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+        <div class="pcoded-content">
+
+<div class="content">
+    <h5 class="text-center">{{ setor.nome }}</h5>
+</div>
+<div class="content">
+    <div class="colM">
+        <h4>{% translate 'Adicionar Equipe' %}</h4>
+        <form action="{% url 'namp:equipe_criar' %}" method="post">
+            {% csrf_token %} {% for field in form %}
+            <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %} {% if field.name == 'fk_setor' %} hidden {% endif %}">
+                <div>
+                    <label>{{ field.label }}: </label> {{ field }}
+                </div>
+                <div>
+                    {% if field.errors %} {{ field.errors }} {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <div class="submit-row">
+                <input type="submit" value="{% translate 'Adicionar' %}">
+            </div>
+        </form>
+    </div>
+</div>
+    </div>
+</div>
+
+{% endblock %}

@@ -14,6 +14,23 @@
 {% endblock %}
 
 
-{% block content %}
 
-{% endblock%}
+
+    {% block content %}
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+      <div class="pcoded-content">
+        <p>Texto</p>
+      </div>
+    </div>
+    {% endblock%}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <!-- Apex Chart -->
+    <script src="/static/assets/js/plugins/apexcharts.min.js"></script>
+    <!-- custom-chart js -->
+    <script src="/static/assets/js/pages/dashboard-main.js"></script>
+
+{% endblock javascripts %}

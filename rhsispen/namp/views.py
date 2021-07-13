@@ -143,7 +143,7 @@ def equipe_operador_change_list(request, template_name='namp/equipe/equipe_opera
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_change_form(request, template_name='namp/equipe/equipe_operador_change_form.html'):
+def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 	form = EquipeForm()
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
