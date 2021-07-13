@@ -2,34 +2,79 @@
 
 {% block content %}
 <!-- [ Main Content ] start -->
-    <div class="pcoded-main-container">
-        <div class="pcoded-content">
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="mt-5">Adicionar Equipe</h5>
+                        <hr>
+                        <form action="{% url 'namp:equipe_criar' %}" method="post">
+                            {% csrf_token %}
+                            <h6>Configurações</h6>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    <label for="inputNome">Nome</label>
+                                    {{ form.nome }}
 
-<div class="content">
-    <h5 class="text-center">{{ setor.nome }}</h5>
-</div>
-<div class="content">
-    <div class="colM">
-        <h4>{% translate 'Adicionar Equipe' %}</h4>
-        <form action="{% url 'namp:equipe_criar' %}" method="post">
-            {% csrf_token %} {% for field in form %}
-            <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %} {% if field.name == 'fk_setor' %} hidden {% endif %}">
-                <div>
-                    <label>{{ field.label }}: </label> {{ field }}
-                </div>
-                <div>
-                    {% if field.errors %} {{ field.errors }} {% endif %}
-                </div>
-            </div>
-            {% endfor %}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="inputCategoria">Categoria</label>
+                                    {{ form.categoria }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <label for="inputTipoJornada">Tipo de Jornada</label>
+                                    {{ form.fk_tipo_jornada }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label for="inputHoraInicial">Hora Inicial</label>
+                                    {{ form.hora_inicial }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <div class="form-check">
+                                        {{ form.status }}
+                                        {% if form.status.is_checked %}
+                                            <label class="form-check-label" for="gridCheck">Equipe Ativa</label>
+                                        {% else %}
+                                            <label class="form-check-label" for="gridCheck">Ativar Equipe</label>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            
+                                    
+                                    
+                            
+                            <div class="form-group">
+                                <label for="inputSetor">Setor</label>
+                                <select class="form-control" id="inputSetor">
+                                    {% for setor in form.fk_setor %}
+                                    <option value="">form.fk_setor.nome</option>
+                                    <option>2</option>
+                                    <option>3</option>
+                                    <option>4</option>
+                                    <option>5</option>
+                                </select>
+                            </div>
 
-            <div class="submit-row">
-                <input type="submit" value="{% translate 'Adicionar' %}">
-            </div>
-        </form>
+
+
+                            <hr>
+                            <div class="submit-row">
+                                <input type="submit" class="default" name="_save" value="{% translate 'Salvar' %}">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+           </div>
+        </div>
     </div>
 </div>
-    </div>
-</div>
-
 {% endblock %}
+
+        
