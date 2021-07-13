@@ -57,9 +57,9 @@
                             <div class="form-row">
                                 <div class="form-group col-md-12">
                                     <label for="inputSetor">Setor</label>
-                                    <select class="form-control" id="inputSetor">
+                                    <select class="form-control" id="inputSetor" disabled>
                                         {% for setor in form.fk_setor %}
-                                            <option value="{{setor}}" disabled>{{ setor.nome }}</option>
+                                            <option value="{{setor}}">{{ setor.nome }}</option>
                                         {%endfor%}
                                     </select>
                                 </div>
