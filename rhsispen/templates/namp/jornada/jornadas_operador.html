@@ -1,8 +1,4 @@
-{% extends "base.html" %} {% load i18n static %} {% load static %} {% block extrahead %}{{ block.super }}
-<script src="{% url 'admin:jsi18n' %}"></script>
-<script src="http://code.jquery.com/jquery-1.9.1.js"></script>
-<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-
+{% extends "layout/base.html" %} {% load i18n static %} {% load static %}
 <script type="text/javascript">
     $(function() {
         // inspect html to check id of category select dropdown.
@@ -50,190 +46,194 @@
         });
     });
 </script>
-{% endblock %} {% block extrastyle %}{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
-<link rel="stylesheet" type="text/css" href="{% static 'css/gerarjornadasetor.css' %}">
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous"> {% endblock %} {% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'namp:home' %}">{% translate 'Home' %}</a> &rsaquo; {% translate 'Jornadas' %}
-</div>
-{% endblock %} {% block content %}
-<div class="content">
-    <h5 class="text-center">{{ setor.nome }}</h5>
-    <h4 class="text-center">Gerar Escala Regular - Mês próx {{ mouth.}}</h4>
-</div>
 
-<div class="content">
-    <div class="boxJorExp">
-        <h6>Equipes em Jornada de Expediente</h6>
-        <table class="table table-bordered text-center table-overflow">
-            <thead>
-                <tr>
-                    <th scope="col">EQUIPE: </th>
-                    <th scope="col">QTDE DE SERVIDORES:</th>
-                    <th scope="col">TIPO DE JORNADA:</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for equipe in equipes %}
-                <tr>
-                    {% if equipe.categoria == "Expediente" %}
-                    <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                    <td>{{ equipe.get_servidores }}</td>
-                    <td>{{ equipe.fk_tipo_jornada.tipificacao }}</td>
-                    {% endif %}
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
 
-    <br><br> {% if tem_plantao12%}
-    <div class="boxJorExp">
-        <h6>Equipes em Jornada de Plantão 12hrs</h6>
-        <table class="table table-bordered text-center table-overflow">
-            <thead>
-                <tr>
-                    <th scope="col">EQUIPE: </th>
-                    <th scope="col">QTDE DE SERVIDORES:</th>
-                    <th scope="col">TIPO DE JORNADA:</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for equipe in equipes %} {% if equipe.fk_tipo_jornada.carga_horaria == 12 %}
-                <tr>
-                    <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                    <td>{{equipe.get_servidores}}</td>
-                    <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
-                </tr>
-                {% endif %} {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %} {% if tem_plantao24%}
-    <div class="boxJorExp">
-        <h6>Equipes em Jornada de Plantão 1X3</h6>
-        <table class="table table-bordered text-center table-overflow">
-            <thead>
-                <tr>
-                    <th scope="col">EQUIPE: </th>
-                    <th scope="col">QTDE DE SERVIDORES:</th>
-                    <th scope="col">TIPO DE JORNADA:</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for equipe in equipes %} {% if equipe.fk_tipo_jornada.carga_horaria == 24 %}
-                <tr>
-                    <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                    <td>{{equipe.get_servidores}}</td>
-                    <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
-                </tr>
-                {% endif %} {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %} {% if tem_plantao48%}
-    <div class="boxJorExp">
-        <h6>Equipes em Jornada de Plantão 2x6</h6>
-        <table class="table table-bordered text-center table-overflow">
-            <thead>
-                <tr>
-                    <th scope="col">EQUIPE: </th>
-                    <th scope="col">QTDE DE SERVIDORES:</th>
-                    <th scope="col">TIPO DE JORNADA:</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for equipe in equipes %} {% if tem_plantao48 and equipe.fk_tipo_jornada.carga_horaria == 48 %}
-                <tr>
-                    <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                    <td>{{equipe.get_servidores}}</td>
-                    <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
-                </tr>
-                {% endif %} {% endfor %}
-            </tbody>
-        </table>
-    </div>
-    {% endif %}
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                            <div>
+                                <h5 class="text-center">{{ user.servidor.fk_setor }}</h5>
+                            </div>
+                            <hr>
+                            <div class="content">
+                                <div class="boxJorExp">
+                                    <h6>Equipes em Jornada de Expediente</h6>
+                                    <table class="table table-bordered text-center table-overflow">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">EQUIPE: </th>
+                                                <th scope="col">QTDE DE SERVIDORES:</th>
+                                                <th scope="col">TIPO DE JORNADA:</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for equipe in equipes %}
+                                            <tr>
+                                                {% if equipe.categoria == "Expediente" %}
+                                                <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                                <td>{{ equipe.get_servidores }}</td>
+                                                <td>{{ equipe.fk_tipo_jornada.tipificacao }}</td>
+                                                {% endif %}
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
 
-    <br><br>
+                                <br><br> {% if tem_plantao12%}
+                                <div class="boxJorExp">
+                                    <h6>Equipes em Jornada de Plantão 12hrs</h6>
+                                    <table class="table table-bordered text-center table-overflow">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">EQUIPE: </th>
+                                                <th scope="col">QTDE DE SERVIDORES:</th>
+                                                <th scope="col">TIPO DE JORNADA:</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for equipe in equipes %} {% if equipe.fk_tipo_jornada.carga_horaria == 12 %}
+                                            <tr>
+                                                <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                                <td>{{equipe.get_servidores}}</td>
+                                                <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
+                                            </tr>
+                                            {% endif %} {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% endif %} {% if tem_plantao24%}
+                                <div class="boxJorExp">
+                                    <h6>Equipes em Jornada de Plantão 1X3</h6>
+                                    <table class="table table-bordered text-center table-overflow">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">EQUIPE: </th>
+                                                <th scope="col">QTDE DE SERVIDORES:</th>
+                                                <th scope="col">TIPO DE JORNADA:</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for equipe in equipes %} {% if equipe.fk_tipo_jornada.carga_horaria == 24 %}
+                                            <tr>
+                                                <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                                <td>{{equipe.get_servidores}}</td>
+                                                <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
+                                            </tr>
+                                            {% endif %} {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% endif %} {% if tem_plantao48%}
+                                <div class="boxJorExp">
+                                    <h6>Equipes em Jornada de Plantão 2x6</h6>
+                                    <table class="table table-bordered text-center table-overflow">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">EQUIPE: </th>
+                                                <th scope="col">QTDE DE SERVIDORES:</th>
+                                                <th scope="col">TIPO DE JORNADA:</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for equipe in equipes %} {% if tem_plantao48 and equipe.fk_tipo_jornada.carga_horaria == 48 %}
+                                            <tr>
+                                                <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                                <td>{{equipe.get_servidores}}</td>
+                                                <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
+                                            </tr>
+                                            {% endif %} {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {% endif %}
 
-    <div class="boxJorExp">
-        {% if tem_plantao12 or tem_plantao24 or tem_plantao48 %}
-        <table class="table table-bordered text-center table-overflow">
-            <thead>
-                <tr>
-                    <th scope="col">DEFINIÇÕES FINAIS DA ESCALA REGULAR</th>
-                </tr>
-            </thead>
-        </table>
-        <br> {% endif %}
-        <div class="formPlantao">
-            <div class="row g-3 align-items-center">
-                <form method="post" action="{% url 'namp:jornadas_operador' %}">{% csrf_token %}
-                    <div class="col-md-12 row">
-                        {% if tem_plantao12 %}
-                        <div class="col-md-4">
-                            {{ form.equipe_plantao12h.label }}
-                        </div>
-                        <div class="col-md-3">
-                            {{ form.equipe_plantao12h }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form.data_plantao12h.label }}
-                        </div>
-                        <div class="col-md-3">
-                            {{ form.data_plantao12h }}
-                        </div>
-                        <div class="col-md-12">
-                            <span class="form-text text-right">
-                  Equipe que encerrará o mês 04/2021:
-                </span>
-                        </div>
-                        {% endif %} {% if tem_plantao24 %}
-                        <div class="col-md-4">
-                            {{ form.equipe_plantao24h.label }}
-                        </div>
-                        <div class="col-md-3">
-                            {{ form.equipe_plantao24h }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form.data_plantao24h.label }}
-                        </div>
-                        <div class="col-md-3">
-                            {{ form.data_plantao24h }}
-                        </div>
-                        <div class="col-md-12">
-                            <span class="form-text text-right">
-                  Equipe que encerrará o mês 04/2021:
-                </span>
-                        </div>
-                        {% endif %} {% if tem_plantao48 %}
-                        <div class="col-md-4">
-                            {{ form.equipe_plantao48h.label }}
-                        </div>
-                        <div class="col-md-3">
-                            {{ form.equipe_plantao48h }}
-                        </div>
-                        <div class="col-md-2">
-                            {{ form.data_plantao48h.label }}
-                        </div>
-                        <div class="col-md-3">
-                            {{ form.data_plantao48h }}
-                        </div>
-                        <div class="col-md-12">
-                            <span class="form-text text-right">
-                  Equipe que encerrará o mês 04/2021:
-                </span>
-                        </div>
-                        {% endif %}
-                        <div class="submit-row" align="right">
-                            <input type="submit" value="{% translate 'Consolidar Escalas' %}">
-                        </div>
-                    </div>
-                </form>
+                                <br><br>
+
+                                <div class="boxJorExp">
+                                    {% if tem_plantao12 or tem_plantao24 or tem_plantao48 %}
+                                    <table class="table table-bordered text-center table-overflow">
+                                        <thead>
+                                            <tr>
+                                                <th scope="col">DEFINIÇÕES FINAIS DA ESCALA REGULAR</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                    <br> {% endif %}
+                                    <div class="formPlantao">
+                                        <div class="row g-3 align-items-center">
+                                            <form method="post" action="{% url 'namp:jornadas_operador' %}">{% csrf_token %}
+                                                <div class="col-md-12 row">
+                                                    {% if tem_plantao12 %}
+                                                    <div class="col-md-4">
+                                                        {{ form.equipe_plantao12h.label }}
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        {{ form.equipe_plantao12h }}
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        {{ form.data_plantao12h.label }}
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        {{ form.data_plantao12h }}
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <span class="form-text text-right">
+                                            Equipe que encerrará o mês 04/2021:
+                                            </span>
+                                                    </div>
+                                                    {% endif %} {% if tem_plantao24 %}
+                                                    <div class="col-md-4">
+                                                        {{ form.equipe_plantao24h.label }}
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        {{ form.equipe_plantao24h }}
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        {{ form.data_plantao24h.label }}
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        {{ form.data_plantao24h }}
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <span class="form-text text-right">
+                                            Equipe que encerrará o mês 04/2021:
+                                            </span>
+                                                    </div>
+                                                    {% endif %} {% if tem_plantao48 %}
+                                                    <div class="col-md-4">
+                                                        {{ form.equipe_plantao48h.label }}
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        {{ form.equipe_plantao48h }}
+                                                    </div>
+                                                    <div class="col-md-2">
+                                                        {{ form.data_plantao48h.label }}
+                                                    </div>
+                                                    <div class="col-md-3">
+                                                        {{ form.data_plantao48h }}
+                                                    </div>
+                                                    <div class="col-md-12">
+                                                        <span class="form-text text-right">
+                                            Equipe que encerrará o mês 04/2021:
+                                            </span>
+                                                    </div>
+                                                    {% endif %}
+                                                    <div class="submit-row" align="right">
+                                                        <input type="submit" value="{% translate 'Consolidar Escalas' %}">
+                                                    </div>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                <hr>
+                </div>
             </div>
         </div>
     </div>
-    {% endblock %}
+</div>                    
+{% endblock %}

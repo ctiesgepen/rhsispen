@@ -1,68 +1,87 @@
 {% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
 {% block content %}
- <div class="pcoded-main-container">
-    <div class="pcoded-content">
-        <div class="content">
-            <div>
-                <h5 class="text-center">{{ servidor.fk_setor }}</h5>
-                <h4 class="text-center">Selecione Equipe para modificar</h4>
-            </div>
-            {% block object-tools %}
-            <ul class="object-tools">
-                {% block object-tools-items %}
-                <li>
-                    <a href="{% url 'namp:equipe_criar' %}" class="addlink">
-            {% blocktrans with cl.opts.verbose_name as name %}Adicionar Equipe {{ name }}{% endblocktrans %}
-            </a>
-                </li>
-                {% endblock %}
-            </ul>
-            {% endblock %}
-            <div id="toolbar">
-                <form method="POST" action="{% url 'namp:equipe_list' %}">{% csrf_token %}
-                    <div>
-                        {{ form.nome }}
-                        <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
-                        <a href="{% url 'namp:equipe_list' %}">ver todos</a>
-                    </div>
-                </form>
-            </div><br>
-            <div class="results" style="overflow-x:auto;">
-                <table class="table">
-                    <table class="table">
-                        <thead>
-                            <tr class="table">
-                                <th scope="col">NOME</th>
-                                <th scope="col">EQUIPE ATIVA</th>
-                                <th scope="col">CATEGORIA</th>
-                                <th scope="col">SERVIDORES</th>
-                            </tr>
-                        </thead>
 
-<!-- cód comentado na parte de baixo -->
-                </table>
-    
-                <div class="pagination justify-content-center">
-                    <span class="step-links">
-                {% if page_obj.has_previous %}
-                    <a href="?page=1">&laquo;</a>          
-                    <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                {% endif %}
-    
-                <span class="current">
-                    Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                </span> {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
-                    </span>
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                            <div>
+                                <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                            </div>
+                        <hr>
+
+                        <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
+                            <div class="container px-1" id="conteudo">
+                                <div class="row gx-2">
+                                    <div class="col">
+                                        <div class="p-3 bg-white text-center" id="titulo-atividade">
+                                            <h4>Equipe - Lista</h4>
+                                        </div>
+                                            {% block object-tools %}
+                                            <ul class="object-tools">
+                                                {% block object-tools-items %}
+                                                <li>
+                                                    <a href="{% url 'namp:equipe_criar' %}" class="addlink">
+                                            {% blocktrans with cl.opts.verbose_name as name %}Adicionar Equipe {{ name }}{% endblocktrans %}
+                                            </a>
+                                                </li>
+                                                {% endblock %}
+                                            </ul>
+                                            {% endblock %}
+                                            <div id="toolbar">
+                                                <form method="POST" action="{% url 'namp:equipe_list' %}">{% csrf_token %}
+                                                    <div>
+                                                        {{ form.nome }}
+                                                        <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
+                                                        <a href="{% url 'namp:equipe_list' %}">ver todos</a>
+                                                    </div>
+                                                </form>
+                                            </div><br>
+
+                                            <div class="card-body table-border-style">
+                                                <div class="table-responsive">
+                                                    <table class="table table-striped">
+                                                        <thead>
+                                                            <tr>
+                                                                <th scope="col">MÊS DE REFERÊNCIA</th>
+                                                                <th scope="col">EQUIPE ATIVA</th>
+                                                                <th scope="col">CATEGORIA</th>
+                                                                <th scope="col">SERVIDORES</th>
+                                                            </tr>
+                                                        </thead>
+
+                                                <!-- cód comentado na parte de baixo -->
+                                                </table>
+                                    
+                                                <div class="pagination justify-content-center">
+                                                        <span class="step-links">
+                                                    {% if page_obj.has_previous %}
+                                                        <a href="?page=1">&laquo;</a>          
+                                                        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                                    {% endif %}
+                                        
+                                                    <span class="current">
+                                                        Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                                                    </span> {% if page_obj.has_next %}
+                                                        <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                                                        <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
+                                                        </span>
+                                                </div>
+                                    
+                                            </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    <hr>
                 </div>
-    
             </div>
         </div>
     </div>
- </div>
-{% endblock %}
-
+</div>    
+{% endblock %}            
                 <!--
                     <tbody>
                         {% for equipe in equipes %}
@@ -77,4 +96,6 @@
                             <td> {{equipe.get_servidores | default:0 }} </td>
                         </tr>
                         {% endfor %}
-                    </tbody>--> 
+                    </tbody>               
+                
+                --> 

@@ -23,7 +23,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 @login_required(login_url='/autenticacao/login/')
 def home(request,template_name='home.html'):
-
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:

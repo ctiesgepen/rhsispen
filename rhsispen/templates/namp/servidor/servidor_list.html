@@ -2,72 +2,93 @@
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
-        <div class="content">
-            <div>
-                <h5 class="text-center">{{ setor }}</h5>
-                <h4 class="text-center"> Selecione um Servidor para modificar </h4>
-            </div>
-            <!--<h4>Selecione Servidor para modificar</h4>-->
-            <div id="toolbar">
-                <form method="POST" action="{% url 'namp:servidor_list' %}">{% csrf_token %}
-                    <div>
-                        {{ form.nome }}
-                        <input type="submit" value="{% translate 'Pesquisar' %}" style="padding: 4px 8px;">
-                        <a href="{% url 'namp:servidor_list' %}">ver todos</a>
-                    </div>
-                </form>
-            </div><br>
-            <div class="results" style="overflow-x:auto;">
-                <table class=table>
-                    <thead>
-                        <tr>
-                            <th scope="col">NOME</th>
-                            <th scope="col">MATRICULA</th>
-                            <th scope="col">VINCULO</th>
-                            <th scope="col">CPF</th>
-                            <th scope="col">DATA NASCIMENTO</th>
-                            <th scope="col">SEXO</th>
-                            <th scope="col">CARGO</th>
-                            <th scope="col">CURSO DE FORMAÇÃO</th>
-                            <th scope="col">TIPO DE VÍNCULO</th>
-                            <th scope="col">REGIME JURÍDICO</th>
-                            <th scope="col">EQUIPE</th>
-                        </tr>
-                    </thead>
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                            <div>
+                                <h5 class="text-center">{{ user.servidor.fk_setor }}</h5>
+                            </div>
 
-                    <tbody>
-                        {% for servidor in page_obj %} 
-                        <tr class="{% cycle 'row1' 'row2' %}">
-                            <td>
-                                <a href="{% url 'namp:servidor_att' servidor.id_matricula %}">{{ servidor.nome }}</a></td>
-                            <td> {{ servidor.id_matricula }} </td>
-                            <td> {{ servidor.vinculo }} </td>
-                            <td> {{ servidor.cpf }} </td>
-                            <td> {{ servidor.dt_nasc }} </td>
-                            <td> {{ servidor.sexo }} </td>
-                            <td> {{ servidor.cargo }} </td>
-                            <td> {{ servidor.cf }} </td>
-                            <td> {{ servidor.tipo_vinculo }} </td>
-                            <td> {{ servidor.regime_juridico }} </td>
-                            <td> {{ servidor.fk_equipe }} </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
+                        <hr>
+                        <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
+                            <div class="container px-1" id="conteudo">
+                                <div class="row gx-2">
+                                    <div class="col">
+                                        <div class="p-3 bg-white text-center" id="titulo-atividade">
+                                            <h4>Servidores - Lista</h4>
+                                        </div>
 
-                <div class="pagination justify-content-center">
-                    <span class="step-links">
-                        {% if page_obj.has_previous %}
-                            <a href="?page=1">&laquo;</a>          
-                            <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                        {% endif %}
+                                        <!--<h4>Selecione Servidor para modificar</h4>-->
+                                            <div id="toolbar">
+                                                <form method="POST" action="{% url 'namp:servidor_list' %}">{% csrf_token %}
+                                                    <div>
+                                                        {{ form.nome }}
+                                                        <input type="submit" value="{% translate 'Pesquisar' %}" style="padding: 4px 8px;">
+                                                        <a href="{% url 'namp:servidor_list' %}">ver todos</a>
+                                                    </div>
+                                                </form>
+                                            </div><br>
+                                            <div class="results" style="overflow-x:auto;">
+                                                <table class=table>
+                                                    <thead>
+                                                        <tr>
+                                                            <th scope="col">NOME</th>
+                                                            <th scope="col">MATRICULA</th>
+                                                            <th scope="col">VINCULO</th>
+                                                            <th scope="col">CPF</th>
+                                                            <th scope="col">DATA NASCIMENTO</th>
+                                                            <th scope="col">SEXO</th>
+                                                            <th scope="col">CARGO</th>
+                                                            <th scope="col">CURSO DE FORMAÇÃO</th>
+                                                            <th scope="col">TIPO DE VÍNCULO</th>
+                                                            <th scope="col">REGIME JURÍDICO</th>
+                                                            <th scope="col">EQUIPE</th>
+                                                        </tr>
+                                                    </thead>
 
-                        <span class="current">
-                            Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                        </span> {% if page_obj.has_next %}
-                    <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                    <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
-                    </span>
+                                                    <tbody>
+                                                        {% for servidor in page_obj %} 
+                                                        <tr class="{% cycle 'row1' 'row2' %}">
+                                                            <td><a href="{% url 'namp:servidor_att' servidor.id_matricula %}">{{ servidor.nome }}</a></td>
+                                                            <td> {{ servidor.id_matricula }} </td>
+                                                            <td> {{ servidor.vinculo }} </td>
+                                                            <td> {{ servidor.cpf }} </td>
+                                                            <td> {{ servidor.dt_nasc }} </td>
+                                                            <td> {{ servidor.sexo }} </td>
+                                                            <td> {{ servidor.cargo }} </td>
+                                                            <td> {{ servidor.cf }} </td>
+                                                            <td> {{ servidor.tipo_vinculo }} </td>
+                                                            <td> {{ servidor.regime_juridico }} </td>
+                                                            <td> {{ servidor.fk_equipe }} </td>
+                                                        </tr>
+                                                        {% endfor %}
+                                                    </tbody>
+                                                </table>
+
+                                                <div class="pagination justify-content-center">
+                                                    <span class="step-links">
+                                                        {% if page_obj.has_previous %}
+                                                            <a href="?page=1">&laquo;</a>          
+                                                            <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                                                        {% endif %}
+
+                                                        <span class="current">
+                                                            Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                                                        </span> {% if page_obj.has_next %}
+                                                    <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                                                    <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>    
+                    
+                    <hr>
                 </div>
             </div>
         </div>
@@ -75,4 +96,4 @@
 </div>
 {% endblock %}
 
-<!---->
+

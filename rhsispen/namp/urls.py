@@ -24,6 +24,7 @@ urlpatterns = [
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
 	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
+	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
 	path('operador_afastamentos/', views.operador_afastamentos, name='operador_afastamentos'), #falta fazer	
 
