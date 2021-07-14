@@ -1,89 +1,121 @@
 {% extends 'base.html' %} {% load i18n static %} {% load static %} {% block extrahead %}{{ block.super }}
+
+{% load namp_extras %}
+
 <scrip src="{% url 'admin:jsi18n' %}">
     </script>
     <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
     <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
-    {% endblock %}
-    
-    {% block extrastyle %}{{ block.super }}
+    {% endblock %} {% block extrastyle %}{{ block.super }}
     <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
-    {% endblock %} {% block breadcrumbs %}
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous"> {% endblock %} {% block breadcrumbs %}
     <div class="breadcrumbs">
         <a href="{% url 'namp:home' %}">
     {% translate 'Home' %}
 </a> &rsaquo; {% translate 'Jornadas' %}
-</div>
-{% endblock %}
-
-{% block content %}
-<div class="content">
-    <div>
-        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
     </div>
+    {% endblock %} {% block content %}
+    <div class="content">
+        <div>
+            <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+        </div>
 
-  <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
-      <div class="container px-1" id="conteudo">
-          <div class="row gx-2">
-            <div class="col">
-              <div class="p-3 bg-white text-center" id="titulo-atividade">
-                  <h4>Escala Regular - Lista</h4>
-              </div>
-             <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
-                  <div class="col-md-9 ms-md-auto text-center">
-                      <div class="dropdown">
-                          Crie e envie a escala do mês "Tal" em:
-                      </div>
-                  </div>
-                  {% if mensagens.mensagem_escalas %}
-                  <div class="col-md-3 ms-md-auto text-center">
-                      <button type="button" class="btn btn-secondary" id="botao-gerar-escala"><a href="{% url 'namp:jornadas_operador' %}" style="color: white; text-decoration-line: none;">Gerar Escala Regular</a></button>
-                  </div>
-                  {% endif %}
-              </div>
-             
-              {% if mensagens.mensagem_escalas %}
-              <div class="row gx-2 p-1 bg-light" id="div-alerta-prazo-escala">
-                  <div class="col text-center">
-                      <div class="alert alert-warning" role="alert" id="alert-prazo">
-                        {{ mensagens.mensagem_escalas }}
-                      </div>
-                  </div>
-              </div>
-              {% endif %}
 
-              <div class="row gx-2 p-1 bg-light" id="div-tabela-escala">
-                  <table class="table" id="table-escala">
-                      <thead>
-                        <tr class="table-dark">
-                          <th scope="col">MÊS DE REFERÊNCIA</th>
-                          <th scope="col">QTDE EQUIPES</th>
-                          <th scope="col">QTDE SERVIDORES</th>
-                          <th scope="col">SERVIDORES EM EXPEDIENTE</th>
-                          <th scope="col">SERVIDORES EM PLANTÃO</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        <tr class="table-secondary">
-                          <td>04/2021</td>
-                          <td>9</td>
-                          <td>61</td>
-                          <td>16</td>
-                          <td>45</td>
-                        </tr>
-                        <tr class="table-secondary">
-                          <td>03/2021</td>
-                          <td>8</td>
-                          <td>54</td>
-                          <td>9</td>
-                          <td>45</td>
-                        </tr>
-                      </tbody>
-                    </table>
-              </div>
-             </div>
-          </div>
-      </div>
-  </div>
-</div>
-  {% endblock %}
+        <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
+            <div class="container px-1" id="conteudo">
+                <div class="row gx-2">
+                    <div class="col">
+                        <div class="p-3 bg-white text-center" id="titulo-atividade">
+                            <h4>Escala Regular - Lista</h4>
+                        </div>
+
+                        <div id="toolbar">
+                            <form method="POST" action="{% url 'namp:escalas_operador_list' %}">{% csrf_token %}
+                                <div>
+                                    {{ form.data }}
+                                    <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
+                                </div>
+                            </form>
+                        </div><br>
+
+                        <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
+                            {% if mensagens.mensagem_escalas %}
+                            <div class="col-md-9 ms-md-auto text-center">
+                                <div class="dropdown">
+                                    CRIE ESCALAS DO MÊS ( SUB-SEQUENTE ) NO BOTÃO AO LADO:
+                                </div>
+                            </div>
+                            <div class="col-md-3 ms-md-auto text-center">
+                                <button type="button" class="btn btn-secondary" id="botao-gerar-escala"><a href="{% url 'namp:jornadas_operador' %}" style="color: white; text-decoration-line: none;">Gerar Escala Regular</a></button>
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        {% if mensagens.mensagem_escalas %}
+                        <div class="row gx-2 p-1 bg-light" id="div-alerta-prazo-escala">
+                            <div class="col text-center">
+                                <div class="alert alert-warning" role="alert" id="alert-prazo">
+                                    {{ mensagens.mensagem_escalas }}
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+
+                        <div class="results" style="overflow-x:auto;">
+                            <table class=table>
+                                <thead>
+                                    <tr>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">MÊS DE REFERÊNCIA</a>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">QTD EQUIPES</a>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">QTD SERVIDORES</a>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">SERVIDORES EM EXPEDIENTE</a>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">SERVIDORES EM PLANTÃO</a>
+                                            </div>
+                                        </th>
+                                        <th>
+                                            <div class="text">
+                                                <a scope="col">AÇÕES</a>
+                                            </div>
+                                        </th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    {% for escalafrequencia in page_obj %}
+                                    <tr class="{% cycle 'row1' 'row2' %}">
+                                        <td> {{ escalafrequencia.data|add_month|date:"F Y"}} </td>
+                                        <td> {{ escalafrequencia.qtd_equipes|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_servidores|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_expediente|length }} </td>
+                                        <td> {{ escalafrequencia.qtd_plantonista|length }} </td>
+                                        <td> EDITAR - BAIXAR</td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

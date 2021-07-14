@@ -1,0 +1,134 @@
+{% extends 'base.html' %} {% load i18n static %} {% load static %}
+{% block extrahead %}
+{{ block.super }}
+<scrip src="{% url 'admin:jsi18n' %}">
+    </script>
+    <script src="http://code.jquery.com/jquery-1.9.1.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.0/jquery-ui.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+{% endblock %}
+
+{% block extrastyle %}
+{{ block.super }}
+    <link rel="stylesheet" type="text/css" href="{% static 'admin/css/forms.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous"> 
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+{% endblock %}
+    
+
+{% block breadcrumbs %}
+    <div class="breadcrumbs">
+        <a href="{% url 'namp:home' %}">
+    {% translate 'Home' %}
+</a> &rsaquo; {% translate 'Frequência' %}
+</div>
+{% endblock %}
+
+{% block content %}
+<title>Prazos de Execução - Lista</title>
+  <body>
+    <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
+        <div class="container px-1" id="conteudo">
+            <div class="row gx-2">
+              <div class="col">
+                <div class="p-3 bg-white text-center" id="titulo-atividade">
+                    <h5>Prazos de Execução - Lista</h5>
+                </div>
+               <div class="row gx-2 p-3 bg-light" id="div-vazia">
+                    <div class="col-md-9 ms-md-auto text-center">
+                        
+                    </div>
+                    <div class="col-md-3 ms-md-auto text-center">
+                        <button type="button" class="btn btn-secondary" id="botao-criar-prazo">Criar Prazo de Execução</button>
+                    </div>
+                </div>
+                <div class="row gx-2 p-1 bg-light" id="div-tabela-prazos">
+                    <table class="table" id="table-prazos">
+                        <thead>
+                          <th>
+                            <div class="text">
+                                <a scope="col">MÊS DE REFERÊNCIA</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">ATIVIDADE</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">DATA INÍCIO</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">DATA FINAL</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">STATUS</a>
+                            </div>
+                          </th>
+                          <th>
+                            <div class="text">
+                                <a scope="col">AÇÕES</a>
+                            </div>
+                          </th>
+                        </thead>
+
+
+                        <tbody>
+                          {% for escalafrequencia in page_obj %}
+                          <tr class="{% cycle 'row1' 'row2' %}">
+                              <td> {{ escalafrequencia.data }} </td>
+                              <td> {{ escalafrequencia.descricao }} </td>
+                              <td> {{ escalafrequencia.dt_inicio }} </td>
+                              <td> {{ escalafrequencia.dt_final }} </td>
+                              <td> {{ escalafrequencia.status }} </td>
+                              <td> {{ escalafrequencia.acoes }} </td>
+                              <td><button type="button" id="botao-editar-prazo" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#modal-editar-prazo">
+                                Editar
+                                </button></td>
+                          </tr>
+                          {% endfor %}
+                      </table>
+                </div>
+               </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Editar Prazo-->
+    <div class="modal fade" id="modal-editar-prazo" tabindex="-1" aria-labelledby="editar-prazo-Label" aria-hidden="true">
+      <div class="modal-dialog modal-sm">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="criar-editar-prazo-Label">Editar Prazo de Execução</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cancelar"></button>
+          </div>
+          <div class="modal-body">
+				<form id="form-editar-prazo">
+				  <div class="mb-3">
+					<label for="text-editar-prazo-inicio" class="form-label">Início</label>
+					<input type="date" class="form-control" id="text-editar-prazo-inicio">
+				  </div>
+				  <div class="mb-3">
+					<label for="text-editar-prazo-fim" class="form-label">Fim</label>
+					<input type="date" class="form-control" id="text-editar-prazo-fim">
+				  </div>
+						<label for="select-editar-prazo-tipo" class="form-label">Tipo de Prazo</label>
+						<select class="form-select" multiple aria-label="multiple select example" id="select-editar-prazo-tipo">
+							<option value="1">Escala Regular</option>
+							<option value="2">Frequência</option>
+						</select>
+				</form>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+            <button type="submit" class="btn btn-primary">Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>  
+{% endblock %}

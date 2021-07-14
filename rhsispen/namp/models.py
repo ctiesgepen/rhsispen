@@ -298,15 +298,7 @@ class Jornada(models.Model):
 		verbose_name_plural = "Jornadas"
 		unique_together = ('fk_servidor','data_jornada',)
 
-<<<<<<< HEAD
-class Periodo(models.Model):
-	id_periodo_acao = models.AutoField(primary_key=True)
-	data_inicial = models.DateField()
-	data_final = models.DateField()
-	descricao = models.CharField(max_length=25)
 
-class Acao
-=======
 class PeriodoAcao(models.Model):
 	id_periodo_acao = models.AutoField(primary_key=True)
 	data_inicial = models.DateTimeField()
@@ -329,6 +321,73 @@ class EscalaFrequencia(models.Model):
 	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Operador')
 	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
 
+	'''
+	Atenção: esse método leva em consideração as jornadas registradas. Isso quer
+	dizer que a numérica que deve ser levada em consideração é a de servidores
+	que trabalharam de fato no período e a de equipes que tiveram escalas.
+	'''
+	def qtd_servidores(self):
+		dt_inicio = Date(day=1, month=self.data.month+1, year=self.data.year)
+		dt_fim = dt_inicio + TimeDelta(days=30)
+		jornadas = list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__range=[dt_inicio,dt_fim]))
+		lista = []
+		for jornada in jornadas:
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
+		return lista
 
+	def qtd_equipes(self):
+		lista = []
+		for jornada in self.qtd_servidores():
+			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
+		return lista
 
->>>>>>> 2d015c00c4d7a1bd0a7bb3b580f141c5fd2074a3
+	def qtd_expediente(self):
+		lista = []
+		for jornada in self.qtd_servidores():
+			if jornada.fk_equipe.categoria == 'Expediente': lista.append(jornada)
+		return lista
+
+	def qtd_plantonista(self):
+		lista = []
+		for jornada in self.qtd_servidores():
+			if jornada.fk_equipe.categoria == 'Plantão': lista.append(jornada)
+		return lista
+
+	def qtd_servidores_frequencia(self):
+		dt_inicio = Date(day=1, month=self.data.month-1, year=self.data.year)
+		dt_fim = dt_inicio + TimeDelta(days=30)
+		jornadas = list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__range=[dt_inicio,dt_fim]))
+		lista = []
+		for jornada in jornadas:
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
+		return lista
+	
+	def qtd_equipes_frequencia(self):
+		lista = []
+		for jornada in self.qtd_servidores_frequencia():
+			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
+		return lista
+
+	def qtd_expediente_frequencia(self):
+		lista = []
+		for jornada in self.qtd_servidores_frequencia():
+			if jornada.fk_equipe.categoria == 'Expediente': lista.append(jornada)
+		return lista
+
+	def qtd_plantonista_frequencia(self):
+		lista = []
+		for jornada in self.qtd_servidores_frequencia():
+			if jornada.fk_equipe.categoria == 'Plantão': lista.append(jornada)
+		return lista
+
+	def qtd_afastamento_frequencia(self):
+		dt_inicio = Date(day=1, month=self.data.month-1, year=self.data.year)
+		dt_fim = dt_inicio + TimeDelta(days=30)
+		jornadas = list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__range=[dt_inicio,dt_fim]))
+		lista = []
+		for jornada in jornadas:
+			if jornada.assiduidade == None and jornada.fk_afastamento != None and jornada.fk_servidor not in lista: lista.append(jornada)
+		return lista

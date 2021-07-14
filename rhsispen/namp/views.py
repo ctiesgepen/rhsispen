@@ -17,11 +17,7 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import re
 
-
 from django.core.paginator import Paginator
-
-from django.core.paginator import Paginator
-
 
 from django.contrib.admin.views.decorators import staff_member_required
 
@@ -147,7 +143,7 @@ def equipe_operador_change_list(request, template_name='namp/equipe/equipe_opera
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_change_form(request, template_name='namp/equipe/equipe_operador_change_form.html'):
+def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 	form = EquipeForm()
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
@@ -321,7 +317,66 @@ def servidor_operador_change_form(request,id_matricula):
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def frequencias_operador_list(request,template_name='namp/frequencia/frequencias_operador_list.html'):
-	print('Acesso view de frequencias_operador!')
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		frequencias = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=2)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
+	page = request.GET.get('page')
+	paginator = Paginator(list(frequencias), 15)
+	page_obj = paginator.get_page(page)
+
+	mensagens = {}
+				
+	#Verificando se tem período para consolidar escalas
+	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+
+	if periodo_frequencia:
+		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+		if not frequencia_gerada:
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
+
+	form = EscalaFrequenciaForm()
+	if request.method =='POST':
+		form = EscalaFrequenciaForm(request.POST)
+		if form.is_valid():
+
+			frequencias_operador_change(servidor, servidor.fk_setor, periodo_frequencia)
+			frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+			if frequencia_gerada:
+				mensagens = []
+
+			contexto = { 
+				'servidor': servidor,
+				'mensagens': mensagens,
+				'page_obj': page_obj,
+				'form': form,
+			}
+			messages.success(request, 'Frequências consolidadas com sucesso!')
+			return HttpResponseRedirect('/frequencias_operador_list')
+	else:
+		contexto = { 
+			'servidor': servidor,
+			'mensagens': mensagens,
+			'page_obj': page_obj,
+			'form': form,
+		}
+		return render(request, template_name, contexto)
+
+def frequencias_operador_change(servidor, setor, periodo_frequencia):
+	frequencia = EscalaFrequencia()
+	frequencia.fk_periodo_acao = periodo_frequencia
+	frequencia.data = DateTime.today()
+	frequencia.fk_servidor = servidor
+	frequencia.fk_setor = setor
+	frequencia.save()
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def frequencias_admin_list(request,template_name='namp/frequencia/frequencias_admin_list.html'):
+	print('Acesso view de frequencias_admin!')
 	return render(request,template_name, {})
 
 @login_required(login_url='/autenticacao/login/')
@@ -444,33 +499,40 @@ def afastamento_att_form(request, id_hist_afastamento):
 def escalas_operador_list(request,template_name='namp/escala/escalas_operador_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
+		escalas = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=1)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	mensagens = {}
+	#form = EscalaFrequenciaSearchForm(request.POST or None)
 	
+	page = request.GET.get('page')
+	paginator = Paginator(list(escalas), 15)
+	page_obj = paginator.get_page(page)
+
+	mensagens = {}
+				
 	#Verificando se tem período para consolidar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
-	
+
 	if periodo_escala:
 		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
 		if not escalas_geradas:
 			mensagens['mensagem_escalas'] = 'O período para consolidar as escalas do mês de ' + periodo_escala.data_inicial.strftime('%B') + ' encontra-se em aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M')
-			#mensagens.append(mensagem_escalas)
 	if periodo_frequencia:
 		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
 		if not frequencia_gerada:
 			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
-			#mensagens.append(mensagem_frequencia)
-
-	contexto = {
-		'mensagens':mensagens,
+			
+	contexto = { 
 		'servidor': servidor,
-	}	
+		'mensagens': mensagens,
+		'page_obj': page_obj,
+	}
 
-	return render(request,template_name, contexto)
+	return render(request, template_name, contexto)
+	
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -617,6 +679,13 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					Servidor.objects.filter(fk_equipe=equipe),
 					inicioDoMes,#A data inicial é a mesma para todas equipes de expediente
 					fimDoMes)
+			
+			escala = EscalaFrequencia()
+			escala.fk_periodo_acao = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+			escala.data = DateTime.today()
+			escala.fk_servidor = Servidor.objects.get(fk_user=request.user.id)
+			escala.fk_setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+			escala.save()
 
 			messages.success(request, 'As escalas das equipes desta unidade foram atualizadas com suceso!')
 			return redirect('/')
