@@ -437,28 +437,57 @@ def frequencias_operador_change(servidor, setor, periodo_frequencia):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def operador_afastamentos(request):
-	return render(request, 'operador_afastamentos.html')
+def operador_afastamentos(request,template_name='namp/afastamento/operador_afastamentos.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
+	else:
+		servidores = list(Servidor.objects.filter(fk_setor=servidor.fk_setor).values_list('id_matricula', 'nome'))
+		form = AfastamentoForm({"servidores":servidores})
+	
+	if request.method == 'POST':
+		form = AfastamentoForm(request.POST, {"servidores":servidores})
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Afastamento cadastrado com sucesso!')	
+			return HttpResponseRedirect('/')
+		else:
+			contexto['form'] = form
+			return render(request, template_name, contexto)
+	else:
+		contexto = { 
+			'servidor': servidor,
+			'form': form
+		}
+		return render(request, template_name, contexto)
 
 #SERVIDOR
-@login_required(login_url='/autenticacao/login/')
 def servidor_att(request, id_matricula):
+	print('ENTREI NA FUNÇÃO')
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
+		print(user, 'USER')
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
+		print(servidor, 'SERVIDOR')
 		#enderecoServ = EnderecoServ.objects.get(fk_servidor=id_matricula)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	form = ServidorForm(instance=servidor)
 
+	print('ANTES DO REQUEST')
 	if request.method == 'POST':
 		form = ServidorForm(request.POST, instance=servidor)
+		print('DEPOIS DO REQUEST')
 		if form.is_valid():
+			print('FORMULÁRIO VÁLIDO')
 			form.save()
 			messages.success(request, 'Servidor editado com suceso!')
 			return HttpResponseRedirect('/')
 		else:
+			print('FORM INVÁLIDO')
 			contexto = {
 				'user': user,
 				'servidor': servidor,
@@ -468,6 +497,7 @@ def servidor_att(request, id_matricula):
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, 'namp/servidor/servidor_att.html',contexto)
 	else:
+		print('REQUEST INVÁLIDO')
 		contexto = {
 			'form': form,
 			'user':user,
@@ -716,7 +746,7 @@ def afastamento_change_list(request, template_name='namp/afastamento/afastamento
 				messages.warning(request, 'Sem afastamentos para o servidor informado!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
-
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def afastamento_change_form(request,template_name='namp/afastamento/afastamento_change_form.html'):
@@ -743,7 +773,7 @@ def afastamento_change_form(request,template_name='namp/afastamento/afastamento_
 			'form': form
 		}
 		return render(request, template_name, contexto)
-
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def afastamento_att_form(request, id_hist_afastamento):
