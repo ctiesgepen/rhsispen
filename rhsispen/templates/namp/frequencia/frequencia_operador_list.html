@@ -1,0 +1,80 @@
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load namp_extras %}
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="content">
+            <div>
+                <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+            </div>
+    
+            <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
+                <div class="container px-1" id="conteudo">
+                    <div class="row gx-2">
+                        <div class="col">
+                            <div class="p-3 bg-white text-center" id="titulo-atividade">
+                                <h4>FREQUÊNCIAS - Lista</h4>
+                            </div>
+                            <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
+                                {% if mensagens.mensagem_frequencia %}
+                                <form action="{% url 'namp:frequencias_operador_list' %}" method="post">{% csrf_token %}
+                                    <div class="col-md-9 ms-md-auto text-center">
+                                        <div class="dropdown">
+                                            ENVIE A FREQUÊNCIA DO MÊS NO BOTÃO AO LADO:<br>
+                                            ATENÇÃO: AO APERTAR O BOTÃO DE 'GERAR FREQUÊNCIA' O SISTEMA JÁ ESTÁ LEVANDO EM CONSIDERAÇÃO, <br>
+                                            OS AFASTAMENTOS CADASTRADOS NAQUELE MÊS.
+                                        </div>                               
+                                        <div class="submit-row col-md-3 ms-md-auto text-center">
+                                            <input type="submit" class="default" name="_save" value="{% translate 'Consolidar Frequência' %}">
+                                        </div>
+                                    </div>
+                                </form>
+                                {% endif %}
+                            </div>
+    
+                            {% if mensagens.mensagem_frequencia %}
+                            <div class="row gx-2 p-1 bg-light" id="div-alerta-prazo-frequencia">
+                                <div class="col text-center">
+                                    <div class="alert alert-danger" role="alert" id="alert-prazo">
+                                        {{ mensagens.mensagem_frequencia }}
+                                    </div>
+                                </div>
+                            </div>
+                            {% endif %}
+    
+                            <div class="results" style="overflow-x:auto;">
+                                <table class=table>
+                                    <thead>
+                                        <tr>
+                                            <th><a scope="col">MÊS DE REFERÊNCIA</a></th>
+                                            <th><a scope="col">QTD EQUIPES</a></th>
+                                            <th><a scope="col">QTD SERVIDORES</a></th>
+                                            <th><a scope="col">SERVIDORES EM EXPEDIENTE</a></th>
+                                            <th><a scope="col">SERVIDORES EM PLANTÃO</a></th>
+                                            <th><a scope="col">QTD DE AFASTAMENTOS</a></th>
+                                            <th><a scope="col">AÇÕES</a></th>
+                                        </tr>
+                                    </thead>
+    
+                                    <tbody>
+                                        {% for escalafrequencia in page_obj %}
+                                        <tr class="{% cycle 'row1' 'row2' %}">
+                                            <td> {{ escalafrequencia.data|less_month|date:"F Y" }} </td>
+                                            <td> {{ escalafrequencia.qtd_equipes_frequencia|length }} </td>
+                                            <td> {{ escalafrequencia.qtd_servidores_frequencia|length }} </td>
+                                            <td> {{ escalafrequencia.qtd_expediente_frequencia|length }} </td>
+                                            <td> {{ escalafrequencia.qtd_plantonista_frequencia|length }} </td>
+                                            <td> {{ escalafrequencia.qtd_afastamento_frequencia|length }} </td>
+                                            <td> EDITAR - BAIXAR</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

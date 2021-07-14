@@ -4,6 +4,8 @@ Template Name: Gradient able Bootstrap Admin Template
 Author: Phoenixcoded
 Support: support@phoenixcoded.net
 File: style.css
+
+NOME DO CSS PARA MEXER NA PÁG INICIAL .pcoded-header.header-blue 
 =========================================================================
 =================================================================================== */
 /* devanagari */
@@ -10990,7 +10992,7 @@ a.text-dark:hover, a.text-dark:focus {
   h3 {
         page-break-after: avoid;
     }
-  @    page {
+  @page {
         size: a3;
     }
 
@@ -22675,7 +22677,8 @@ pre[class*=language-]:before {
 
 .pcoded-header.header-blue {
     background: -webkit-gradient(linear, left top, right top, from(#4099ff), to(#73b4ff));
-    background: linear-gradient(to right, #4099ff, #73b4ff);
+    /*background: linear-gradient(to right, #4099ff, #73b4ff);*/
+    background: linear-gradient(to right, #000000, #00009C);
     color: rgba(255, 255, 255, 0.8);
 }
 

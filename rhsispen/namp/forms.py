@@ -52,7 +52,7 @@ class ServidorFormAdmin(forms.ModelForm):
         self.fields['dt_nasc'].widget.attrs={"placeholder":"00/00/0000"}
         self.fields['dt_nasc'].widget.attrs['class'] = 'mask-dt'
        # if self.objects.filter(Servidor.tipo_contato == 'Celular')
-        self.fields['contato'].widget.attrs={"placeholder": "(00)90000-0000"}
+        self.fields['contato'].widget.attrs={"placeholder":"(00) 90000-0000"}
         self.fields['contato'].widget.attrs['class'] = 'mask-contato'
         #    else:
          #   self.fields['contato'].widget.attrs={"placeholder": "(00) 0000-0000"}
@@ -157,6 +157,7 @@ class ServidorForm(forms.ModelForm):
         for field in self.fields:
             if field =='fk_equipe': continue
             self.fields[field].widget.attrs['readonly'] = True
+        self.fields[''].disabled = True
             #self.fields[choices].widget.attrs['readonly'] = True
             #Falta setar o choices 
 

@@ -10,3 +10,4 @@ def add_month(value):
 @register.filter(name='less_month')
 def less_month(value):
     return value + TimeDelta(days=-30)
+

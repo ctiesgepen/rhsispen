@@ -19,22 +19,22 @@
 					<li class="nav-item pcoded-hasmenu">
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Relatórios</span></a>
 						<ul class="pcoded-submenu">
-							<li><a href="/bc_alert.html">Afastamentos</a></li>
-							<li><a href="/bc_alert.html">Movimentação de Servidores</a></li>
-							<li><a href="/bc_alert.html">Unidades</a></li>
-							<li><a href="/bc_alert.html">Históricos</a></li>
-							<li><a href="/bc_alert.html">Add Noturno</a></li>
+							<li><a href="{% url 'namp:admin_afastamento'%}">Afastamentos</a></li>
+							<li><a href="{% url 'namp:admin_servidor'%}">Movimentação de Servidores</a></li>
+							<li><a href="{% url 'namp:admin_unidades'%}">Unidades</a></li>
+							<li><a href="{% url 'namp:admin_historico'%}">Históricos</a></li>
+							<li><a href="{% url 'namp:admin_add_noturno'%}">Add Noturno</a></li>
 						</ul>
 					</li>
 
 					<li class="nav-item">
-					    <a href="/form_elements.html" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Unidades</span></a>
+					    <a href="{% url 'namp:admin_unidades'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Unidades</span></a>
 					</li>
 					<li class="nav-item">
-					    <a href="/form_elements.html" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Servidores</span></a>
+					    <a href="{% url 'namp:admin_servidores'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Servidores</span></a>
 					</li>
 					<li class="nav-item">
-					    <a href="/form_elements.html" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Escalas/Frequencias</span></a>
+					    <a href="{% url 'namp:admin_escalas_frequencias'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Escalas/Frequencias</span></a>
 					</li>
 							<!-- <li><a href="/bc_alert.html">Alert</a></li>
 							<li><a href="/bc_button.html">Button</a></li>
@@ -59,26 +59,26 @@
 					<li class="nav-item pcoded-hasmenu">
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Minha Unidade</span></a>
 						<ul class="pcoded-submenu">
-							<li><a href="{% url 'namp:equipe_criar' %}">Adicionar Equipe</a></li>
-							<li><a href={% url "namp:equipe_operador_change_list" %}>Listar Equipe</a></li>
+							<li><a href="{% url 'namp:equipe_criar'%}">Criar Equipe</a></li>
+							<li><a href="{% url 'namp:equipe_list' %}">Listar Equipe</a></li>
 						</ul>
 					</li>
 					<li class="nav-item pcoded-hasmenu">
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Servidores</span></a>
 						<ul class="pcoded-submenu">
-							<li><a href="/bc_alert.html">Mov. de Servidores</a></li>
-							<li><a href="/bc_alert.html">Listar Servidores</a></li>
+							<li><a href="{% url 'namp:servidor_mov'%}">Mov. de Servidores</a></li>
+							<li><a href="{% url 'namp:servidor_list'%}">Listar Servidores</a></li>
 						</ul>
 					</li>
 					<li class="nav-item pcoded-hasmenu">
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Períodos</span></a>
 						<ul class="pcoded-submenu">
-							<li><a href="/bc_alert.html">Definir Escala</a></li>
-							<li><a href="/bc_alert.html">Definir Frequência</a></li>
+							<li><a href="{% url 'namp:escala_operador_list'%}">Definir Escala</a></li>
+							<li><a href="{% url 'namp:frequencia_operador_list'%}">Definir Frequência</a></li>
 						</ul>
 					</li>
 					<li class="nav-item">
-					    <a href="/form_elements.html" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Lançar Afastamentos</span></a>
+					    <a href="{% url 'namp:operador_afastamentos'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Lançar Afastamentos</span></a>
 					</li>
 
 					<li class="nav-item pcoded-menu-caption">
@@ -87,9 +87,9 @@
 					<li class="nav-item pcoded-hasmenu">
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Atualizar</span></a>
 						<ul class="pcoded-submenu">
-							<li><a href="/bc_alert.html">Dados Pessoais</a></li>
-							<li><a href="/bc_alert.html">Ver escala</a></li>
-							<li><a href="/bc_alert.html">Ver Histórico</a></li>
+							<li><a href="#">Dados Pessoais</a></li>
+							<li><a href="{% url 'namp:servidor_escala'%}l">Ver escala</a></li>
+							<li><a href="{% url 'namp:servidor_hist'%}">Ver Histórico</a></li>
 						</ul>
 					</li>
 

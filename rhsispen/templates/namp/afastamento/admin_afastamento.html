@@ -1,0 +1,75 @@
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} 
+    {% block content %}
+    <div class="pcoded-main-container">
+        <div class="pcoded-content">
+            <div class="content">
+                <div>
+                    <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                </div>
+        
+                <h4>Selecione Afastamento para modificar</h4>
+        
+                {% block object-tools %}
+                <ul class="object-tools">
+                    {% block object-tools-items %}
+                    <li>
+                        <a href="{% url 'namp:admin_afastamento' %}" class="addlink">
+                {% blocktrans with cl.opts.verbose_name as name %}Adicionar Afastamento {{ name }}{% endblocktrans %}
+                </a>
+                    </li>
+                    {% endblock %}
+                </ul>
+                {% endblock %}
+                <div id="toolbar">
+                    <form method="POST" action="{% url 'namp:admin_afastamento' %}">{% csrf_token %}
+                        <div>
+                            {{ form.servidor }}
+                            <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
+                            <a href="{% url 'namp:admin_afastamento' %}">ver todos</a>
+                        </div>
+                    </form>
+                </div><br>
+                <div class="results" style="overflow-x:auto;">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th><a scope="col">SERVIDOR</a></th>
+                                <th><a scope="col">DATA INICIAL</a></th>
+                                <th><a scope="col">DATA FINAL</a></th>
+                                <th><a scope="col">AFASTAMENTO</a></th>
+                            </tr>
+                        </thead>
+        
+                        <tbody>
+                            {% for afastamento in page_obj %}
+                            <tr class="{% cycle 'row1' 'row2' %}">
+                                <td> <a href="{% url 'namp:admin_afastamento' afastamento.id_hist_afastamento %}">{{afastamento.fk_servidor}}</a></td>
+        
+                                <td> {{ afastamento.data_inicial }} </td>
+                                <td> {{ afastamento.data_final }} </td>
+                                <td> {{ afastamento.fk_afastamento }} </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+        
+                    <div class="pagination justify-content-center">
+                        <span class="step-links">
+                    {% if page_obj.has_previous %}
+                        <a href="?page=1">&laquo;</a>          
+                        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                    {% endif %}
+        
+                    <span class="current">
+                        Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                    </span> {% if page_obj.has_next %}
+                        <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                        <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
+                        </span>
+                    </div>
+        
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endblock %}

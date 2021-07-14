@@ -1,0 +1,36 @@
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="content">
+            <h5 class="text-center">{{ user.fk_setor }}</h5>
+        </div>
+        
+        <div class="content">
+            <div id="content" class="colM">
+                <br>
+                <h4>Dados do Servidor:</h4>
+        
+                <form action="{% url 'namp:servidor_operador_att_form' servidor.id_matricula %}" method="post">
+                    {% csrf_token %} {% for field in form %}
+                    <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %}
+                     {% if field.name == 'fk_setor' %} hidden {% endif %}
+                     {% if field.name == 'fk_user' %} hidden {% endif %}">
+        
+                        <div>
+                            <label>{{ field.label }}</label> {{ field }}
+                        </div>
+                        <div>
+                            {% if field.errors %} {{ field.errors }} {% endif %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                    <div class="submit-row">
+                        <input type="submit" class="default" name="_save" value="{% translate 'Salvar' %}">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
