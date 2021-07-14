@@ -1,4 +1,4 @@
-{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %}
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
@@ -14,13 +14,12 @@
                                     <div class="row gx-2">
                                         <div class="col">
                                             <div class="p-3 bg-white text-center" id="titulo-atividade">
-                                                <h4>Atualizar Equipe</h4>
+                                                <h4>Atualizar/Editar Equipe</h4>
                                             </div>
                                             <div class="content">
                                                 <div id="content" class="colM">
-                                                    <h4>{% translate 'Editar Equipe' %}</h4>
                                                     <form action="{% url 'namp:equipe_att' equipe.id_equipe %}" method="post">
-                                                        {% csrf_token %}
+                                                        {% csrf_token %} <!--
                                                         {% for field in form %}
                                                             <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %} {% if field.name == 'fk_setor' %} hidden {% endif %}">
                                                                 <div>
@@ -30,8 +29,46 @@
                                                                     {% if field.errors %} {{ field.errors }} {% endif %}
                                                                 </div>
                                                             </div>
-                                                        {% endfor %}
+                                                        {% endfor %}-->
 
+                                                        <h6>Configurações</h6>
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-6">
+                                                                {{form.nome|as_crispy_field }}
+                                                                {{ form.nome.errors }}
+                                                            </div>
+                                                        </div>
+                                                        
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-3">
+                                                                {{form.categoria|as_crispy_field}}
+                                                                {{ form.categoria.errors }}
+                                                            </div>
+                                                            <div class="form-group col-md-6">
+                                                                {{form.fk_tipo_jornada|as_crispy_field}}
+                                                                {{ form.fk_tipo_jornada.errors }}
+                                                            </div>
+                                                        </div>
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-3">
+                                                                {{form.hora_inicial|as_crispy_field}}
+                                                                {{ form.hora_inicial.errors }}
+                                                            </div>
+                                                        </div>
+                            
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-3">
+                                                                {{form.status|as_crispy_field}}
+                                                            </div>
+                                                        </div>
+                                                                
+                                                        <div class="form-row">
+                                                            <div class="form-group col-md-12" disabled="">
+                                                                {{form.fk_setor|as_crispy_field}}
+                                                                {{ form.hora_inicial.errors }}
+                                                            </div>
+                                                        </div>
+                            
                                                         <div class="submit-row">
                                                             <input type="submit" class="default" name="_save" value="{% translate 'Salvar' %}">
                                                             {% if equipe.nome.upper != 'GERAL' %}

@@ -265,6 +265,21 @@ def equipe_att(request, id_equipe):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
+def equipe_delete(request, id_equipe):
+	equipe = get_object_or_404(Equipe, id_equipe=id_equipe)
+	servidores = list(Servidor.objects.filter(fk_equipe=equipe))
+	if servidores:
+		equipeGeral = get_object_or_404(Equipe, nome='GERAL', fk_setor=equipe.fk_setor)
+		if equipeGeral:
+			for servidor in servidores:
+				servidor.fk_equipe = equipeGeral
+				servidor.save()
+	equipe.delete()
+	messages.success(request, "Equipe deletada com sucesso!")
+	return HttpResponseRedirect("/equipe_list")
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request):
 	return render(request, 'servidor_mov.html')
 
@@ -467,9 +482,7 @@ def servidor_escala(request):
 def servidor_hist(request):
 	return render(request, 'servidor_hist.html')
 
-
-
-
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def equipe_operador_change_list(request, template_name='namp/equipe/equipe_operador_change_list.html'):
@@ -519,21 +532,7 @@ def equipe_operador_change_list(request, template_name='namp/equipe/equipe_opera
 				messages.warning(request, 'Equipe com este nome não encontrada!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
-
-@login_required(login_url='/autenticacao/login/')
-@staff_member_required(login_url='/autenticacao/login/')
-def EquipeDeleteView(request, id_equipe):
-	equipe = get_object_or_404(Equipe, id_equipe=id_equipe)
-	servidores = list(Servidor.objects.filter(fk_equipe=equipe))
-	if servidores:
-		equipeGeral = get_object_or_404(Equipe, nome='GERAL', fk_setor=equipe.fk_setor)
-		if equipeGeral:
-			for servidor in servidores:
-				servidor.fk_equipe = equipeGeral
-				servidor.save()
-	equipe.delete()
-	messages.success(request, "Equipe deletada com sucesso!")
-	return HttpResponseRedirect("/equipe_operador_change_list")
+'''
 
 '''@login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')

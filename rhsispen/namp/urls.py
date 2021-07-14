@@ -10,7 +10,7 @@ app_name = 'namp'
 urlpatterns = [
 	path('', views.home, name='home'),
 	#Tela do Operador
-	path('equipe_operador_change_list/', views.equipe_operador_change_list, name='equipe_operador_change_list'),
+	#path('equipe_operador_change_list/', views.equipe_operador_change_list, name='equipe_operador_change_list'),
 	#path('equipe_operador_att_form/<int:id_equipe>/', views.equipe_operador_att_form, name='equipe_operador_att_form'),
 	#path('equipe_delete/<int:id_equipe>/delete', views.EquipeDeleteView, name='equipe_delete'),
 
@@ -27,6 +27,7 @@ urlpatterns = [
 	path('equipe_att/<int:id_equipe>/', views.equipe_att, name='equipe_att'),
 	path('equipe_criar/', views.equipe_criar, name='equipe_criar'),
 	path('equipe_list/', views.equipe_list, name='equipe_list'),
+	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
 	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),

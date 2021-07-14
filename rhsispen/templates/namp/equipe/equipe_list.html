@@ -50,7 +50,20 @@
                                                                 <th scope="col">SERVIDORES</th>
                                                             </tr>
                                                         </thead>
-
+                                                        <tbody>
+                                                            {% for equipe in equipes %}
+                                                            <tr class="{% cycle 'row1' 'row2' %}">
+                                                                <td> <a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                                                <td class="field-status">
+                                                                    {% if equipe.status %}
+                                                                    <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
+                                                                    <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
+                                                                </td>
+                                                                <td> {{equipe.categoria}} </td>
+                                                                <td> {{equipe.get_servidores | default:0 }} </td>
+                                                            </tr>
+                                                            {% endfor %}
+                                                        </tbody>    
                                                 <!-- cód comentado na parte de baixo -->
                                                 </table>
                                     
@@ -83,19 +96,6 @@
 </div>    
 {% endblock %}            
                 <!--
-                    <tbody>
-                        {% for equipe in equipes %}
-                        <tr class="{% cycle 'row1' 'row2' %}">
-                            <td> <a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                            <td class="field-status">
-                                {% if equipe.status %}
-                                <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
-                                <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
-                            </td>
-                            <td> {{equipe.categoria}} </td>
-                            <td> {{equipe.get_servidores | default:0 }} </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>               
+           
                 
                 --> 
