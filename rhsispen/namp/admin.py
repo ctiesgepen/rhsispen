@@ -17,6 +17,7 @@ from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date
 # Register your models here.
 
 admin.site.site_header = 'Núcleo de Apoio e Movimentação de Pessoal'
+admin.site.login_template = 'autenticacao/login.html'
 
 class OperadorAdminSite(admin.AdminSite):
     pass

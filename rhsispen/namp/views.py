@@ -144,7 +144,7 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 	form = EquipeForm()
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		form.fields['fk_setor'].initial = setor
+		form.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=setor.id_setor).values_list('id_setor', 'nome'))
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -157,7 +157,7 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 			'''
 			form.save()
 			messages.success(request, 'Equipe adicionada com suceso!')
-			return HttpResponseRedirect('/home')
+			return HttpResponseRedirect('/')
 
 		else:
 			contexto = {
@@ -165,6 +165,7 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 				'form': form,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			#messages.warning(request, 'Erro no formulário!')
 			return render(request, template_name, contexto)
 	else:
 		contexto = {
@@ -479,41 +480,6 @@ def equipe_operador_change_list(request, template_name='namp/equipe/equipe_opera
 				messages.warning(request, 'Equipe com este nome não encontrada!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
-
-@login_required(login_url='/autenticacao/login/')
-@staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_change_form(request, template_name='namp/equipe/equipe_operador_change_form.html'):
-	form = EquipeForm()
-	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		form.fields['fk_setor'].initial = setor
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	if request.method == 'POST':
-		form = EquipeForm(request.POST)		
-		if form.is_valid():
-			'''
-			Realizar os tratamentos necessários e fazer o form.save()
-			para a instância do modelo Equipe seja salva
-			'''
-			form.save()
-			messages.success(request, 'Equipe adicionada com suceso!')
-			return HttpResponseRedirect('/equipe_operador_change_list')
-
-		else:
-			contexto = {
-				'setor': setor,
-				'form': form,
-			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			return render(request, template_name, contexto)
-	else:
-		contexto = {
-			'setor': setor,
-			'form': form
-		}
-		return render(request,template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')

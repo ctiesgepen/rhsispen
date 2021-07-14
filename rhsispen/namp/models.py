@@ -298,6 +298,7 @@ class Jornada(models.Model):
 		verbose_name_plural = "Jornadas"
 		unique_together = ('fk_servidor','data_jornada',)
 
+
 class PeriodoAcao(models.Model):
 	id_periodo_acao = models.AutoField(primary_key=True)
 	data_inicial = models.DateTimeField()
