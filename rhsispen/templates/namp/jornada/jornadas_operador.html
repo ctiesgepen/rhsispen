@@ -1,4 +1,4 @@
-{% extends "layout/base.html" %} {% load i18n static %} {% load static %}
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %}
 <script type="text/javascript">
     $(function() {
         // inspect html to check id of category select dropdown.
@@ -73,7 +73,7 @@
                                             {% for equipe in equipes %}
                                             <tr>
                                                 {% if equipe.categoria == "Expediente" %}
-                                                <td><a href="{% url 'namp:equipe_operador_att_form' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                                <td><a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
                                                 <td>{{ equipe.get_servidores }}</td>
                                                 <td>{{ equipe.fk_tipo_jornada.tipificacao }}</td>
                                                 {% endif %}

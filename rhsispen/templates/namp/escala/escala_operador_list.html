@@ -26,9 +26,9 @@
                                                     </div>
                                                 </form>
                                             </div><br>
-                    
+                                            
+                                            {% if mensagens.mensagem_escalas %}
                                             <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
-                                                {% if mensagens.mensagem_escalas %}
                                                 <div class="col-md-9 ms-md-auto text-center">
                                                     <div class="dropdown">
                                                         CRIE ESCALAS DO MÊS ( SUB-SEQUENTE ) NO BOTÃO AO LADO:
@@ -37,8 +37,8 @@
                                                 <div class="col-md-3 ms-md-auto text-center">
                                                     <button type="button" class="btn btn-secondary" id="botao-gerar-escala"><a href="{% url 'namp:jornadas_operador' %}" style="color: white; text-decoration-line: none;">Gerar Escala Regular</a></button>
                                                 </div>
-                                                {% endif %}
                                             </div>
+                                            {% endif %}
                     
                                             {% if mensagens.mensagem_escalas %}
                                             <div class="row gx-2 p-1 bg-light" id="div-alerta-prazo-escala">

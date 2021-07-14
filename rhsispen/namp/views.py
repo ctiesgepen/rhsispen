@@ -226,6 +226,45 @@ def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
+def equipe_att(request, id_equipe):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		equipe = Equipe.objects.get(id_equipe=id_equipe)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Equipe.DoesNotExist:
+		messages.warning(request, 'Equipe não encontrada!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	form = EquipeForm(instance=equipe)
+	if request.method == 'POST':
+		form = EquipeForm(request.POST, instance=equipe)
+		if form.is_valid():
+			'''
+			Realizar os tratamentos necessários e fazer o form.save()
+			para a instância do modelo Equipe seja salva
+			'''
+			form.save()
+			messages.success(request, 'Equipe editada com suceso!')
+			return HttpResponseRedirect('/equipe_list')
+		else:
+			contexto = {
+				'equipe':equipe,
+				'servidor': servidor,
+				'form': form
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/equipe/equipe_att.html',contexto)
+	else:
+		contexto = {
+			'equipe':equipe,
+			'servidor': servidor,
+			'form': form
+		}
+		return render(request, 'namp/equipe/equipe_att.html',contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request):
 	return render(request, 'servidor_mov.html')
 
