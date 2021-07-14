@@ -1,0 +1,57 @@
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="col-xl-12">
+            <div class="card">
+                <div class="card-body">
+                            <div>
+                                <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                            </div>
+                        <hr>
+                            <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
+                                <div class="container px-1" id="conteudo">
+                                    <div class="row gx-2">
+                                        <div class="col">
+                                            <div class="p-3 bg-white text-center" id="titulo-atividade">
+                                                <h4>Atualizar Equipe</h4>
+                                            </div>
+                                            <div class="content">
+                                                <div id="content" class="colM">
+                                                    <h4>{% translate 'Editar Equipe' %}</h4>
+                                                    <form action="{% url 'namp:equipe_att' equipe.id_equipe %}" method="post">
+                                                        {% csrf_token %}
+                                                        {% for field in form %}
+                                                            <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %} {% if field.name == 'fk_setor' %} hidden {% endif %}">
+                                                                <div>
+                                                                    <label>{{ field.label }}: </label> {{ field }}
+                                                                </div>
+                                                                <div>
+                                                                    {% if field.errors %} {{ field.errors }} {% endif %}
+                                                                </div>
+                                                            </div>
+                                                        {% endfor %}
+
+                                                        <div class="submit-row">
+                                                            <input type="submit" class="default" name="_save" value="{% translate 'Salvar' %}">
+                                                            {% if equipe.nome.upper != 'GERAL' %}
+                                                            <p class="deletelink-box">
+                                                                <a href="{% url 'namp:equipe_delete' equipe.id_equipe %}" class="deletelink" style="height: auto;">Apagar</a>
+                                                            </p>
+                                                            {% endif %}
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                            <hr>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

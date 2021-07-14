@@ -24,6 +24,7 @@ urlpatterns = [
 	path('admin_escalas_frequencias/', views.admin_escalas_frequencias, name='admin_escalas_frequencias'), #falta fazer
 
 	#Tela do OPERADOR
+	path('equipe_att/<int:id_equipe>/', views.equipe_att, name='equipe_att'),
 	path('equipe_criar/', views.equipe_criar, name='equipe_criar'),
 	path('equipe_list/', views.equipe_list, name='equipe_list'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
