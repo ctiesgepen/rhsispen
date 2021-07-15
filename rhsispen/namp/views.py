@@ -71,11 +71,12 @@ def admin_setores(request):
 @staff_member_required(login_url='/autenticacao/login/')
 def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id)
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		#setor = Servidor.objects.filter(fk_servidor=setor.id_codigo)
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Setores não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
-	
+	print(setor.nome)
 	form = SetorForm()
 	contexto = { 
 		'setor': setor,

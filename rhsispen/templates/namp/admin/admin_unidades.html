@@ -1,6 +1,5 @@
 {% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
 
-{% load crispy_forms_tags %}
 
 {% block content %}
 <div class="pcoded-main-container">
@@ -43,7 +42,7 @@
                                     {% for setores in page_obj %}
                                     <tr class="{% cycle 'row1' 'row2' %}">
                                         <td> {{setor.id_setor}} </td>
-                                        <td> <a href="{% url 'namp:admin_unidades_att' setor.id_setor %}">{{setores.nome}}</a></td>
+                                        <td> {{setor.nome}}</a></td>
                                         <td class="field-status">
                                             {% if setores.status %}
                                             <img src="/static/admin/img/icon-yes.svg" alt="{{setores.status}}"> {% else %}
