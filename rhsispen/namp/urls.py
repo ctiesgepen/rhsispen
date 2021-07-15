@@ -18,14 +18,13 @@ urlpatterns = [
 	path('admin_historico/', views.admin_unidades, name='admin_historico'), #falta fazer
 	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), #falta fazer
 	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), #falta fazer
-	path('admin_escalas_frequencias/', views.admin_escalas_frequencias, name='admin_escalas_frequencias'), #falta fazer
+	path('admin_escalas_frequencias/', views.admin_escalas_frequencias, name='admin_escalas_frequencias'),#falta fazer
 
 	#Tela do OPERADOR
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
-	
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
 	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
