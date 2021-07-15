@@ -157,13 +157,7 @@ class ServidorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
-        for field in self.fields:
-            if field =='fk_equipe': continue
-            self.fields[field].widget.attrs['readonly'] = True
-        self.fields[''].disabled = True
-            #self.fields[choices].widget.attrs['readonly'] = True
-            #Falta setar o choices 
-
+        
 class ServidorSearchForm(forms.ModelForm):
     class Meta:
         model = Servidor

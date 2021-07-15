@@ -433,12 +433,15 @@ def operador_afastamentos(request,template_name='namp/afastamento/operador_afast
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
-	else:
-		servidores = list(Servidor.objects.filter(fk_setor=servidor.fk_setor).values_list('id_matricula', 'nome'))
-		form = AfastamentoForm({"servidores":servidores})
 	
+	form = AfastamentoForm()
+	form.fields['fk_servidor'].choices = [('', '---------')] + list(Servidor.objects.filter(fk_setor=servidor.fk_setor).values_list('id_matricula', 'nome'))
+	contexto = { 
+		'servidor': servidor,
+		'form': form
+	}
 	if request.method == 'POST':
-		form = AfastamentoForm(request.POST, {"servidores":servidores})
+		form = AfastamentoForm(request.POST)
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Afastamento cadastrado com sucesso!')	
@@ -446,55 +449,34 @@ def operador_afastamentos(request,template_name='namp/afastamento/operador_afast
 		else:
 			contexto['form'] = form
 			return render(request, template_name, contexto)
-	else:
-		contexto = { 
-			'servidor': servidor,
-			'form': form
-		}
-		return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 #SERVIDOR
 def servidor_att(request, id_matricula):
-	print('ENTREI NA FUNÇÃO')
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
-		print(user, 'USER')
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
-		print(servidor, 'SERVIDOR')
-		#enderecoServ = EnderecoServ.objects.get(fk_servidor=id_matricula)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	form = ServidorForm(instance=servidor)
-
-	print('ANTES DO REQUEST')
+	
+	contexto = {
+		'form': form,
+		'user':user,
+		'servidor': servidor,
+	}
 	if request.method == 'POST':
 		form = ServidorForm(request.POST, instance=servidor)
-		print('DEPOIS DO REQUEST')
 		if form.is_valid():
-			print('FORMULÁRIO VÁLIDO')
 			form.save()
 			messages.success(request, 'Servidor editado com suceso!')
 			return HttpResponseRedirect('/')
 		else:
-			print('FORM INVÁLIDO')
-			contexto = {
-				'user': user,
-				'servidor': servidor,
-				'form': form,
-				#'enderecoServ': enderecoServ,
-			}
+			contexto['form'] = form
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, 'namp/servidor/servidor_att.html',contexto)
-	else:
-		print('REQUEST INVÁLIDO')
-		contexto = {
-			'form': form,
-			'user':user,
-			'servidor': servidor,
-			#'enderecoServ':enderecoServ,
-		}
-		return render(request, 'namp/servidor/servidor_att.html',contexto)
+	return render(request, 'namp/servidor/servidor_att.html',contexto)
 
 def servidor_escala(request):
 	return render(request, 'servidor_escala.html')

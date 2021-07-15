@@ -1,61 +1,58 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %}
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+
+{% load crispy_forms_tags %}
+
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-body">
-                            <div>
-                                <h5 class="text-center">{{ servidor.fk_setor }}</h5>
-                            </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                        {% if messages %}
+                          {% for message in messages %}
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                          {% endfor %}
+                        {% endif %}
+
+                        <h5 class="mt-5">Cadastrar Equipe</h5>
                         <hr>
-                        <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
-                            <div class="container px-1" id="conteudo">
-                                <div class="row gx-2">
-                                    <div class="col">
-                                        <div class="p-3 bg-white text-center" id="titulo-atividade">
-                                            <h4>Lançar Afastamento</h4>
-                                        </div>
-
-                                        <form action="{% url 'namp:operador_afastamentos' %}" method="post">
-                                            {% csrf_token %}
-                                            <h6>Preencha as informações abaixo:</h6>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    {{ form.data_inicial|as_crispy_field }}
-                                                    {{ form.data_inicial.errors }}
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    {{ form.data_final|as_crispy_field }}
-                                                    {{ form.data_final.errors }}
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    {{ form.fk_afastamento|as_crispy_field }}
-                                                    {{ form.fk_afastamento.errors }}
-                                                </div>
-                                            </div>
-                                            <div class="form-row">
-                                                <div class="form-group col-md-6">
-                                                    {{ form.fk_servidor|as_crispy_field }}
-                                                    {{ form.fk_servidor.errors }}
-                                                </div>
-                                            </div>
-
-                                            <div class="submit-row">
-                                                <input type="submit" class="btn btn-dark" value="{% translate 'Adicionar' %}">
-                                            </div>
-                                        </form>
-                                    </div>
+                        <form action="{% url 'namp:operador_afastamentos' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.data_inicial|as_crispy_field }}
+                                    {{ form.data_inicial.errors }}
                                 </div>
                             </div>
-                        </div>
-
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.data_final|as_crispy_field }}
+                                    {{ form.data_final.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{ form.fk_afastamento|as_crispy_field }}
+                                    {{ form.fk_afastamento.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{ form.fk_servidor|as_crispy_field }}
+                                    {{ form.fk_servidor.errors }}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="submit-row">
+                            <button type="submit" class="btn  btn-dark">Salvar</button>
+                            <a href="{% url 'namp:home' %}" class="btn  btn-dark">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-            </div>
+           </div>
         </div>
     </div>
 </div>

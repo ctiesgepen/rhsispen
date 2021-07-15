@@ -184,7 +184,6 @@ class Servidor(models.Model):
 		('Nenhum', 'Nenhum'),
 	]
 	cf = models.CharField('Curso de Formação',max_length=10, choices=CHOICES_CF)
-	tipo_vinculo = models.CharField('Tipo de Vínculo',max_length=50)
 	CHOICES_VINCULO = [
 		('Contrato', 'Contrato'),
 		('Concursado', 'Concursado'),

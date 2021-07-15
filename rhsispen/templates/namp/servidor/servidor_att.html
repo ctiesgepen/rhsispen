@@ -1,35 +1,110 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+
+{% load crispy_forms_tags %}
+
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
-        <div class="content">
-            <h5 class="text-center">{{ user.fk_setor }}</h5>
-        </div>
-        
-        <div class="content">
-            <div id="content" class="colM">
-                <br>
-                <h4>Dados do Servidor:</h4>
-        
-                <form action="{% url 'namp:servidor_att' servidor.id_matricula %}" method="post">
-                    {% csrf_token %} {% for field in form %}
-                    <div class="form-row field-field {% if not field.is_readonly and field.errors %} errors {% endif %}
-                     {% if field.name == 'fk_setor' %} hidden {% endif %}
-                     {% if field.name == 'fk_user' %} hidden {% endif %}">
-        
-                        <div>
-                            <label>{{ field.label }}</label> {{ field }}
-                        </div>
-                        <div>
-                            {% if field.errors %} {{ field.errors }} {% endif %}
-                        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">{{ user.fk_setor }}</h5>
+                        {% if messages %}
+                          {% for message in messages %}
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                          {% endfor %}
+                        {% endif %}
+
+                        <h5 class="mt-5">Editar Dados do Servidor</h5>
+                        <hr>
+                        <form action="{% url 'namp:servidor_att' servidor.id_matricula %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{ form.nome|as_crispy_field }}
+                                    {{ form.nome.errors }}
+                                </div>
+                                {% if servidor.id_matricula == user.id_matricula%}
+                                <div class="form-group col-md-3 hidden">
+                                    {{ form.fk_user|as_crispy_field}}
+                                    {{ form.fk_user.errors }}
+                                </div>   
+                                {% endif%}
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.cpf|as_crispy_field}}
+                                    {{ form.cpf.errors }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{ form.dt_nasc|as_crispy_field}}
+                                    {{ form.dt_nasc.errors }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{ form.sexo|as_crispy_field}}
+                                    {{ form.sexo.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    {{ form.id_matricula|as_crispy_field}}
+                                    {{ form.id_matricula.errors }}
+                                </div>
+                                <div class="form-group col-md-1">
+                                    {{ form.vinculo|as_crispy_field}}
+                                    {{ form.vinculo.errors }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ form.cargo|as_crispy_field}}
+                                    {{ form.cargo.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    {{ form.situacao|as_crispy_field}}
+                                    {{ form.situacao.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.cf|as_crispy_field}}
+                                    {{ form.cf.errors }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{ form.tipo_vinculo|as_crispy_field}}
+                                    {{ form.tipo_vinculo.errors }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{ form.regime_juridico|as_crispy_field}}
+                                    {{ form.regime_juridico.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.contato|as_crispy_field}}
+                                    {{ form.contato.errors }}
+                                </div>                        
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    {{ form.fk_setor|as_crispy_field}}
+                                    {{ form.fk_setor.errors }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ form.fk_equipe|as_crispy_field}}
+                                    {{ form.fk_equipe.errors }}
+                                </div>
+                            </div>                       
+                            <hr>
+                            <div class="submit-row">
+                            <button type="submit" class="btn  btn-dark">Salvar</button>
+                            <a href="{% url 'namp:home' %}" class="btn  btn-dark">Cancelar</a>
+                            </div>
+                        </form>
                     </div>
-                    {% endfor %}
-                    <div class="submit-row">
-                        <input type="submit" class="default" name="_save" value="{% translate 'Salvar' %}">
-                    </div>
-                </form>
-            </div>
+                </div>
+           </div>
         </div>
     </div>
 </div>
