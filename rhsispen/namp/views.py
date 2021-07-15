@@ -64,8 +64,33 @@ def admin_servidor(request):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_unidades(request):
-	return render(request, 'admin_unidades.html')
+def admin_setores(request):
+	return render(request, 'admin_setores.html')
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id)
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Setores não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
+	
+	form = SetorForm()
+	contexto = { 
+		'setor': setor,
+		'form': form
+	}
+	if request.method == 'POST':
+		form = SetorForm(request.POST)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Novo setor cadastrado com sucesso!')	
+			return HttpResponseRedirect('/')
+		else:
+			contexto['form'] = form
+			return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')

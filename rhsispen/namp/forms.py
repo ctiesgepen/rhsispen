@@ -196,3 +196,8 @@ class EscalaFrequenciaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['data'].required = False
+
+class SetorForm(forms.Form):
+    class Meta:
+        model = Setor
+        fields = '__all__'

@@ -20,21 +20,21 @@
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-file-text"></i></span><span class="pcoded-mtext">Relatórios</span></a>
 						<ul class="pcoded-submenu">
 							<li><a href="{% url 'namp:admin_afastamento'%}">Afastamentos</a></li>
-							<li><a href="{% url 'namp:admin_servidor'%}">Movimentação de Servidores</a></li>
-							<li><a href="{% url 'namp:admin_unidades'%}">Unidades</a></li>
+							<li><a href="{% url 'namp:admin_servidor'%}">Servidores</a></li>
+							<li><a href="{% url 'namp:admin_setores'%}">Setores</a></li>
 							<li><a href="{% url 'namp:admin_historico'%}">Históricos</a></li>
 							<li><a href="{% url 'namp:admin_add_noturno'%}">Add Noturno</a></li>
 						</ul>
 					</li>
 
 					<li class="nav-item">
-					    <a href="{% url 'namp:admin_unidades'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Unidades</span></a>
+					    <a href="{% url 'namp:admin_unidades'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Setores</span></a>
 					</li>
 					<li class="nav-item">
 					    <a href="{% url 'namp:admin_servidores'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Servidores</span></a>
 					</li>
 					<li class="nav-item">
-					    <a href="{% url 'namp:admin_escalas_frequencias'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Escalas/Frequencias</span></a>
+					    <a href="{% url 'namp:admin_escalas_frequencias'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Definir Períodos</span></a>
 					</li>
 							<!-- <li><a href="/bc_alert.html">Alert</a></li>
 							<li><a href="/bc_button.html">Button</a></li>
@@ -57,7 +57,7 @@
 						<label>Setor</label>
 					</li>
 					<li class="nav-item pcoded-hasmenu">
-						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Minha Unidade</span></a>
+						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Meu Setor</span></a>
 						<ul class="pcoded-submenu">
 							<li><a href="{% url 'namp:equipe_criar'%}">Cadastrar Equipe</a></li>
 							<li><a href="{% url 'namp:equipe_list' %}">Listar Equipes</a></li>
