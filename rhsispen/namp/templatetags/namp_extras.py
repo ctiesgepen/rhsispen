@@ -11,7 +11,3 @@ def add_month(value):
 def less_month(value):
     return value + TimeDelta(days=-30)
 
-
-#@register.inclusion_tag(name='date_hierarchy')
- #   def date_hierarchy(value):        
-   #     return value + ()

@@ -23,7 +23,6 @@ from django.contrib.admin.views.decorators import staff_member_required
 
 @login_required(login_url='/autenticacao/login/')
 def home(request,template_name='home.html'):
-
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
@@ -52,148 +51,61 @@ def home(request,template_name='home.html'):
 	}
 	return render(request,template_name, contexto)
 
+#GESTÃO
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_att_form(request, id_equipe):
-	try:
-		servidor = Servidor.objects.get(fk_user=request.user.id)
-		equipe = Equipe.objects.get(id_equipe=id_equipe)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Equipe.DoesNotExist:
-		messages.warning(request, 'Equipe não encontrada!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	form = EquipeForm(instance=equipe)
-	if request.method == 'POST':
-		form = EquipeForm(request.POST, instance=equipe)
-		if form.is_valid():
-			'''
-			Realizar os tratamentos necessários e fazer o form.save()
-			para a instância do modelo Equipe seja salva
-			'''
-			form.save()
-			messages.success(request, 'Equipe editada com suceso!')
-			return HttpResponseRedirect('/equipe_operador_change_list')
-		else:
-			contexto = {
-				'equipe':equipe,
-				'servidor': servidor,
-				'form': form
-			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			return render(request, 'namp/equipe/equipe_operador_att_form.html',contexto)
-	else:
-		contexto = {
-			'equipe':equipe,
-			'servidor': servidor,
-			'form': form
-		}
-		return render(request, 'namp/equipe/equipe_operador_att_form.html',contexto)
-		
+def admin_afastamento(request, template_name='namp/afastamento/admin_afastamento.html'):
+	return render(request, template_name)
+
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_change_list(request, template_name='namp/equipe/equipe_operador_change_list.html'):
+def admin_servidor(request):
+	return render(request, 'admin_servidor.html')
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_setores(request):
+	return render(request, 'admin_setores.html')
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
 	try:
-		servidor = Servidor.objects.get(fk_user=request.user.id)
-		equipes = Equipe.objects.filter(fk_setor=servidor.fk_setor, deleted_on=None)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Equipe.DoesNotExist:
-		messages.warning(request, 'Unidade sem equipes equipes cadastradas no momento!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-	form = EquipeSearchForm(request.POST or None)
-
-	page = request.GET.get('page')
-	paginator = Paginator(equipes, 10)
-	page_obj = paginator.get_page(page)
-	
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		#setor = Servidor.objects.filter(fk_servidor=setor.id_codigo)
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Setores não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
+	print(setor.nome)
+	form = SetorForm()
 	contexto = { 
-		'equipes': equipes,
-		'servidor': servidor,
-		'form': form,
-		'page_obj': page_obj,
+		'setor': setor,
+		'form': form
 	}
 	if request.method == 'POST':
+		form = SetorForm(request.POST)
 		if form.is_valid():
-			equipes2 = []
-			print(equipes2)
-			pattern = re.compile(form.cleaned_data['nome'].upper())
-			for equipe in equipes:
-				if pattern.search(equipe.nome.upper()):
-					equipes2.append(equipe)
-			if equipes2:
-				page = request.GET.get('page')
-				paginator = Paginator(equipes2, 15)
-				page_obj = paginator.get_page(page)
-				
-				contexto = { 
-					'equipes': equipes2,
-					'servidor': servidor,
-					'form': form,
-					'page_obj': page_obj,
-				}
-				return render(request, template_name, contexto)
-			else:
-				messages.warning(request, 'Equipe com este nome não encontrada!')
-				return render(request, template_name, contexto)
+			form.save()
+			messages.success(request, 'Novo setor cadastrado com sucesso!')	
+			return HttpResponseRedirect('/')
+		else:
+			contexto['form'] = form
+			return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_change_form(request, template_name='namp/equipe/equipe_operador_change_form.html'):
-	form = EquipeForm()
-	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		form.fields['fk_setor'].initial = setor
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	if request.method == 'POST':
-		form = EquipeForm(request.POST)		
-		if form.is_valid():
-			'''
-			Realizar os tratamentos necessários e fazer o form.save()
-			para a instância do modelo Equipe seja salva
-			'''
-			form.save()
-			messages.success(request, 'Equipe adicionada com suceso!')
-			return HttpResponseRedirect('/equipe_operador_change_list')
-
-		else:
-			contexto = {
-				'setor': setor,
-				'form': form,
-			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			return render(request, template_name, contexto)
-	else:
-		contexto = {
-			'setor': setor,
-			'form': form
-		}
-		return render(request,template_name, contexto)
+def admin_historico(request):
+	return render(request, 'admin_historico.html')
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def EquipeDeleteView(request, id_equipe):
-	equipe = get_object_or_404(Equipe, id_equipe=id_equipe)
-	servidores = list(Servidor.objects.filter(fk_equipe=equipe))
-	if servidores:
-		equipeGeral = get_object_or_404(Equipe, nome='GERAL', fk_setor=equipe.fk_setor)
-		if equipeGeral:
-			for servidor in servidores:
-				servidor.fk_equipe = equipeGeral
-				servidor.save()
-	equipe.delete()
-	messages.success(request, "Equipe deletada com sucesso!")
-	return HttpResponseRedirect("/equipe_operador_change_list")
+def admin_add_noturno(request):
+	return render(request, 'admin_add_noturno.html')
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def servidores_operador_change_list(request,template_name='namp/servidor/servidores_operador_change_list.html'):
+def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
 		equipes = Equipe.objects.filter(fk_setor=setor)
@@ -247,16 +159,366 @@ def servidores_operador_change_list(request,template_name='namp/servidor/servido
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
-def servidor_operador_att_form(request,id_matricula):
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_escalas_frequencias(request):
+	return render(request, 'admin_escalas_frequencias.html')
+
+#SETOR
+#Esta view foi revisada em 14/07 e está funcional
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
+	form = EquipeForm()
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		form.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=setor.id_setor).values_list('id_setor', 'nome'))
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	if request.method == 'POST':
+		form = EquipeForm(request.POST)		
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Equipe adicionada com suceso!')
+			return HttpResponseRedirect('/')
+
+		else:
+			contexto = {
+				'setor': setor,
+				'form': form,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name, contexto)
+	else:
+		contexto = {
+			'setor': setor,
+			'form': form
+		}
+		return render(request,template_name, contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		equipes = Equipe.objects.filter(fk_setor=servidor.fk_setor, deleted_on=None)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Equipe.DoesNotExist:
+		messages.warning(request, 'Unidade sem equipes equipes cadastradas no momento!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	form = EquipeSearchForm(request.POST or None)
+
+	page = request.GET.get('page')
+	paginator = Paginator(equipes, 10)
+	page_obj = paginator.get_page(page)
+	
+	contexto = { 
+		'servidor': servidor,
+		'form': form,
+		'page_obj': page_obj,
+	}
+	if request.method == 'POST':
+		if form.is_valid():
+			equipes2 = []
+			print(equipes2)
+			pattern = re.compile(form.cleaned_data['nome'].upper())
+			for equipe in equipes:
+				if pattern.search(equipe.nome.upper()):
+					equipes2.append(equipe)
+			if equipes2:
+				page = request.GET.get('page')
+				paginator = Paginator(equipes2, 15)
+				page_obj = paginator.get_page(page)
+				
+				contexto = { 
+					'servidor': servidor,
+					'form': form,
+					'page_obj': page_obj,
+				}
+				return render(request, template_name, contexto)
+			else:
+				messages.warning(request, 'Equipe com este nome não encontrada!')
+				return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def equipe_att(request, id_equipe):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		equipe = Equipe.objects.get(id_equipe=id_equipe)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Equipe.DoesNotExist:
+		messages.warning(request, 'Equipe não encontrada!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	form = EquipeForm(instance=equipe)
+	if request.method == 'POST':
+		form = EquipeForm(request.POST, instance=equipe)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Equipe editada com suceso!')
+			return HttpResponseRedirect('/equipe_list')
+		else:
+			contexto = {
+				'equipe':equipe,
+				'servidor': servidor,
+				'form': form
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/equipe/equipe_att.html',contexto)
+	else:
+		contexto = {
+			'equipe':equipe,
+			'servidor': servidor,
+			'form': form
+		}
+		return render(request, 'namp/equipe/equipe_att.html',contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def equipe_delete(request, id_equipe):
+	equipe = get_object_or_404(Equipe, id_equipe=id_equipe)
+	servidores = list(Servidor.objects.filter(fk_equipe=equipe))
+	if servidores:
+		equipeGeral = get_object_or_404(Equipe, nome='GERAL', fk_setor=equipe.fk_setor)
+		if equipeGeral:
+			for servidor in servidores:
+				servidor.fk_equipe = equipeGeral
+				servidor.save()
+	equipe.delete()
+	messages.success(request, "Equipe deletada com sucesso!")
+	return HttpResponseRedirect("/equipe_list")
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		servidores = Servidor.objects.filter(fk_setor=setor)
+		equipes = Equipe.objects.filter(fk_setor=setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Equipe.DoesNotExist:
+		messages.warning(request, 'Equipe não existe!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	#form = Form(instance=equipe)
+	if request.method == 'POST':
+		#form = EquipeForm(request.POST, instance=equipe)
+		if form.is_valid():
+			form.save()
+	contexto = { 
+		'setor': setor,
+		'servidores': servidores,
+		#'form': form,
+	}
+
+	return render(request, template_name, contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Equipe.DoesNotExist:
+		messages.warning(request, 'Unidade não possui equipes cadastradas')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	form = ServidorSearchForm(request.POST or None)
+	
+	servidores = list(Servidor.objects.filter(fk_equipe__fk_setor=setor))
+
+	page = request.GET.get('page')
+	paginator = Paginator(servidores, 15)
+	page_obj = paginator.get_page(page)
+
+	contexto = { 
+		'setor': setor,
+		'form': form,
+		'page_obj': page_obj,
+	}
+
+	if request.method == 'POST':
+		if form.is_valid():
+			servidores2 = []
+			pattern = re.compile(form.cleaned_data['nome'].upper())
+			for servidor in servidores:
+				if pattern.search(servidor.nome.upper()):
+					servidores2.append(servidor)
+			if servidores2:
+				page = request.GET.get('page')
+				paginator = Paginator(servidores2, 15)
+				page_obj = paginator.get_page(page)
+
+				contexto = { 
+					'setor': setor,
+					'form': form,
+					'page_obj': page_obj,
+				}
+				return render(request, template_name, contexto)
+			else:
+				messages.warning(request, 'Servidor com este nome não encontrado!')
+				return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def escala_operador_list(request,template_name='namp/escala/escala_operador_list.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		escalas = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=1)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
+	#form = EscalaFrequenciaSearchForm(request.POST or None)
+	
+	page = request.GET.get('page')
+	paginator = Paginator(list(escalas), 15)
+	page_obj = paginator.get_page(page)
+
+	mensagens = {}
+				
+	#Verificando se tem período para consolidar escalas
+	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+
+	if periodo_escala:
+		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
+		if not escalas_geradas:
+			mensagens['mensagem_escalas'] = 'O período para consolidar as escalas do mês de ' + periodo_escala.data_inicial.strftime('%B') + ' encontra-se em aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M')
+	if periodo_frequencia:
+		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+		if not frequencia_gerada:
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
+			
+	contexto = { 
+		'servidor': servidor,
+		'mensagens': mensagens,
+		'page_obj': page_obj,
+	}
+	return render(request, template_name, contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_operador_list.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		frequencias = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=2)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
+	page = request.GET.get('page')
+	paginator = Paginator(list(frequencias), 15)
+	page_obj = paginator.get_page(page)
+
+	mensagens = {}
+				
+	#Verificando se tem período para consolidar escalas
+	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+
+	if periodo_frequencia:
+		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+		if not frequencia_gerada:
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
+
+	form = EscalaFrequenciaForm()
+	if request.method =='POST':
+		form = EscalaFrequenciaForm(request.POST)
+		if form.is_valid():
+
+			frequencias_operador_change(servidor, servidor.fk_setor, periodo_frequencia)
+			frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
+			if frequencia_gerada:
+				mensagens = []
+
+			contexto = { 
+				'servidor': servidor,
+				'mensagens': mensagens,
+				'page_obj': page_obj,
+				'form': form,
+			}
+			messages.success(request, 'Frequências consolidadas com sucesso!')
+			return HttpResponseRedirect('/frequencia_operador_list')
+	else:
+		contexto = { 
+			'servidor': servidor,
+			'mensagens': mensagens,
+			'page_obj': page_obj,
+			'form': form,
+		}
+		return render(request, template_name, contexto)
+
+def frequencias_operador_change(servidor, setor, periodo_frequencia):
+	frequencia = EscalaFrequencia()
+	frequencia.fk_periodo_acao = periodo_frequencia
+	frequencia.data = DateTime.today()
+	frequencia.fk_servidor = servidor
+	frequencia.fk_setor = setor
+	frequencia.save()
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def operador_afastamentos(request,template_name='namp/afastamento/operador_afastamentos.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
+	
+	form = AfastamentoForm()
+	form.fields['fk_servidor'].choices = [('', '---------')] + list(Servidor.objects.filter(fk_setor=servidor.fk_setor).values_list('id_matricula', 'nome'))
+	contexto = { 
+		'servidor': servidor,
+		'form': form
+	}
+	if request.method == 'POST':
+		form = AfastamentoForm(request.POST)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Afastamento cadastrado com sucesso!')	
+			return HttpResponseRedirect('/')
+		else:
+			contexto['form'] = form
+			return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
+
+#SERVIDOR
+def servidor_att(request, id_matricula):
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
-		#enderecoServ = EnderecoServ.objects.get(fk_servidor=id_matricula)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
 	form = ServidorForm(instance=servidor)
+	
+	if not request.user.is_superuser:
+		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+		form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+		form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+		form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+		form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+		form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
 
+	contexto = {
+		'form': form,
+		'user':user,
+		'servidor': servidor,
+	}
 	if request.method == 'POST':
 		form = ServidorForm(request.POST, instance=servidor)
 		if form.is_valid():
@@ -264,22 +526,16 @@ def servidor_operador_att_form(request,id_matricula):
 			messages.success(request, 'Servidor editado com suceso!')
 			return HttpResponseRedirect('/')
 		else:
-			contexto = {
-				'user': user,
-				'servidor': servidor,
-				'form': form,
-				#'enderecoServ': enderecoServ,
-			}
+			contexto['form'] = form
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			return render(request, 'namp/servidor/servidor_operador_att_form.html',contexto)
-	else:
-		contexto = {
-			'form': form,
-			'user':user,
-			'servidor': servidor,
-			#'enderecoServ':enderecoServ,
-		}
-		return render(request, 'namp/servidor/servidor_operador_att_form.html',contexto)
+			return render(request, 'namp/servidor/servidor_att.html',contexto)
+	return render(request, 'namp/servidor/servidor_att.html',contexto)
+
+def servidor_escala(request):
+	return render(request, 'servidor_escala.html')
+
+def servidor_hist(request):
+	return render(request, 'servidor_hist.html')
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -313,64 +569,8 @@ def servidor_operador_change_form(request,id_matricula):
 			'servidor': servidor,
 		}
 		return render(request, 'namp/servidor/servidor_operador_change_form.html',contexto)
-			
-@login_required(login_url='/autenticacao/login/')
-@staff_member_required(login_url='/autenticacao/login/')
-def frequencias_operador_list(request,template_name='namp/frequencia/frequencias_operador_list.html'):
-	try:
-		servidor = Servidor.objects.get(fk_user=request.user.id)
-		frequencias = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=2)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	
-	page = request.GET.get('page')
-	paginator = Paginator(list(frequencias), 15)
-	page_obj = paginator.get_page(page)
 
-	mensagens = {}
-				
-	#Verificando se tem período para consolidar escalas
-	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
-	if periodo_frequencia:
-		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
-		if not frequencia_gerada:
-			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
-
-	form = EscalaFrequenciaForm()
-	if request.method =='POST':
-		form = EscalaFrequenciaForm(request.POST)
-		if form.is_valid():
-			frequencias_operador_change(servidor, servidor.fk_setor, periodo_frequencia)
-			frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
-			if frequencia_gerada:
-				mensagens = []
-
-			contexto = { 
-				'servidor': servidor,
-				'mensagens': mensagens,
-				'page_obj': page_obj,
-				'form': form,
-			}
-			messages.success(request, 'Frequências consolidadas com sucesso!')
-			return HttpResponseRedirect('/frequencias_operador_list')
-	else:
-		contexto = { 
-			'servidor': servidor,
-			'mensagens': mensagens,
-			'page_obj': page_obj,
-			'form': form,
-		}
-		return render(request, template_name, contexto)
-
-def frequencias_operador_change(servidor, setor, periodo_frequencia ):
-	frequencia= EscalaFrequencia()
-	frequencia.fk_periodo_acao = periodo_frequencia
-	frequencia.data = DateTime.today()
-	frequencia.fk_servidor = servidor
-	frequencia.fk_setor = setor
-	frequencia.save()
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -383,7 +583,6 @@ def frequencias_admin_list(request,template_name='namp/frequencia/frequencias_ad
 def add_noturno_list(request,template_name='namp/jornada/add_noturno_list.html'):
 	print('entrei em LISTA DE ADD NOTURNO')
 	return render(request,template_name, {})
-
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -429,7 +628,7 @@ def afastamento_change_list(request, template_name='namp/afastamento/afastamento
 				messages.warning(request, 'Sem afastamentos para o servidor informado!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
-
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def afastamento_change_form(request,template_name='namp/afastamento/afastamento_change_form.html'):
@@ -456,7 +655,7 @@ def afastamento_change_form(request,template_name='namp/afastamento/afastamento_
 			'form': form
 		}
 		return render(request, template_name, contexto)
-
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def afastamento_att_form(request, id_hist_afastamento):
@@ -492,7 +691,7 @@ def afastamento_att_form(request, id_hist_afastamento):
 		}
 		return render(request, 'namp/afastamento/afastamento_att_form.html',contexto)
 
-
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def escalas_operador_list(request,template_name='namp/escala/escalas_operador_list.html'):
@@ -530,7 +729,7 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 		'page_obj': page_obj,
 	}
 
-	return render(request, template_name, contexto)
+	return render(request, template_name, contexto)'''
 	
 
 @login_required(login_url='/autenticacao/login/')
@@ -545,9 +744,11 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	equipes = Equipe.objects.filter(status=True,fk_setor=setor.id_setor)
+
 	tem_plantao12 = False
 	tem_plantao24 = False
 	tem_plantao48 = False
+
 	for equipe in equipes:
 		if equipe.fk_tipo_jornada.carga_horaria < 12:
 			continue
@@ -561,16 +762,29 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			tem_plantao48 = True
 			continue
 	
-	form = GerarJornadaRegularForm({"tem_plantao12":tem_plantao12,"tem_plantao24":tem_plantao24, "tem_plantao48":tem_plantao48})
+	form = GerarJornadaRegularForm()
+	
+	if not tem_plantao12:
+		form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
+		form.fields['equipe_plantao12h'].required = tem_plantao12
+
+	if not tem_plantao24:
+		form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
+		form.fields['equipe_plantao24h'].required = tem_plantao24
+
+	if not tem_plantao48:
+		form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
+		form.fields['data_plantao48h'].required = tem_plantao48
+
 	if request.method == 'POST':
-		form = GerarJornadaRegularForm(request.POST,{"tem_plantao12":tem_plantao12,"tem_plantao24":tem_plantao24, "tem_plantao48":tem_plantao48})
+		form = GerarJornadaRegularForm(request.POST)
 		if form.is_valid():
 			'''
 			Trecho onde se captura a equipe de 12h do formulário,
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] != '':
+			if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None:
 				equipe12h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao12h'])
 				data_plantao12h = form.cleaned_data['data_plantao12h']
@@ -601,7 +815,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] != '':
+			if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
 				equipe24h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao24h'])
 				data_plantao24h = form.cleaned_data['data_plantao24h']
@@ -632,7 +846,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] != '':
+			if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
 				equipe48h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao48h'])
 				data_plantao48h = form.cleaned_data['data_plantao48h']

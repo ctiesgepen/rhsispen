@@ -1,0 +1,39 @@
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">{{ setor }}</h5>
+                        {% if messages %}
+                          {% for message in messages %}
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                          {% endfor %}
+                        {% endif %}
+                        <h5 class="mt-5">Movimentação Interna de servidores</h5>
+                        <hr>
+                        {% for servidores in servidor %}
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ servidor.nome }}
+                                </div>
+                        {% endfor %}
+                        {% for equipes in equipe %}
+                                <div class="form-group col-md-6">
+                                    {{ equipe.nome }}
+                                </div>
+                            </div>                        
+                        {% endfor %}
+
+                    </div>
+                </div>
+           </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

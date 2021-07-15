@@ -1,4 +1,4 @@
-{% extends 'base.html' %} {% load i18n static %} {% load static %} {% block title %}Home{% endblock %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% block title %}Home{% endblock %}
 
 {% block extrahead %}{{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.1/dist/js/bootstrap.bundle.min.js" integrity="sha384-gtEjrD/SeCtmISkJkNUaaKMoLD0//ElJ19smozuHV6z3Iehds+3Ulb9Bn9Plx0x4" crossorigin="anonymous"></script>
@@ -13,155 +13,26 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" integrity="sha512-iBBXm8fW90+nuLcSKlbmrPcLa0OT92xO1BIsZ+ywDWZCvqsWgccV3gFoRBv0z+8dLJgyAHIhR35VZc2oM/gI1w==" crossorigin="anonymous" referrerpolicy="no-referrer"/>
 
 {% endblock %}
-
-
-{% block content %}
-<title>Home</title>
-    <script>
-      function AtivarSidebar(){
-        var sidebar = document.getElementById('sideB');
-        var cond = sidebar.style.display;
-        if (cond == 'none'){
-          sidebar.style.display = "block";
-        }
-        else{
-          sidebar.style.display = "none";
-        }
-      }
-    </script>
-
-  <body>
-
-    <div class="d-md-none d-lg-none">
-      <nav class="navbar navbar-light bg-light shadow">
-        <div class="container-fluid">
-          <span class="navbar-brand mb-0 h1">Menu de Opções:</span>
-          <button class="navbar-toggler" type="button" id="btn-sidebar" onclick="AtivarSidebar();">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-        </div>
-      </nav>
-      <div class="sidebar bg-light col-md-3" id="sideB" style="display:none;">
-            <div class="flex-shrink-0 p-3 ">
-              <ul class="list-unstyled ps-0">
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
-                    Gestão
-                  </button>
-                  <div class="collapse" id="home-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:add_noturno_list' %}" class="link-dark rounded">Adicional Noturno</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:frequencias_admin_list' %}" class="link-dark rounded">Frequência</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:servidores_operador_change_list' %}" class="link-dark rounded">Movimentação de Servidores</a></li> {% endif %}
-                    </ul>
-                  </div>
-                </li>
-                <li class="border-top my-3"></li>
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-                    Setor
-                  </button>
-                  <div class="collapse" id="dashboard-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:afastamento_change_list' %}" class="link-dark rounded">Afastamentos</a></li>{% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:escalas_operador_list' %}" class="link-dark rounded">Escala Regular</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:frequencias_operador_list' %}" class="link-dark rounded">Gerar Frequências</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:equipe_operador_change_list' %}" class="link-dark rounded">Equipes</a></li> {% endif %}
-                    </ul>
-                  </div>
-                </li>
-                <li class="border-top my-3"></li>
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-                    Servidor
-                  </button>
-                  <div class="collapse" id="orders-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      <li><a href="{% url 'namp:servidor_operador_att_form' servidor.id_matricula %}" class="link-dark rounded">Atualização Cadastral</a></li>
-                      <li><a href="#" class="link-dark rounded">Histórico Funcional</a></li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      <div class="row g-0">
-        <div class="col-md-2 d-none d-sm-none d-md-block d-lg-block">
-          <div class="sid position-fixed">
-            <div class="flex-shrink-0 p-3 ">
-              <ul class="list-unstyled ps-0">
-
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#home-collapse" aria-expanded="false">
-                    Gestão
-                  </button>
-                  <div class="collapse" id="home-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:add_noturno_list' %}" class="link-dark rounded">Adicional Noturno</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:frequencias_admin_list' %}" class="link-dark rounded">Frequência</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:servidores_operador_change_list' %}" class="link-dark rounded">Movimentação de Servidores</a></li> {% endif %}
-                    </ul>
-                  </div>
-                </li>
-                <li class="border-top my-3"></li>
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#dashboard-collapse" aria-expanded="false">
-                    Setor
-                  </button>
-                  <div class="collapse" id="dashboard-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:afastamento_change_list' %}" class="link-dark rounded">Afastamentos</a></li>{% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:escalas_operador_list' %}" class="link-dark rounded">Gerar Escala Regular</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:frequencias_operador_list' %}" class="link-dark rounded">Gerar Frequências</a></li> {% endif %}
-                      {% if request.user.is_staff %} <li><a href="{% url 'namp:equipe_operador_change_list' %}" class="link-dark rounded">Equipes</a></li> {% endif %}
-                    </ul>
-                  </div>
-                </li>
-                <li class="border-top my-3"></li>
-                <li class="mb-1">
-                  <button class="btn btn-toggle align-items-center rounded collapsed" data-bs-toggle="collapse" data-bs-target="#orders-collapse" aria-expanded="false">
-                    Servidor
-                  </button>
-                  <div class="collapse" id="orders-collapse">
-                    <ul class="btn-toggle-nav list-unstyled fw-normal pb-1 small">
-                        <li><a href="{% url 'namp:servidor_operador_att_form' servidor.id_matricula %}" class="link-dark rounded">Atualização Cadastral</a></li>
-                        <li><a href="#" class="link-dark rounded">Histórico Funcional</a></li>
-                    </ul>
-                  </div>
-                </li>
-              </ul>
-            </div>
-          </div>
-        </div>
-        <div class="col-md-10">
-            <div>
-              <div class="notificacoes">
-                <h4>Notificações ({{ mensagens|length }}) </h4>
-                <div>
-                  {% if mensagens.mensagem_escalas %}
-                    <div class="alert alert-warning" role="alert">
-                      <b>CONSOLIDAR ESCALAS</b>: {{ mensagens.mensagem_escalas }}
-                    </div>
-                  {% endif %}
-
-                  {% if mensagens.mensagem_frequencia %}
-                    <div class="alert alert-danger" role="alert">
-                      <b>CONSOLIDAR FREQUÊNCIAS</b>: {{ mensagens.mensagem_frequencia }}
-                    </div>
-                  {% endif %}
-
-                </div>
-              </div>
-            </div>
-        </div>
-
-        <div class="col-md-12 position-relative">
-          <div class="conteudo ">
-            <h4>Dashboard</h4>
-          </div>
-        </div>  
-    
+    {% block content %}
+    <!-- [ Main Content ] start -->
+    <div class="pcoded-main-container">
+      <div class="pcoded-content">
+        {% if messages %}
+          {% for message in messages %}
+            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+          {% endfor %}
+        {% endif %}
+        <p>Teste</p> 
+      </div>
     </div>
-
 {% endblock%}
+
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+
+    <!-- Apex Chart -->
+    <script src="/static/assets/js/plugins/apexcharts.min.js"></script>
+    <!-- custom-chart js -->
+    <script src="/static/assets/js/pages/dashboard-main.js"></script>
+
+{% endblock javascripts %}

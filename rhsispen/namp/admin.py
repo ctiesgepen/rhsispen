@@ -5,7 +5,7 @@ from django import forms
 from django.contrib import admin
 from django.contrib.auth.models import Group, User
 from django.core.serializers.json import DjangoJSONEncoder
-from namp.models import PeriodoAcao, Afastamento, ContatoEquipe, EnderecoServ, EnderecoSetor, Equipe, Funcao, HistAfastamento, HistFuncao, HistLotacao, HistStatusFuncional, Jornada, Regiao, Servidor, Setor, StatusFuncional, TipoJornada
+from namp.models import PeriodoAcao, Afastamento, ContatoEquipe, EnderecoServ, EnderecoSetor, Equipe, Funcao, HistAfastamento, HistFuncao, HistLotacao, HistStatusFuncional, Jornada, Regiao, Servidor, Setor, StatusFuncional, TipoJornada, EscalaFrequencia
 from namp.forms import *
 
 from django.core.files.storage import FileSystemStorage
@@ -17,6 +17,7 @@ from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date
 # Register your models here.
 
 admin.site.site_header = 'Núcleo de Apoio e Movimentação de Pessoal'
+admin.site.login_template = 'autenticacao/login.html'
 
 class OperadorAdminSite(admin.AdminSite):
     pass
@@ -264,3 +265,8 @@ class PeriodoAcaoAdmin(admin.ModelAdmin):
 			return 'CONSOLIDAR ESCALAS - MÊS DE ' + (obj.data_inicial + TimeDelta(days=30)).strftime('%B')
 		elif obj.descricao == '2':
 			return 'CONSOLIDAR FREQUÊNCIAS - MÊS DE ' + (obj.data_inicial - TimeDelta(days=30)).strftime('%B')
+
+
+@admin.register(EscalaFrequencia)
+class EscalaFrequencia(admin.ModelAdmin):
+	list_display = ('data','fk_servidor','fk_setor')

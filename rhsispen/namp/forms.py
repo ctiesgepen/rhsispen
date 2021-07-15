@@ -23,26 +23,26 @@ class DefinirJornadaRegularForm(forms.Form):
 
 class GerarJornadaRegularForm(forms.Form):
     equipe_plantao12h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 12H do mês:')
-    data_plantao12h = forms.DateField(required=True,widget=DateInput(),label='Data de entrada:')
+    data_plantao12h = forms.DateField(required=True,label='Data de entrada:')
     equipe_plantao24h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 24H do mês:')
-    data_plantao24h = forms.DateField(required=True,widget=DateInput(),label='Data de entrada:')
+    data_plantao24h = forms.DateField(required=True,label='Data de entrada:')
     equipe_plantao48h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 48H do mês:')
-    data_plantao48h = forms.DateField(required=True,widget=DateInput(),label='Data de entrada:')
+    data_plantao48h = forms.DateField(required=True,label='Data de entrada:')
     
     def __init__(self, *args, **kwargs):
         super(GerarJornadaRegularForm, self).__init__(*args, **kwargs)
         self.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
         self.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
         self.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
-        self.fields['data_plantao12h'].widget.attrs['readonly'] = True
-        self.fields['data_plantao24h'].widget.attrs['readonly'] = True
-        self.fields['data_plantao48h'].widget.attrs['readonly'] = True
-        self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-        self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-        self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-        self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-        self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
-        self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']
+        self.fields['data_plantao12h'].widget = DateInput()
+        self.fields['data_plantao24h'].widget = DateInput()
+        self.fields['data_plantao48h'].widget = DateInput()
+        '''                     self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
+                                self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
+                                self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
+                                self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
+                                self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
+                                self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']'''
 
 class ServidorFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -52,7 +52,7 @@ class ServidorFormAdmin(forms.ModelForm):
         self.fields['dt_nasc'].widget.attrs={"placeholder":"00/00/0000"}
         self.fields['dt_nasc'].widget.attrs['class'] = 'mask-dt'
        # if self.objects.filter(Servidor.tipo_contato == 'Celular')
-        self.fields['contato'].widget.attrs={"placeholder": "(00)90000-0000"}
+        self.fields['contato'].widget.attrs={"placeholder":"(00) 90000-0000"}
         self.fields['contato'].widget.attrs['class'] = 'mask-contato'
         #    else:
          #   self.fields['contato'].widget.attrs={"placeholder": "(00) 0000-0000"}
@@ -146,6 +146,9 @@ class EquipeSearchForm(forms.ModelForm):
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de equipe'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nome'].label = ""
 
 class ServidorForm(forms.ModelForm):
     class Meta:
@@ -154,12 +157,7 @@ class ServidorForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
-        for field in self.fields:
-            if field =='fk_equipe': continue
-            self.fields[field].widget.attrs['readonly'] = True
-            #self.fields[choices].widget.attrs['readonly'] = True
-            #Falta setar o choices 
-
+        
 class ServidorSearchForm(forms.ModelForm):
     class Meta:
         model = Servidor
@@ -167,6 +165,9 @@ class ServidorSearchForm(forms.ModelForm):
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de servidor'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nome'].label = ""
 
 class AfastamentoForm(forms.ModelForm):
     class Meta:
@@ -195,3 +196,8 @@ class EscalaFrequenciaForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['data'].required = False
+
+class SetorForm(forms.Form):
+    class Meta:
+        model = Setor
+        fields = '__all__'

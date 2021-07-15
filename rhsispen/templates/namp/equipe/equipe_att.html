@@ -1,0 +1,64 @@
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} 
+
+{% load crispy_forms_tags %}
+
+{% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                        {% if messages %}
+                          {% for message in messages %}
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                          {% endfor %}
+                        {% endif %}
+                            <h6>Configurações</h6>
+                            <hr>                            
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{form.categoria|as_crispy_field}}
+                                    {{ form.categoria.errors }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{form.fk_tipo_jornada|as_crispy_field}}
+                                    {{ form.fk_tipo_jornada.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{form.hora_inicial|as_crispy_field}}
+                                    {{ form.hora_inicial.errors }}
+                                </div>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{form.status|as_crispy_field}}
+                                </div>
+                            </div>
+                                    
+                            <div class="form-row">
+                                <div class="form-group col-md-12">
+                                    {{form.fk_setor|as_crispy_field}}
+                                    {{ form.hora_inicial.errors }}
+
+                                </div>
+                            </div>
+
+                            <hr>
+                            <div class="submit-row">
+                            <button type="submit" class="btn  btn-dark">Salvar</button>
+                            <a href="{% url 'namp:equipe_list' %}" class="btn  btn-dark">Voltar</a>
+                            <div class="float-right"><a href="{% url 'namp:equipe_list' %}" class="btn  btn-danger">Apagar</a></div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+           </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

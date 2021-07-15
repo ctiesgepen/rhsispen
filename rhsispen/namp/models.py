@@ -184,7 +184,6 @@ class Servidor(models.Model):
 		('Nenhum', 'Nenhum'),
 	]
 	cf = models.CharField('Curso de Formação',max_length=10, choices=CHOICES_CF)
-	tipo_vinculo = models.CharField('Tipo de Vínculo',max_length=50)
 	CHOICES_VINCULO = [
 		('Contrato', 'Contrato'),
 		('Concursado', 'Concursado'),
@@ -297,6 +296,7 @@ class Jornada(models.Model):
 		verbose_name = "Jornada"
 		verbose_name_plural = "Jornadas"
 		unique_together = ('fk_servidor','data_jornada',)
+
 
 class PeriodoAcao(models.Model):
 	id_periodo_acao = models.AutoField(primary_key=True)
