@@ -30,7 +30,6 @@
                         <div id="toolbar">
                             <form method="POST" action="{% url 'namp:escalas_operador_list' %}">{% csrf_token %}
                                 <div>
-                                    {{ form.data }} {% block date_hierarchy%} {% if cl.date_hierarchy%} {% date_hierarchy cl%} {% endif%} {% endblock%}
                                     <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
                                 </div>
                             </form>
