@@ -296,8 +296,30 @@ def equipe_delete(request, id_equipe):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def servidor_mov(request):
-	return render(request, 'servidor_mov.html')
+def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		servidores = Servidor.objects.filter(fk_setor=setor)
+		equipes = Equipe.objects.filter(fk_setor=setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Equipe.DoesNotExist:
+		messages.warning(request, 'Equipe não existe!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	#form = Form(instance=equipe)
+	if request.method == 'POST':
+		#form = EquipeForm(request.POST, instance=equipe)
+		if form.is_valid():
+			form.save()
+	contexto = { 
+		'setor': setor,
+		'servidores': servidores,
+		#'form': form,
+	}
+
+	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -519,148 +541,6 @@ def servidor_escala(request):
 def servidor_hist(request):
 	return render(request, 'servidor_hist.html')
 
-'''
-@login_required(login_url='/autenticacao/login/')
-@staff_member_required(login_url='/autenticacao/login/')
-def equipe_operador_change_list(request, template_name='namp/equipe/equipe_operador_change_list.html'):
-	try:
-		servidor = Servidor.objects.get(fk_user=request.user.id)
-		equipes = Equipe.objects.filter(fk_setor=servidor.fk_setor, deleted_on=None)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Equipe.DoesNotExist:
-		messages.warning(request, 'Unidade sem equipes equipes cadastradas no momento!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-	form = EquipeSearchForm(request.POST or None)
-
-	page = request.GET.get('page')
-	paginator = Paginator(equipes, 10)
-	page_obj = paginator.get_page(page)
-	
-	contexto = { 
-		'equipes': equipes,
-		'servidor': servidor,
-		'form': form,
-		'page_obj': page_obj,
-	}
-	if request.method == 'POST':
-		if form.is_valid():
-			equipes2 = []
-			print(equipes2)
-			pattern = re.compile(form.cleaned_data['nome'].upper())
-			for equipe in equipes:
-				if pattern.search(equipe.nome.upper()):
-					equipes2.append(equipe)
-			if equipes2:
-				page = request.GET.get('page')
-				paginator = Paginator(equipes2, 15)
-				page_obj = paginator.get_page(page)
-				
-				contexto = { 
-					'equipes': equipes2,
-					'servidor': servidor,
-					'form': form,
-					'page_obj': page_obj,
-				}
-				return render(request, template_name, contexto)
-			else:
-				messages.warning(request, 'Equipe com este nome não encontrada!')
-				return render(request, template_name, contexto)
-	return render(request, template_name, contexto)
-'''
-
-'''@login_required(login_url='/autenticacao/login/')
-@staff_member_required(login_url='/autenticacao/login/')
-def servidores_operador_change_list(request,template_name='namp/servidor/servidores_operador_change_list.html'):
-	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		equipes = Equipe.objects.filter(fk_setor=setor)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Equipe.DoesNotExist:
-		messages.warning(request, 'Unidade não possui equipes cadastradas')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-	form = ServidorSearchForm(request.POST or None)
-	servidores = []
-	for	equipe in equipes:
-		for servidor in Servidor.objects.filter(fk_equipe=equipe):
-			servidores.append(servidor)
-
-	page = request.GET.get('page')
-	paginator = Paginator(servidores, 15)
-	page_obj = paginator.get_page(page)
-
-	contexto = { 
-		'setor': setor,
-		'servidores': servidores,
-		'form': form,
-		'page_obj': page_obj,
-	}
-
-	if request.method == 'POST':
-		if form.is_valid():
-			servidores2 = []
-			pattern = re.compile(form.cleaned_data['nome'].upper())
-			for servidor in servidores:
-				if pattern.search(servidor.nome.upper()):
-					servidores2.append(servidor)
-			if servidores2:
-				page = request.GET.get('page')
-				paginator = Paginator(servidores2, 15)
-				page_obj = paginator.get_page(page)
-
-				contexto = { 
-					'setor': setor,
-					'servidores': servidores2,
-					'form': form,
-					'page_obj': page_obj,
-				}
-				return render(request, template_name, contexto)
-			else:
-				print('entrei no form invalid')
-				messages.warning(request, 'Servidor com este nome não encontrado!')
-				return render(request, template_name, contexto)
-	return render(request, template_name, contexto)'''
-
-'''@login_required(login_url='/autenticacao/login/')
-def servidor_operador_att_form(request,id_matricula):
-	try:
-		user = Servidor.objects.get(fk_user=request.user.id)
-		servidor = Servidor.objects.get(id_matricula=id_matricula)
-		#enderecoServ = EnderecoServ.objects.get(fk_servidor=id_matricula)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	form = ServidorForm(instance=servidor)
-
-	if request.method == 'POST':
-		form = ServidorForm(request.POST, instance=servidor)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Servidor editado com suceso!')
-			return HttpResponseRedirect('/')
-		else:
-			contexto = {
-				'user': user,
-				'servidor': servidor,
-				'form': form,
-				#'enderecoServ': enderecoServ,
-			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			return render(request, 'namp/servidor/servidor_operador_att_form.html',contexto)
-	else:
-		contexto = {
-			'form': form,
-			'user':user,
-			'servidor': servidor,
-			#'enderecoServ':enderecoServ,
-		}
-		return render(request, 'namp/servidor/servidor_operador_att_form.html',contexto)
-'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_operador_change_form(request,id_matricula):
@@ -707,7 +587,6 @@ def frequencias_admin_list(request,template_name='namp/frequencia/frequencias_ad
 def add_noturno_list(request,template_name='namp/jornada/add_noturno_list.html'):
 	print('entrei em LISTA DE ADD NOTURNO')
 	return render(request,template_name, {})
-
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')

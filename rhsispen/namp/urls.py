@@ -25,7 +25,7 @@ urlpatterns = [
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
-	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
+	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
 	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
@@ -33,7 +33,7 @@ urlpatterns = [
 	path('operador_afastamentos/', views.operador_afastamentos, name='operador_afastamentos'), 	
 
 	#Tela do SERVIDOR
-	path('servidor_att/<int:id_matricula>/', views.servidor_att, name='servidor_att'),
+	path('servidor_att/<str:id_matricula>/', views.servidor_att, name='servidor_att'),
 	path('servidor_escala/', views.servidor_escala, name='servidor_escala'), #falta fazer
 	path('servidor_hist/', views.servidor_hist, name='servidor_hist'), #falta fazer
 
