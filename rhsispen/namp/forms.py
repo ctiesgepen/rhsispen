@@ -146,6 +146,9 @@ class EquipeSearchForm(forms.ModelForm):
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de equipe'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nome'].label = ""
 
 class ServidorForm(forms.ModelForm):
     class Meta:
@@ -168,6 +171,9 @@ class ServidorSearchForm(forms.ModelForm):
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de servidor'}),
         }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nome'].label = ""
 
 class AfastamentoForm(forms.ModelForm):
     class Meta:

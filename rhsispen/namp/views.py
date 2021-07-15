@@ -138,6 +138,7 @@ def admin_escalas_frequencias(request):
 	return render(request, 'admin_escalas_frequencias.html')
 
 #SETOR
+#Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
@@ -151,10 +152,6 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 	if request.method == 'POST':
 		form = EquipeForm(request.POST)		
 		if form.is_valid():
-			'''
-			Realizar os tratamentos necessários e fazer o form.save()
-			para a instância do modelo Equipe seja salva
-			'''
 			form.save()
 			messages.success(request, 'Equipe adicionada com suceso!')
 			return HttpResponseRedirect('/')
@@ -165,7 +162,6 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 				'form': form,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			#messages.warning(request, 'Erro no formulário!')
 			return render(request, template_name, contexto)
 	else:
 		contexto = {
@@ -194,7 +190,6 @@ def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 	page_obj = paginator.get_page(page)
 	
 	contexto = { 
-		'equipes': equipes,
 		'servidor': servidor,
 		'form': form,
 		'page_obj': page_obj,
@@ -213,7 +208,6 @@ def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 				page_obj = paginator.get_page(page)
 				
 				contexto = { 
-					'equipes': equipes2,
 					'servidor': servidor,
 					'form': form,
 					'page_obj': page_obj,
@@ -240,10 +234,6 @@ def equipe_att(request, id_equipe):
 	if request.method == 'POST':
 		form = EquipeForm(request.POST, instance=equipe)
 		if form.is_valid():
-			'''
-			Realizar os tratamentos necessários e fazer o form.save()
-			para a instância do modelo Equipe seja salva
-			'''
 			form.save()
 			messages.success(request, 'Equipe editada com suceso!')
 			return HttpResponseRedirect('/equipe_list')

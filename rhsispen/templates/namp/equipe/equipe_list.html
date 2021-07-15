@@ -1,101 +1,79 @@
 {% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
-{% block content %}
 
+{% load crispy_forms_tags %}
+
+{% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
-        <div class="col-xl-12">
-            <div class="card">
-                <div class="card-body">
-                            <div>
-                                <h5 class="text-center">{{ servidor.fk_setor }}</h5>
-                            </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                        {% if messages %}
+                          {% for message in messages %}
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                          {% endfor %}
+                        {% endif %}
+
+                        <h5 class="mt-5">Lista de Equipes</h5>
                         <hr>
-
-                        <div class="container-fluid" id="div-geral" style="margin-top: 50px;">
-                            <div class="container px-1" id="conteudo">
-                                <div class="row gx-2">
-                                    <div class="col">
-                                        <div class="p-3 bg-white text-center" id="titulo-atividade">
-                                            <h4>Equipe - Lista</h4>
-                                        </div>
-                                            {% block object-tools %}
-                                            <ul class="object-tools">
-                                                {% block object-tools-items %}
-                                                <li>
-                                                    <a href="{% url 'namp:equipe_criar' %}" class="addlink">
-                                            {% blocktrans with cl.opts.verbose_name as name %}Adicionar Equipe {{ name }}{% endblocktrans %}
-                                            </a>
-                                                </li>
-                                                {% endblock %}
-                                            </ul>
-                                            {% endblock %}
-                                            <div id="toolbar">
-                                                <form method="POST" action="{% url 'namp:equipe_list' %}">{% csrf_token %}
-                                                    <div>
-                                                        {{ form.nome }}
-                                                        <input type="submit" value="Pesquisar" style="padding: 4px 8px;">
-                                                        <a href="{% url 'namp:equipe_list' %}">ver todos</a>
-                                                    </div>
-                                                </form>
-                                            </div><br>
-
-                                            <div class="card-body table-border-style">
-                                                <div class="table-responsive">
-                                                    <table class="table table-striped">
-                                                        <thead>
-                                                            <tr>
-                                                                <th scope="col">MÊS DE REFERÊNCIA</th>
-                                                                <th scope="col">EQUIPE ATIVA</th>
-                                                                <th scope="col">CATEGORIA</th>
-                                                                <th scope="col">SERVIDORES</th>
-                                                            </tr>
-                                                        </thead>
-                                                        <tbody>
-                                                            {% for equipe in equipes %}
-                                                            <tr class="{% cycle 'row1' 'row2' %}">
-                                                                <td> <a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                                                                <td class="field-status">
-                                                                    {% if equipe.status %}
-                                                                    <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
-                                                                    <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
-                                                                </td>
-                                                                <td> {{equipe.categoria}} </td>
-                                                                <td> {{equipe.get_servidores | default:0 }} </td>
-                                                            </tr>
-                                                            {% endfor %}
-                                                        </tbody>    
-                                                <!-- cód comentado na parte de baixo -->
-                                                </table>
-                                    
-                                                <div class="pagination justify-content-center">
-                                                        <span class="step-links">
-                                                    {% if page_obj.has_previous %}
-                                                        <a href="?page=1">&laquo;</a>          
-                                                        <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                                                    {% endif %}
-                                        
-                                                    <span class="current">
-                                                        Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                                                    </span> {% if page_obj.has_next %}
-                                                        <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                                                        <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
-                                                        </span>
-                                                </div>
-                                    
-                                            </div>
-                                    </div>
-                                </div>
+                        <form method="POST" action="{% url 'namp:equipe_list' %}">{% csrf_token %}
+                            <div class="form-inline">
+                                {{ form.nome|as_crispy_field }}
+                                <button type="input" class="btn btn-dark">
+                                <i class="fas fa-search"></i>
+                                </button>
+                                <a href="{% url 'namp:equipe_list' %}">ver todos</a>
                             </div>
+                        </form>
+                        <br>
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">MÊS DE REFERÊNCIA</th>
+                                        <th scope="col">EQUIPE ATIVA</th>
+                                        <th scope="col">CATEGORIA</th>
+                                        <th scope="col">SERVIDORES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for equipe in page_obj %}
+                                    <tr class="{% cycle 'row1' 'row2' %}">
+                                        <td> <a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                        <td class="field-status">
+                                            {% if equipe.status %}
+                                            <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
+                                            <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
+                                        </td>
+                                        <td> {{equipe.categoria}} </td>
+                                        <td> {{equipe.get_servidores | default:0 }} </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>    
+                            </table>
                         </div>
-
-                    <hr>
+                        <hr>
+                        <div class="pagination justify-content-center">
+                            <span class="step-links">
+                            {% if page_obj.has_previous %}
+                                <a href="?page=1">&laquo;</a>          
+                                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
+                            {% endif %}
+                
+                            <span class="current">
+                                Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
+                            </span> {% if page_obj.has_next %}
+                                <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                                <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
+                            </span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-</div>    
+    </div>    
+</div>
 {% endblock %}            
-                <!--
-           
-                
-                --> 
+          
