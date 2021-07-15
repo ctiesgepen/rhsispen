@@ -9,10 +9,6 @@ app_name = 'namp'
 
 urlpatterns = [
 	path('', views.home, name='home'),
-	#Tela do Operador
-	#path('equipe_operador_change_list/', views.equipe_operador_change_list, name='equipe_operador_change_list'),
-	#path('equipe_operador_att_form/<int:id_equipe>/', views.equipe_operador_att_form, name='equipe_operador_att_form'),
-	#path('equipe_delete/<int:id_equipe>/delete', views.EquipeDeleteView, name='equipe_delete'),
 
 	#Tela do GESTOR
 	path('admin_afastamento/', views.admin_afastamento, name='admin_afastamento'),
@@ -28,12 +24,13 @@ urlpatterns = [
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
+	
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
 	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
-	path('operador_afastamentos/', views.operador_afastamentos, name='operador_afastamentos'), #falta fazer	
+	path('operador_afastamentos/', views.operador_afastamentos, name='operador_afastamentos'), 	
 
 	#Tela do SERVIDOR
 	path('servidor_att/<int:id_matricula>/', views.servidor_att, name='servidor_att'),
