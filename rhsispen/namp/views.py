@@ -304,7 +304,6 @@ def servidor_mov(request):
 def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		equipes = Equipe.objects.filter(fk_setor=setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -313,10 +312,8 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	form = ServidorSearchForm(request.POST or None)
-	servidores = []
-	for	equipe in equipes:
-		for servidor in Servidor.objects.filter(fk_equipe=equipe):
-			servidores.append(servidor)
+	
+	servidores = list(Servidor.objects.filter(fk_equipe__fk_setor=setor))
 
 	page = request.GET.get('page')
 	paginator = Paginator(servidores, 15)
@@ -324,7 +321,6 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 
 	contexto = { 
 		'setor': setor,
-		'servidores': servidores,
 		'form': form,
 		'page_obj': page_obj,
 	}
@@ -343,13 +339,11 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 
 				contexto = { 
 					'setor': setor,
-					'servidores': servidores2,
 					'form': form,
 					'page_obj': page_obj,
 				}
 				return render(request, template_name, contexto)
 			else:
-				print('entrei no form invalid')
 				messages.warning(request, 'Servidor com este nome não encontrado!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
@@ -485,16 +479,18 @@ def servidor_att(request, id_matricula):
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
 	form = ServidorForm(instance=servidor)
 	
-	if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
-	else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
-	form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
-	form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
-	form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
-	form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
-	form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
-	form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
+	if not request.user.is_superuser:
+		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+		form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+		form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+		form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+		form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+		form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
 
 	contexto = {
 		'form': form,
@@ -869,9 +865,11 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	equipes = Equipe.objects.filter(status=True,fk_setor=setor.id_setor)
+
 	tem_plantao12 = False
 	tem_plantao24 = False
 	tem_plantao48 = False
+
 	for equipe in equipes:
 		if equipe.fk_tipo_jornada.carga_horaria < 12:
 			continue
@@ -885,16 +883,29 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			tem_plantao48 = True
 			continue
 	
-	form = GerarJornadaRegularForm({"tem_plantao12":tem_plantao12,"tem_plantao24":tem_plantao24, "tem_plantao48":tem_plantao48})
+	form = GerarJornadaRegularForm()
+	
+	if not tem_plantao12:
+		form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
+		form.fields['equipe_plantao12h'].required = tem_plantao12
+
+	if not tem_plantao24:
+		form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
+		form.fields['equipe_plantao24h'].required = tem_plantao24
+
+	if not tem_plantao48:
+		form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
+		form.fields['data_plantao48h'].required = tem_plantao48
+
 	if request.method == 'POST':
-		form = GerarJornadaRegularForm(request.POST,{"tem_plantao12":tem_plantao12,"tem_plantao24":tem_plantao24, "tem_plantao48":tem_plantao48})
+		form = GerarJornadaRegularForm(request.POST)
 		if form.is_valid():
 			'''
 			Trecho onde se captura a equipe de 12h do formulário,
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] != '':
+			if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None:
 				equipe12h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao12h'])
 				data_plantao12h = form.cleaned_data['data_plantao12h']
@@ -925,7 +936,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] != '':
+			if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
 				equipe24h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao24h'])
 				data_plantao24h = form.cleaned_data['data_plantao24h']
@@ -956,7 +967,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] != '':
+			if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
 				equipe48h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao48h'])
 				data_plantao48h = form.cleaned_data['data_plantao48h']
