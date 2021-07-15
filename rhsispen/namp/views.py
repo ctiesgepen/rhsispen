@@ -486,6 +486,15 @@ def servidor_att(request, id_matricula):
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	form = ServidorForm(instance=servidor)
 	
+	if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+	else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+	form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+	form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+	form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+	form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+	form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+	form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
+
 	contexto = {
 		'form': form,
 		'user':user,
