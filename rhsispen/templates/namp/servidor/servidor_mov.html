@@ -2,6 +2,22 @@
 
 {% load crispy_forms_tags %}
 
+{% block javascripts %}
+<script type="text/javascript">
+    $(function() {
+        // inspect html to check id of category select dropdown.
+        $(document).on("change", "#id_servidor", function() {
+            $.getJSON("/getEquipeServidor/", {
+                id_matricula: $("#id_servidor").val()
+            }, function(j) {
+                var options = '<option value="' + j[0].id_equipe + '">' + j[0].nome + "</option>";
+                $("#id_equipe_origem").html(options);
+            });
+        });
+    });
+</script>
+{% endblock javascripts %}
+
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
@@ -15,21 +31,34 @@
                             <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                           {% endfor %}
                         {% endif %}
-                        <h5 class="mt-5">Movimentação Interna de servidores</h5>
-                        <hr>
-                        {% for servidores in servidor %}
-                            <div class="form-row">
-                                <div class="form-group col-md-3">
-                                    {{ servidor.nome }}
-                                </div>
-                        {% endfor %}
-                        {% for equipes in equipe %}
-                                <div class="form-group col-md-6">
-                                    {{ equipe.nome }}
-                                </div>
-                            </div>                        
-                        {% endfor %}
 
+                        <h5 class="mt-5">Movimentação Interna</h5>
+                        <hr>
+                        
+                        <form action="{% url 'namp:servidor_mov' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{ form.servidor|as_crispy_field }}
+                                    {{ form.servidor.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{ form.equipe_origem|as_crispy_field}}
+                                    {{ form.equipe_origem.errors }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ form.equipe_destino|as_crispy_field}}
+                                    {{ form.equipe_destino.errors }}
+                                </div>
+                            </div>                       
+                            <hr>
+                            <div class="submit-row">
+                            <button type="submit" class="btn  btn-dark">Salvar</button>
+                            <a href="{% url 'namp:home' %}" class="btn  btn-dark">Cancelar</a>
+                            </div>
+                        </form>
                     </div>
                 </div>
            </div>

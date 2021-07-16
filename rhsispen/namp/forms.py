@@ -202,3 +202,14 @@ class SetorForm(forms.Form):
     class Meta:
         model = Setor
         fields = '__all__'
+
+class ServidorMoverForm(forms.Form):
+    servidor = forms.ChoiceField(required=True, label='Servidor')
+    equipe_origem = forms.ChoiceField(required=True,label='Equipe Atual')
+    equipe_destino = forms.ChoiceField(required=True, label='Equipe Destino')
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['servidor'].choices = [('', '--Selecione--')] + list(Servidor.objects.all().values_list('id_matricula', 'nome'))
+        self.fields['equipe_origem'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+        self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))

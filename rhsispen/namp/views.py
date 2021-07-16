@@ -76,7 +76,6 @@ def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Setores não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
-	print(setor.nome)
 	form = SetorForm()
 	contexto = { 
 		'setor': setor,
@@ -92,6 +91,7 @@ def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
 			contexto['form'] = form
 			return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
+
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -298,38 +298,49 @@ def equipe_delete(request, id_equipe):
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id)
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
 		servidores = Servidor.objects.filter(fk_setor=setor)
-		equipes = list(Equipe.objects.filter(fk_equipe__fk_setor=setor))
+		equipes = Equipe.objects.filter(fk_setor=setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	except Equipe.DoesNotExist:
-		messages.warning(request, 'Equipe não existe!')
+		messages.warning(request, 'Não há equipes cadastradas para esse setor!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	form = ServidorForm(request.POST or None)
+	form = ServidorMoverForm()
+	form.fields['servidor'].choices = [('', '--Selecione--')] + list(servidores.values_list('id_matricula','nome'))
+	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
+	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
+	contexto = {
+		'setor':setor,
+		'form': form,
+	}
 	if request.method == 'POST':
-		form = ServidorForm(request.POST, instance=servidores)
+		form = ServidorMoverForm(request.POST)
 		if form.is_valid():
-			form.save()
-			messages.success(request, 'Servidor movimentado com suceso!')
-			return HttpResponseRedirect('/servidor_list')
+			try:
+				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
+				equipe = Equipe.objects.get(id_equipe=form.cleaned_data['equipe_destino'])
+			except Servidor.DoesNotExist:
+				messages.warning(request, 'Servidor não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			except Equipe.DoesNotExist:
+				messages.warning(request, 'Equipe não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
+			
+			servidor.fk_equipe = equipe
+			servidor.save()
+			messages.success(request, 'Movimentação realizada com suceso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
 		else:
 			contexto = {
 				'setor':setor,
-				#'servidores': servidores,
-				'form': form
+				'form': form,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			return render(request, 'namp/servidor/servidor_list',contexto)
-	else:
-		contexto = {
-			'setor':setor,
-			#'servidores': servidores,
-			'form': form
-		}
-		return render(request, 'namp/servidor/servidor_lis',contexto)
+			return render(request, template_name,contexto)
+	return render(request, template_name,contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -514,7 +525,7 @@ def servidor_att(request, id_matricula):
 	
 	form = ServidorForm(instance=servidor)
 	
-	if not request.user.is_superuser:
+	if not request.user.is_superuse:
 		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
 		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
 		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
@@ -971,10 +982,13 @@ def get_tipo_jornada(request):
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_equipe_servidor(request):
+	print('entrei no get equipe')
 	result = list(Equipe.objects.none())
 	id_matricula = request.GET.get('id_matricula', '')
 	if (id_matricula):
-		result = list(Equipe.objects.filter(fk_setor=Servidor.objects.get(id_matricula=id_matricula).fk_setor).values('id_equipe', 'nome'))
+		print('achei o servidor')
+		result = list(Equipe.objects.filter(id_equipe=Servidor.objects.get(id_matricula=id_matricula).fk_equipe.id_equipe).values('id_equipe', 'nome'))
+	print('vou sair do get equipe')
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def exportar_pdf(request):
