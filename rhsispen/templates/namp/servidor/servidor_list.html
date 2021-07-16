@@ -10,7 +10,7 @@
                         <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                         {% endfor %} {% endif %}
 
-                        <h5 class="mt-5">Lista de Servidores</h5>
+                        <h5 class="mt-5">Servidores</h5>
                         <hr>
                         <form method="POST" action="{% url 'namp:servidor_list' %}">{% csrf_token %}
                             <div class="form-inline">
@@ -19,8 +19,8 @@
                                 <i class="fas fa-search"></i>
                                 </button>
                                 <a class="col float-right" href="{% url 'namp:servidor_list' %}">ver todos</a>
-                                <div class="col float-right" style="padding: 0;">
-                                    <a href="{% url 'namp:servidor_mov'%}" class="btn btn-dark float-right">Mover Servidor</a>
+                                <div class="float-right" style="padding: 0;">
+                                    <a href="{% url 'namp:servidor_mov'%}" class="btn btn-dark float-right"><i class="fas fa-exchange-alt"></i> Mover Servidor</a>
                                 </div>
                             </div>
                         </form>
