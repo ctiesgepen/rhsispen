@@ -654,7 +654,7 @@ def afastamento_list(request, template_name='namp/afastamento/afastamento_list.h
 	form = AfastamentoSearchForm(request.POST or None)
 		
 	page = request.GET.get('page')
-	paginator = Paginator(list(afastamentos), 4)
+	paginator = Paginator(list(afastamentos), 15)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 
