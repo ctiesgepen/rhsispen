@@ -24,17 +24,20 @@ urlpatterns = [
 	path('admin_escalas_frequencias/', views.admin_escalas_frequencias, name='admin_escalas_frequencias'), #falta fazer
 
 	#Tela do OPERADOR
-	path('equipe_att/<int:id_equipe>/', views.equipe_att, name='equipe_att'),
-	path('equipe_criar/', views.equipe_criar, name='equipe_criar'),
-	path('equipe_list/', views.equipe_list, name='equipe_list'),
+
+	path('setor_att/<int:id_setore>/', views.setor_att, name='setor_att'), #falta fazer
+	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
+	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
+	path('equipes/', views.equipe_list, name='equipe_list'),
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
-	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), #falta fazer
-	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
+	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
+	path('servidor_list/', views.servidor_list, name='servidor_list'),
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
-	path('operador_afastamentos/', views.operador_afastamentos, name='operador_afastamentos'), #falta fazer	
-
+	path('afastamentos/afastamento_criar/', views.afastamento_criar, name='afastamento_criar'), 	
+	path('afastamentos/', views.afastamento_list, name='afastamento_list'),
+	
 	#Tela do SERVIDOR
 	path('servidor_att/<int:id_matricula>/', views.servidor_att, name='servidor_att'),
 	path('servidor_escala/', views.servidor_escala, name='servidor_escala'), #falta fazer
@@ -51,13 +54,9 @@ urlpatterns = [
 	#path('servidor_operador_att_form/<int:id_matricula>/', views.servidor_operador_att_form, name='servidor_operador_att_form'),
 	
 	#path('afastamento_change_form/', views.afastamento_change_form, name='afastamento_change_form'),
-	#path('afastamento_change_list/', views.afastamento_change_list, name='afastamento_change_list'),
+	
 	#path('afastamento_att_form/<int:id_hist_afastamento>/', views.afastamento_att_form, name='afastamento_att_form'),
 
-	#path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
-
-	#path('escalas_operador_list/', views.escalas_operador_list, name='escalas_operador_list'),
-	
 	#path('frequencias_operador_list/', views.frequencias_operador_list, name='frequencias_operador_list'),
 	#path('frequencias_admin_list/', views.frequencias_admin_list, name='frequencias_admin_list'),
 

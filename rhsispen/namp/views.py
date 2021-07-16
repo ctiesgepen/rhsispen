@@ -76,7 +76,6 @@ def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Setores não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
-	print(setor.nome)
 	form = SetorForm()
 	contexto = { 
 		'setor': setor,
@@ -92,6 +91,7 @@ def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
 			contexto['form'] = form
 			return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
+
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -164,6 +164,42 @@ def admin_escalas_frequencias(request):
 	return render(request, 'admin_escalas_frequencias.html')
 
 #SETOR
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def setor_att(request, id_setor):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		#equipe = Equipe.objects.get(id_equipe=id_equipe)
+		setor = Servidor.objects.get(fk_setor=id_setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Setor não encontrada!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	form = SetorForm(instance=setor)
+	if request.method == 'POST':
+		form = SetorForm(request.POST, instance=setor)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Setor editado com suceso!')
+			return HttpResponseRedirect('/')
+		else:
+			contexto = {
+				'setor': setor,
+				'servidor': servidor,
+				'form': form
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/setor/setor_att.html',contexto)
+	else:
+		contexto = {
+			'setor': setor,
+			'servidor': servidor,
+			'form': form
+		}
+		return render(request, 'namp/equipe/setor_att.html',contexto)
+
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -180,8 +216,7 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Equipe adicionada com suceso!')
-			return HttpResponseRedirect('/')
-
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 		else:
 			contexto = {
 				'setor': setor,
@@ -292,7 +327,7 @@ def equipe_delete(request, id_equipe):
 				servidor.save()
 	equipe.delete()
 	messages.success(request, "Equipe deletada com sucesso!")
-	return HttpResponseRedirect("/equipe_list")
+	return HttpResponseRedirect("/")
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -305,21 +340,43 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	except Equipe.DoesNotExist:
-		messages.warning(request, 'Equipe não existe!')
+		messages.warning(request, 'Não há equipes cadastradas para esse setor!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	#form = Form(instance=equipe)
-	if request.method == 'POST':
-		#form = EquipeForm(request.POST, instance=equipe)
-		if form.is_valid():
-			form.save()
-	contexto = { 
-		'setor': setor,
-		'servidores': servidores,
-		#'form': form,
+	form = ServidorMoverForm()
+	form.fields['servidor'].choices = [('', '--Selecione--')] + list(servidores.values_list('id_matricula','nome'))
+	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
+	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
+	contexto = {
+		'setor':setor,
+		'form': form,
 	}
-
-	return render(request, template_name, contexto)
+	if request.method == 'POST':
+		form = ServidorMoverForm(request.POST)
+		if form.is_valid():
+			try:
+				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
+				equipe = Equipe.objects.get(id_equipe=form.cleaned_data['equipe_destino'])
+			except Servidor.DoesNotExist:
+				messages.warning(request, 'Servidor não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			except Equipe.DoesNotExist:
+				messages.warning(request, 'Equipe não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
+			
+			servidor.fk_equipe = equipe
+			servidor.save()
+			messages.success(request, 'Movimentação realizada com suceso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			#return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
+		else:
+			contexto = {
+				'setor':setor,
+				'form': form,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name,contexto)
+	return render(request, template_name,contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -469,7 +526,7 @@ def frequencias_operador_change(servidor, setor, periodo_frequencia):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def operador_afastamentos(request,template_name='namp/afastamento/operador_afastamentos.html'):
+def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
@@ -487,7 +544,7 @@ def operador_afastamentos(request,template_name='namp/afastamento/operador_afast
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Afastamento cadastrado com sucesso!')	
-			return HttpResponseRedirect('/')
+			return HttpResponseRedirect('namp:afastamento_list')
 		else:
 			contexto['form'] = form
 			return render(request, template_name, contexto)
@@ -504,7 +561,7 @@ def servidor_att(request, id_matricula):
 	
 	form = ServidorForm(instance=servidor)
 	
-	if not request.user.is_superuser:
+	if not request.user.is_superuse:
 		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
 		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
 		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
@@ -586,7 +643,7 @@ def add_noturno_list(request,template_name='namp/jornada/add_noturno_list.html')
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def afastamento_change_list(request, template_name='namp/afastamento/afastamento_change_list.html'):
+def afastamento_list(request, template_name='namp/afastamento/afastamento_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		afastamentos = HistAfastamento.objects.filter(fk_servidor__fk_setor=servidor.fk_setor)
@@ -595,7 +652,7 @@ def afastamento_change_list(request, template_name='namp/afastamento/afastamento
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	form = AfastamentoSearchForm(request.POST or None)
-	
+		
 	page = request.GET.get('page')
 	paginator = Paginator(list(afastamentos), 15)
 	page_obj = paginator.get_page(page)
@@ -961,10 +1018,13 @@ def get_tipo_jornada(request):
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_equipe_servidor(request):
+	print('entrei no get equipe')
 	result = list(Equipe.objects.none())
 	id_matricula = request.GET.get('id_matricula', '')
 	if (id_matricula):
-		result = list(Equipe.objects.filter(fk_setor=Servidor.objects.get(id_matricula=id_matricula).fk_setor).values('id_equipe', 'nome'))
+		print('achei o servidor')
+		result = list(Equipe.objects.filter(id_equipe=Servidor.objects.get(id_matricula=id_matricula).fk_equipe.id_equipe).values('id_equipe', 'nome'))
+	print('vou sair do get equipe')
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def exportar_pdf(request):
