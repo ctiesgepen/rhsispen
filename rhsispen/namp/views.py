@@ -292,15 +292,15 @@ def equipe_delete(request, id_equipe):
 				servidor.save()
 	equipe.delete()
 	messages.success(request, "Equipe deletada com sucesso!")
-	return HttpResponseRedirect("/equipe_list")
+	return HttpResponseRedirect("/")
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		setor = Servidor.objects.get(fk_user=request.user.id)
 		servidores = Servidor.objects.filter(fk_setor=setor)
-		equipes = Equipe.objects.filter(fk_setor=setor)
+		equipes = list(Equipe.objects.filter(fk_equipe__fk_setor=setor))
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -308,18 +308,28 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 		messages.warning(request, 'Equipe não existe!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	#form = Form(instance=equipe)
+	form = ServidorForm(request.POST or None)
 	if request.method == 'POST':
-		#form = EquipeForm(request.POST, instance=equipe)
+		form = ServidorForm(request.POST, instance=servidores)
 		if form.is_valid():
 			form.save()
-	contexto = { 
-		'setor': setor,
-		'servidores': servidores,
-		#'form': form,
-	}
-
-	return render(request, template_name, contexto)
+			messages.success(request, 'Servidor movimentado com suceso!')
+			return HttpResponseRedirect('/servidor_list')
+		else:
+			contexto = {
+				'setor':setor,
+				#'servidores': servidores,
+				'form': form
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/servidor/servidor_list',contexto)
+	else:
+		contexto = {
+			'setor':setor,
+			#'servidores': servidores,
+			'form': form
+		}
+		return render(request, 'namp/servidor/servidor_lis',contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
