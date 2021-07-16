@@ -216,8 +216,7 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Equipe adicionada com suceso!')
-			return HttpResponseRedirect('/')
-
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 		else:
 			contexto = {
 				'setor': setor,
@@ -368,7 +367,7 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 			servidor.fk_equipe = equipe
 			servidor.save()
 			messages.success(request, 'Movimentação realizada com suceso!')
-			return render(request, 'namp/servidor/servidor_list.html',contexto)
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 			#return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
 		else:
 			contexto = {
