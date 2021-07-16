@@ -52,7 +52,7 @@
                             <div class="submit-row">
                             <button type="submit" class="btn  btn-dark">Salvar</button>
                             <a href="{% url 'namp:equipe_list' %}" class="btn  btn-dark">Voltar</a>
-                            <div class="float-right"><a href="{% url 'namp:equipe_list' %}" class="btn  btn-danger">Apagar</a></div>
+                            <div class="float-right"><a href="{% url 'namp:equipe_delete' equipe.id_equipe %}" class="btn  btn-danger">Apagar</a></div>
                             </div>
                         </form>
                     </div>

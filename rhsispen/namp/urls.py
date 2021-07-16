@@ -26,7 +26,7 @@ urlpatterns = [
 	path('equipes/', views.equipe_list, name='equipe_list'),
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
-	path('servidor_list/', views.servidor_list, name='servidor_list'), #falta fazer
+	path('servidor_list/', views.servidor_list, name='servidor_list'),
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
@@ -51,10 +51,6 @@ urlpatterns = [
 	#path('afastamento_change_list/', views.afastamento_change_list, name='afastamento_change_list'),
 	#path('afastamento_att_form/<int:id_hist_afastamento>/', views.afastamento_att_form, name='afastamento_att_form'),
 
-	#path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
-
-	#path('escalas_operador_list/', views.escalas_operador_list, name='escalas_operador_list'),
-	
 	#path('frequencias_operador_list/', views.frequencias_operador_list, name='frequencias_operador_list'),
 	#path('frequencias_admin_list/', views.frequencias_admin_list, name='frequencias_admin_list'),
 

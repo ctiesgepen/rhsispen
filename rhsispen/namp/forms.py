@@ -158,10 +158,11 @@ class ServidorForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
         
+
 class ServidorSearchForm(forms.ModelForm):
     class Meta:
         model = Servidor
-        fields = ('nome', )
+        fields = ('nome',)
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de servidor'}),
         }
