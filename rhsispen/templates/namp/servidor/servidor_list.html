@@ -1,8 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
-
-{% load crispy_forms_tags %}
-
-{% block content %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -10,11 +6,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="text-center">{{ setor }}</h5>
-                        {% if messages %}
-                          {% for message in messages %}
-                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
-                          {% endfor %}
-                        {% endif %}
+                        {% if messages %} {% for message in messages %}
+                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                        {% endfor %} {% endif %}
 
                         <h5 class="mt-5">Lista de Servidores</h5>
                         <hr>
@@ -29,8 +23,6 @@
                         </form>
                         <br>
                         <div class="table-responsive">
-                            <table class="table table-striped">
-                                <thead class="thead-dark">                                    
                             <table class="table table-striped table-sm shadow-sm">
                                 <thead class="thead-dark">
                                     <tr>
@@ -52,24 +44,24 @@
                                     {% for servidor in page_obj %} 
                                     <tr class="{% cycle 'row1' 'row2' %}">
                                         <td><a href="{% url 'namp:servidor_att' servidor.id_matricula %}">{{ servidor.nome }}</a></td>
-                                        <td> {{ servidor.id_matricula }} </td>
-                                        <td> {{ servidor.vinculo }} </td>
-                                        <td> {{ servidor.cpf }} </td>
-                                        <td> {{ servidor.dt_nasc }} </td>
-                                        <td> {{ servidor.sexo }} </td>
-                                        <td> {{ servidor.cargo }} </td>
-                                        <td> {{ servidor.cf }} </td>
-                                        <td> {{ servidor.tipo_vinculo }} </td>
-                                        <td> {{ servidor.regime_juridico }} </td>
-                                        <td> {{ servidor.fk_equipe }} </td>
-                                    </tr>
-                                    {% endfor %}
+                                <td> {{ servidor.id_matricula }} </td>
+                                <td> {{ servidor.vinculo }} </td>
+                                <td> {{ servidor.cpf }} </td>
+                                <td> {{ servidor.dt_nasc }} </td>
+                                <td> {{ servidor.sexo }} </td>
+                                <td> {{ servidor.cargo }} </td>
+                                <td> {{ servidor.cf }} </td>
+                                <td> {{ servidor.tipo_vinculo }} </td>
+                                <td> {{ servidor.regime_juridico }} </td>
+                                <td> {{ servidor.fk_equipe }} </td>
+                                </tr>
+                                {% endfor %}
                                 </tbody>
-                            </table>
-                        </div>
-                        <hr>
-                        <div class="pagination justify-content-center">
-                            <span class="step-links">
+                                </table>
+                            </div>
+                            <hr>
+                            <div class="pagination justify-content-center">
+                                <span class="step-links">
                                 {% if page_obj.has_previous %}
                                 <a href="?page=1">&laquo;</a>          
                                 <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
@@ -77,18 +69,15 @@
                     
                                 <span class="current">
                                     Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                                </span> 
-                                {% if page_obj.has_next %}
+                                </span> {% if page_obj.has_next %}
                                 <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                                <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> 
-                                {% endif %}
-                            </span>
-                        </div>
+                                <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
+                                </span>
+                            </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
 </div>
-{% endblock %}            
-          
+{% endblock %}
