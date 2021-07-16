@@ -526,7 +526,7 @@ def frequencias_operador_change(servidor, setor, periodo_frequencia):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def operador_afastamentos(request,template_name='namp/afastamento/operador_afastamentos.html'):
+def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
@@ -544,7 +544,7 @@ def operador_afastamentos(request,template_name='namp/afastamento/operador_afast
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Afastamento cadastrado com sucesso!')	
-			return HttpResponseRedirect('/')
+			return HttpResponseRedirect('namp:afastamento_list')
 		else:
 			contexto['form'] = form
 			return render(request, template_name, contexto)
@@ -643,7 +643,7 @@ def add_noturno_list(request,template_name='namp/jornada/add_noturno_list.html')
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def afastamento_change_list(request, template_name='namp/afastamento/afastamento_change_list.html'):
+def afastamento_list(request, template_name='namp/afastamento/afastamento_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		afastamentos = HistAfastamento.objects.filter(fk_servidor__fk_setor=servidor.fk_setor)
@@ -652,9 +652,9 @@ def afastamento_change_list(request, template_name='namp/afastamento/afastamento
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	form = AfastamentoSearchForm(request.POST or None)
-	
+		
 	page = request.GET.get('page')
-	paginator = Paginator(list(afastamentos), 15)
+	paginator = Paginator(list(afastamentos), 4)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 

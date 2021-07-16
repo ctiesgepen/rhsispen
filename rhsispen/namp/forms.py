@@ -185,9 +185,11 @@ class AfastamentoSearchForm(forms.Form):
     servidor = forms.CharField(required=True)
     class Meta:
         fields = ('servidor', )
-        widgets = {
-            'servidor': forms.TextInput(attrs={'placeholder': 'Digite um nome de servidor'}),
-        }
+        
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['servidor'].label = ""
+        self.fields['servidor'].widget.attrs['placeholder'] = 'Digite um nome de servidor'
 
 class EscalaFrequenciaForm(forms.ModelForm):
     class Meta:
