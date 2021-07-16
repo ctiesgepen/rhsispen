@@ -164,6 +164,42 @@ def admin_escalas_frequencias(request):
 	return render(request, 'admin_escalas_frequencias.html')
 
 #SETOR
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def setor_att(request, id_setor):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		#equipe = Equipe.objects.get(id_equipe=id_equipe)
+		setor = Servidor.objects.get(fk_setor=id_setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Setor não encontrada!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	form = SetorForm(instance=setor)
+	if request.method == 'POST':
+		form = SetorForm(request.POST, instance=setor)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Setor editado com suceso!')
+			return HttpResponseRedirect('/')
+		else:
+			contexto = {
+				'setor': setor,
+				'servidor': servidor,
+				'form': form
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/setor/setor_att.html',contexto)
+	else:
+		contexto = {
+			'setor': setor,
+			'servidor': servidor,
+			'form': form
+		}
+		return render(request, 'namp/equipe/setor_att.html',contexto)
+
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -332,7 +368,8 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 			servidor.fk_equipe = equipe
 			servidor.save()
 			messages.success(request, 'Movimentação realizada com suceso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
+			return render(request, 'namp/servidor/servidor_list.html',contexto)
+			#return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
 		else:
 			contexto = {
 				'setor':setor,
