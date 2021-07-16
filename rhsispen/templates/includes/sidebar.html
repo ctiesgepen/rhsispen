@@ -31,7 +31,7 @@
 					    <a href="{% url 'namp:admin_unidades'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Setores</span></a>
 					</li>
 					<li class="nav-item">
-					    <a href="{% url 'namp:admin_servidores'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Mov. Servidores</span></a>
+					    <a href="{% url 'namp:admin_servidores'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Servidores</span></a>
 					</li>
 					<li class="nav-item">
 					    <a href="{% url 'namp:admin_escalas_frequencias'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Definir Períodos</span></a>
@@ -56,19 +56,18 @@
 					<li class="nav-item pcoded-menu-caption">
 						<label>Setor</label>
 					</li>
+					<li class="nav-item">
+					    <a href="" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Meu Setor</span></a>
+					</li>
 					<li class="nav-item pcoded-hasmenu">
-						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Meu Setor</span></a>
+						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Equipes</span></a>
 						<ul class="pcoded-submenu">
 							<li><a href="{% url 'namp:equipe_criar'%}">Cadastrar Equipe</a></li>
 							<li><a href="{% url 'namp:equipe_list' %}">Listar Equipes</a></li>
 						</ul>
 					</li>
-					<li class="nav-item pcoded-hasmenu">
-						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Servidores</span></a>
-						<ul class="pcoded-submenu">
-							<li><a href="{% url 'namp:servidor_mov'%}">Mov. de Servidores</a></li>
-							<li><a href="{% url 'namp:servidor_list'%}">Listar Servidores</a></li>
-						</ul>
+					<li class="nav-item">
+					    <a href="{% url 'namp:servidor_list'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Servidores</span></a>
 					</li>
 					<li class="nav-item pcoded-hasmenu">
 						<a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Períodos</span></a>
