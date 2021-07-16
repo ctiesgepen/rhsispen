@@ -1,6 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
-{% %}
-{% block content %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -8,11 +6,9 @@
                 <div class="card">
                     <div class="card-body">
                         <h5 class="text-center">Estado do Tocantins</h5>
-                        {% if messages %}
-                          {% for message in messages %}
-                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
-                          {% endfor %}
-                        {% endif %}
+                        {% if messages %} {% for message in messages %}
+                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                        {% endfor %} {% endif %}
 
                         <h5 class="mt-5">Lista de todos os Setores</h5>
                         <hr>
@@ -41,7 +37,8 @@
                                     {% for setores in page_obj %}
                                     <tr class="{% cycle 'row1' 'row2' %}">
                                         <td> {{setor.id_setor}} </td>
-                                        <td> {{setor.nome}}</a></td>
+                                        <td> {{setor.nome}}</a>
+                                        </td>
                                         <td class="field-status">
                                             {% if setores.status %}
                                             <img src="/static/admin/img/icon-yes.svg" alt="{{setores.status}}"> {% else %}
@@ -52,7 +49,7 @@
                                         <td> {{setor.get_servidores | default:0}} </td>
                                     </tr>
                                     {% endfor %}
-                                </tbody>    
+                                </tbody>
                             </table>
                         </div>
                         <hr>
@@ -66,15 +63,14 @@
                             <span class="current">
                                 Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
                             </span> {% if page_obj.has_next %}
-                                <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                                <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
+                            <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
                             </span>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>    
+    </div>
 </div>
-{% endblock %}            
-          
+{% endblock %}

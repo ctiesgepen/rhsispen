@@ -4,7 +4,7 @@ from typing import Pattern
 import xlwt
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento
+from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia
 from django.http import HttpResponse, HttpResponseRedirect
 from weasyprint import HTML
 from django.template.loader import render_to_string
