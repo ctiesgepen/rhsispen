@@ -12,7 +12,7 @@ from django.core.files.storage import FileSystemStorage
 from .forms import *
 from django.urls import resolve
 from urllib.parse import urlparse
-from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date
+from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date, time as Time
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import re
@@ -158,10 +158,97 @@ def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
+
+'''
+Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
+'''
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_escalas_frequencias(request):
-	return render(request, 'admin_escalas_frequencias.html')
+def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
+	
+	form = PeriodoAcaoForm()
+	contexto = {
+		'form': form,
+	}
+
+	if request.method == 'POST':
+		form = PeriodoAcaoForm(request.POST)		
+		if form.is_valid():
+			periodo = form.save(commit=False)
+			periodo.data_inicial = periodo.data_inicial.replace(hour=form.cleaned_data['hora_inicial'].hour, minute=form.cleaned_data['hora_inicial'].minute)
+			periodo.data_final = periodo.data_final.replace(hour=form.cleaned_data['hora_final'].hour, minute=form.cleaned_data['hora_final'].minute)
+			periodo.save()
+			messages.warning(request, 'Período cadastrado com sucesso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		else:
+			contexto['form'] = form
+			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			messages.warning(request, 'Erro no form')
+			return render(request, template_name, contexto)
+	return render(request,template_name, contexto)
+
+'''
+Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
+'''
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
+	
+	try:
+		periodos = list(PeriodoAcao.objects.all())
+	except PeriodoAcao.DoesNotExist:
+		messages.warning(request,'Não há períodos registrados até o momento.')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	page = request.GET.get('page')
+	paginator = Paginator(periodos, 15)
+	page_obj = paginator.get_page(page)
+	
+	form = PeriodoAcaoSearchForm()
+	contexto = { 
+		'form': form,
+		'page_obj': page_obj,
+	}
+	if request.method == 'POST':
+		form = PeriodoAcaoSearchForm(request.POST)
+		if form.is_valid():
+			periodos2 = []
+			meses = {
+			'Jan':'JANEIRO', 
+			'Feb':'FEVEREIRO', 
+			'Mar':'MARÇO', 
+			'Apr':'ABRIL', 
+			'May':'MAIO', 
+			'Jun':'JUNHO', 
+			'Jul':'JULHO', 
+			'Aug':'AGOSTO', 
+			'Sep':'SETEMBRO', 
+			'Out':'OUTUBRO', 
+			'Nov':'NOVEMBRO', 
+			'Dec':'DEZEMBRO',
+			}
+			pattern = re.compile(form.cleaned_data['descricao'].upper())
+			for periodo in periodos:
+				if periodo.descricao == 'GERAR ESCALAS':
+					if pattern.search(periodo.descricao.upper()) or pattern.search(meses[periodo.data_inicial.replace(month=periodo.data_inicial.month+1).strftime('%b')]):
+						periodos2.append(periodo)
+				else:
+					if pattern.search(periodo.descricao.upper()) or pattern.search(meses[periodo.data_inicial.replace(month=periodo.data_inicial.month-1).strftime('%b')]):
+						periodos2.append(periodo)
+			if periodos2:
+				page = request.GET.get('page')
+				paginator = Paginator(periodos2, 15)
+				page_obj = paginator.get_page(page)
+				
+				contexto = { 
+					'form': form,
+					'page_obj': page_obj,
+				}
+				return render(request, template_name, contexto)
+			else:
+				messages.warning(request, 'Período ou evento não encontrado!')
+				return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 #SETOR
 @login_required(login_url='/autenticacao/login/')

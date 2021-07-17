@@ -303,10 +303,10 @@ class PeriodoAcao(models.Model):
 	data_inicial = models.DateTimeField()
 	data_final = models.DateTimeField()
 	CHOICES_DESCRICAO = [
-		('1', 'CONSOLIDAR ESCALAS'),
-		('2', 'CONSOLIDAR FREQUENCIAS'),
+		('GERAR ESCALAS', 'GERAR ESCALAS'),
+		('CONSOLIDAR FREQUENCIAS', 'CONSOLIDAR FREQUENCIAS'),
 	]
-	descricao = models.CharField('Descrição',max_length=25, choices=CHOICES_DESCRICAO)
+	descricao = models.CharField('Evento do Período',max_length=25, choices=CHOICES_DESCRICAO)
 
 	class Meta:
 		ordering = ["data_inicial"]

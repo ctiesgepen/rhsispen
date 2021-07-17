@@ -261,11 +261,11 @@ class PeriodoAcaoAdmin(admin.ModelAdmin):
 	list_display = ('getDescricao', 'data_inicial', 'data_final')
 
 	def getDescricao(self, obj):
-		if obj.descricao == '1':
-			return 'CONSOLIDAR ESCALAS - MÊS DE ' + (obj.data_inicial + TimeDelta(days=30)).strftime('%B')
-		elif obj.descricao == '2':
+		if obj.descricao == 'GERAR ESCALAS':
+			return 'GERAR ESCALAS - MÊS DE ' + (obj.data_inicial + TimeDelta(days=30)).strftime('%B')
+		elif obj.descricao == 'CONSOLIDAR FREQUENCIAS':
 			return 'CONSOLIDAR FREQUÊNCIAS - MÊS DE ' + (obj.data_inicial - TimeDelta(days=30)).strftime('%B')
-
+	getDescricao.short_description = 'Evento do Período'  #Nome da coluna
 
 @admin.register(EscalaFrequencia)
 class EscalaFrequencia(admin.ModelAdmin):

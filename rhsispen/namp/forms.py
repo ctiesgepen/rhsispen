@@ -2,9 +2,12 @@ from django import forms
 from .models import * 
 from functools import partial
 from django.forms import ModelForm
+from django.forms import DateTimeInput, DateInput
 
 DateInput = partial(forms.DateInput, {'class': 'datepicker'})
-    
+
+DateTimeInput = partial(forms.DateTimeInput, {'class':'datepicker'})
+
 class DefinirJornadaRegularForm(forms.Form):   
     setor = forms.CharField(required=False, label='Código da Unidade')
     data_inicial = forms.DateField(widget=DateInput(),required=True)    
@@ -215,3 +218,27 @@ class ServidorMoverForm(forms.Form):
         self.fields['servidor'].choices = [('', '--Selecione--')] + list(Servidor.objects.all().values_list('id_matricula', 'nome'))
         self.fields['equipe_origem'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+
+class PeriodoAcaoForm(forms.ModelForm):
+    #data_inicial = forms.DateField(widget=DateInput()) 
+    #data_final = forms.DateField(widget=DateInput()) 
+    hora_inicial = forms.TimeField(widget=TimeInput()) 
+    hora_final = forms.TimeField(widget=TimeInput()) 
+    #descricao = forms.ChoiceField()
+
+    class Meta:
+        model = PeriodoAcao
+        fields = '__all__'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['data_inicial'].widget = DateInput()
+        self.fields['data_final'].widget = DateInput()
+
+class PeriodoAcaoSearchForm(forms.Form):
+    descricao = forms.CharField(max_length=25)
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['descricao'].label = ""
+        self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
