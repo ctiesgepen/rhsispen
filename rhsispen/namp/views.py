@@ -165,7 +165,6 @@ Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
-	
 	form = PeriodoAcaoForm()
 	contexto = {
 		'form': form,
@@ -249,6 +248,36 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 				messages.warning(request, 'Período ou evento não encontrado!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def periodo_att(request, id_perido_acao):
+	form = PeriodoAcaoForm()
+	contexto = {
+		'form': form,
+	}
+
+	if request.method == 'POST':
+		form = PeriodoAcaoForm(request.POST)
+	if request.method == 'POST':
+		form = PeriodoAcao(request.POST, instance=PeriodoAcaoForm)
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Período editado com suceso!')
+			return HttpResponseRedirect('/periodo_list')
+		else:
+			contexto = {
+				'periodoAcao':PeriodoAcao,
+				'form': form
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/periodo/periodo_listar.html',contexto)
+	else:
+		contexto = {
+				'periodoAcao':PeriodoAcao,
+				'form': form
+		}
+		return render(request, 'namp/periodo/periodo_listar.html',contexto)
 
 #SETOR
 @login_required(login_url='/autenticacao/login/')
@@ -648,7 +677,7 @@ def servidor_att(request, id_matricula):
 	
 	form = ServidorForm(instance=servidor)
 	
-	if not request.user.is_superuse:
+	if not request.user.is_superuser:
 		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
 		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
 		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
