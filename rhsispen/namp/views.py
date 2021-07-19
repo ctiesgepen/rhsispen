@@ -170,20 +170,15 @@ def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
 	contexto = {
 		'form': form,
 	}
-
 	if request.method == 'POST':
 		form = PeriodoAcaoForm(request.POST)		
 		if form.is_valid():
-			periodo = form.save(commit=False)
-			periodo.data_inicial = periodo.data_inicial.replace(hour=form.cleaned_data['hora_inicial'].hour, minute=form.cleaned_data['hora_inicial'].minute)
-			periodo.data_final = periodo.data_final.replace(hour=form.cleaned_data['hora_final'].hour, minute=form.cleaned_data['hora_final'].minute)
-			periodo.save()
+			form.save()
 			messages.warning(request, 'Período cadastrado com sucesso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			return redirect('namp:periodo_listar')
 		else:
 			contexto['form'] = form
-			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			messages.warning(request, 'Erro no form')
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name, contexto)
 	return render(request,template_name, contexto)
 
@@ -254,32 +249,27 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_att(request, id_periodo_acao):
 	try:
-		periodo = PeriodoAcao.objects.filter(id_periodo_acao=id_periodo_acao)
+		periodo = PeriodoAcao.objects.get(id_periodo_acao=id_periodo_acao)
 	except PeriodoAcao.DoesNotExist:
 		messages.warning(request, 'Período ou evento não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	form = PeriodoAcaoForm(instance=periodo[0])
-	form.fields['descricao'].choices = list(periodo.values_list('id_periodo_acao', 'descricao'))
-
+	form = PeriodoAcaoForm(instance=periodo)
 	contexto = {
 			'form': form,
 			'id_periodo_acao':id_periodo_acao,
 		}
 	if request.method == 'POST':
-		form = PeriodoAcaoForm(request.POST)
+		form = PeriodoAcaoForm(request.POST,instance=periodo)
 		if form.is_valid():
-			periodo.data_inicial = form.cleaned_data['data_inicial']
-			periodo.data_inicial = form.cleaned_data['data_final']
-			#periodo.save()
+			form.save()
 			messages.success(request, 'Período editado com suceso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			return redirect('namp:periodo_listar')
 		else:
 			contexto['form']=form
-			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			messages.success(request, 'Erro no formulário!')
-			return render(request, 'namp/periodo/periodo_criar.html',contexto)
-	return render(request, 'namp/periodo/periodo_criar.html',contexto)
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, 'namp/periodo/periodo_att.html',contexto)
+	return render(request, 'namp/periodo/periodo_att.html',contexto)
 
 
 #SETOR

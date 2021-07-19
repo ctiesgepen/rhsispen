@@ -21,7 +21,7 @@
                         <form action="{% url 'namp:periodo_criar' %}" method="post">
                             {% csrf_token %}
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     {{form.data_inicial|as_crispy_field }}
                                     {{ form.data_inicial.errors }}
                                 </div>
@@ -31,7 +31,7 @@
                                 </div>
                             </div>
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-4">
                                     {{form.data_final|as_crispy_field }}
                                     {{ form.data_final.errors }}
                                 </div>

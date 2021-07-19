@@ -127,6 +127,11 @@ class TimeInput(forms.TimeInput):
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class DateTimeInput(forms.DateTimeInput):
+    input_type = 'datetime-local'
+    def __init__(self, **kwargs):
+        kwargs["format"] = "%Y-%m-%dT%H:%M"
+        super().__init__(**kwargs)
 
 '''
 Formulário de adição de equipes. Cria-se o formulário a partir
@@ -231,8 +236,8 @@ class PeriodoAcaoForm(forms.ModelForm):
         model = PeriodoAcao
         fields = '__all__'
         widgets = {
-            'data_inicial': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
-            'data_final': forms.DateTimeInput(attrs={'type': 'datetime-local'}),
+            'data_inicial': DateTimeInput(),
+            'data_final': DateTimeInput(),
         }
 
     def __init__(self, *args, **kwargs):
