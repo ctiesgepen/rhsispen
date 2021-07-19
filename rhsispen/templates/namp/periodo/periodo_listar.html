@@ -78,8 +78,8 @@
                                         <td> {{ periodo.data_inicial }} </td>
                                         <td> {{ periodo.data_final }} </td>
                                         <td>
-                                            <a href="{% url 'namp:periodo_criar' %}"><i class="fas fa-eye"></i> Eventos</a>
-                                            <a href="{% url 'namp:periodo_criar' %}"><i class="fas fa-pencil-alt"></i> Editar</a>
+                                            <a href="{% url 'namp:periodo_criar' %}"><i class="feather icon-eye"></i> Eventos</a>
+                                            <a href="{% url 'namp:periodo_att' periodo.id_periodo_acao %}"><i class="feather icon-edit"></i> Editar</a>
                                         </td>
                                     </tr>
                                     {% endfor %}

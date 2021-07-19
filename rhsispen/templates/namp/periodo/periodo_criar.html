@@ -18,7 +18,7 @@
 
                         <h5 class="mt-5">Cadastrar Período</h5>
                         <hr>
-                        <form action="{% url 'namp:periodo_criar' %}" method="post">
+                        <form action="{% url 'namp:periodo_att' id_periodo_acao %}" method="post">
                             {% csrf_token %}
                             <div class="form-row">
                                 <div class="form-group col-md-3">
@@ -26,7 +26,7 @@
                                     {{ form.data_inicial.errors }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{form.hora_inicial|as_crispy_field }}
+                                    {{form.hora_inicial }}
                                     {{ form.hora_inicial.errors }}
                                 </div>
                             </div>
@@ -36,7 +36,7 @@
                                     {{ form.data_final.errors }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{form.hora_final|as_crispy_field }}
+                                    {{form.hora_final }}
                                     {{ form.hora_final.errors }}
                                 </div>
                             </div>

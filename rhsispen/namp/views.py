@@ -250,6 +250,38 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def periodo_att(request, id_periodo_acao):
+	try:
+		periodo = PeriodoAcao.objects.filter(id_periodo_acao=id_periodo_acao)
+	except PeriodoAcao.DoesNotExist:
+		messages.warning(request, 'Período ou evento não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
+	form = PeriodoAcaoForm(instance=periodo[0])
+	form.fields['descricao'].choices = list(periodo.values_list('id_periodo_acao', 'descricao'))
+
+	contexto = {
+			'form': form,
+			'id_periodo_acao':id_periodo_acao,
+		}
+	if request.method == 'POST':
+		form = PeriodoAcaoForm(request.POST)
+		if form.is_valid():
+			periodo.data_inicial = form.cleaned_data['data_inicial']
+			periodo.data_inicial = form.cleaned_data['data_final']
+			#periodo.save()
+			messages.success(request, 'Período editado com suceso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		else:
+			contexto['form']=form
+			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			messages.success(request, 'Erro no formulário!')
+			return render(request, 'namp/periodo/periodo_criar.html',contexto)
+	return render(request, 'namp/periodo/periodo_criar.html',contexto)
+
+
 #SETOR
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
