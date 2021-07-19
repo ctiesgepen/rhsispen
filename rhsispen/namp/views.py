@@ -165,7 +165,6 @@ Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
-	
 	form = PeriodoAcaoForm()
 	contexto = {
 		'form': form,
@@ -676,7 +675,7 @@ def servidor_att(request, id_matricula):
 	
 	form = ServidorForm(instance=servidor)
 	
-	if not request.user.is_superuse:
+	if not request.user.is_superuser:
 		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
 		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
 		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
