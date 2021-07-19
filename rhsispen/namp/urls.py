@@ -23,10 +23,9 @@ urlpatterns = [
 	path('periodos/', views.periodo_listar, name='periodo_listar'),
 	#Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 	path('periodos/cadastrar', views.periodo_criar, name='periodo_criar'),
-	#Acionada pelo botão de ícone, localiza na template de PERÍODOS PARA ATUALIZAR
-	path('periodos/atualizar', views.periodo_att, name='periodo_att'),
-
-
+	#Acionada pelo botão EDITAR, localizado na template de PERÍODOS.
+	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'),
+	
 	#Tela do OPERADOR
 	path('setor_att/<int:id_setore>/', views.setor_att, name='setor_att'), #falta fazer
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),

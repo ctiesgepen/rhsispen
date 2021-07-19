@@ -127,6 +127,12 @@ class TimeInput(forms.TimeInput):
 class DateInput(forms.DateInput):
     input_type = 'date'
 
+class DateTimeInput(forms.DateTimeInput):
+    input_type = 'datetime-local'
+    def __init__(self, **kwargs):
+        kwargs["format"] = "%Y-%m-%dT%H:%M"
+        super().__init__(**kwargs)
+
 '''
 Formulário de adição de equipes. Cria-se o formulário a partir
 do modelo que se quer trabalhar. Neste caso, o model Equipe.
@@ -222,18 +228,20 @@ class ServidorMoverForm(forms.Form):
 class PeriodoAcaoForm(forms.ModelForm):
     #data_inicial = forms.DateField(widget=DateInput()) 
     #data_final = forms.DateField(widget=DateInput()) 
-    hora_inicial = forms.TimeField(widget=TimeInput()) 
-    hora_final = forms.TimeField(widget=TimeInput()) 
+    #hora_inicial = forms.TimeField(widget=TimeInput())
+    #hora_final = forms.TimeField(widget=TimeInput())
     #descricao = forms.ChoiceField()
 
     class Meta:
         model = PeriodoAcao
         fields = '__all__'
+        widgets = {
+            'data_inicial': DateTimeInput(),
+            'data_final': DateTimeInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['data_inicial'].widget = DateInput()
-        self.fields['data_final'].widget = DateInput()
 
 class PeriodoAcaoSearchForm(forms.Form):
     descricao = forms.CharField(max_length=25)

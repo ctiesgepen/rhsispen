@@ -66,8 +66,9 @@
                                         <td> {{ periodo.data_inicial }} </td>
                                         <td> {{ periodo.data_final }} </td>
                                         <td>
-                                            <a href="{% url 'namp:periodo_att' periodoacao.id_periodo_acao %}"><i class="fas fa-eye"></i> Eventos</a>
-                                            <a href="{% url 'namp:periodo_criar' %}"><i class="fas fa-pencil-alt"></i> Editar</a>
+                                            <!-- <a href="modalCart"><i class="feather icon-eye"></i> Eventos</a> -->
+                                            <a type="modalCart" data-toggle="modal" data-target="#modalCart"><i class="feather icon-eye"></i> Eventos</a>
+                                            <a href="{% url 'namp:periodo_att' periodo.id_periodo_acao %}"><i class="feather icon-edit"></i> Editar</a>
                                         </td>
                                     </tr>
                                     {% endfor %}
@@ -95,4 +96,64 @@
         </div>
     </div>
 </div>
+<!-- Modal: modalCart -->
+<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <!--Header-->
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Controle de envios</h4>
+            </div>
+            <!--Body-->
+            <div class="modal-body">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Unidade</th>
+                            <th>Escala</th>
+                            <th>Frequência</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <th scope="row">0</th>
+                            <td> {{ EscalaFrequencia.fk_setor.nome }} </td>
+                        </tr>
+                        <tr>
+                            <th scope="row">1</th>
+                            <td>{{ EscalaFrequencia.fk_setor }}</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><a><i class="fas fa-check"></i></a></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">2</th>
+                            <td>CEPEMA 2</td>
+                            <td><i class="fas fa-times"></i></td>
+                            <td><a><i class="fas fa-times"></i></a></td>
+                        </tr>
+                        <tr>
+                            <th scope="row">3</th>
+                            <td>CASE 3</td>
+                            <td><i class="fas fa-check"></i></td>
+                            <td><a><i class="fas fa-times"></i></a></td>
+                        </tr>
+                        <tr class="total">
+                            <th scope="row">5</th>
+                            <td>CEIP</td>
+                            <td><i class="fas fa-times"></i></td>
+                            <td><i class="fas fa-check"></i></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+            </div>
+            <!--Footer-->
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Fechar</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!--Div da Modal-->
 {% endblock %}
