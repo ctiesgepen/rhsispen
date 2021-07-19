@@ -280,6 +280,21 @@ def periodo_att(request, id_periodo_acao):
 #SETOR
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
+def setor_att(request):#, id_setor):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		#setor = Setor.objects.get(id_setor=id_setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Setor não encontrada!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	return render(request, 'namp/setor/setor_att.html')
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
@@ -552,13 +567,12 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	#form = EscalaFrequenciaSearchForm(request.POST or None)
-	
 	page = request.GET.get('page')
 	paginator = Paginator(list(escalas), 15)
 	page_obj = paginator.get_page(page)
 
 	mensagens = {}
-				
+
 	#Verificando se tem período para consolidar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
