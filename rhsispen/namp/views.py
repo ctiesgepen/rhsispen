@@ -191,8 +191,12 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	
 	try:
 		periodos = list(PeriodoAcao.objects.all())
+		setores = list(Setor.objects.all())
 	except PeriodoAcao.DoesNotExist:
 		messages.warning(request,'Não há períodos registrados até o momento.')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except Setor.DoesNotExist:
+		messages.warning(request,'Não há setores registrados até o momento.')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	page = request.GET.get('page')
@@ -202,6 +206,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	form = PeriodoAcaoSearchForm()
 	contexto = { 
 		'form': form,
+		'setores':setores,
 		'page_obj': page_obj,
 	}
 	if request.method == 'POST':
@@ -238,6 +243,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 				contexto = { 
 					'form': form,
 					'page_obj': page_obj,
+					'setores':setores,
 				}
 				return render(request, template_name, contexto)
 			else:

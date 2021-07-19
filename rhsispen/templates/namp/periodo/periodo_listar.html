@@ -5,6 +5,9 @@
 {% load namp_extras %}
 
 {% block content %}
+
+{% include 'includes/periodo_eventos_list.html' %}
+
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -78,7 +81,8 @@
                                         <td> {{ periodo.data_inicial }} </td>
                                         <td> {{ periodo.data_final }} </td>
                                         <td>
-                                            <a href="{% url 'namp:periodo_criar' %}"><i class="feather icon-eye"></i> Eventos</a>
+                                            
+                                            <a type="text" data-toggle="modal" data-target="#modalPeriodoEventos"><i class="feather icon-eye"></i> Eventos</a>
                                             <a href="{% url 'namp:periodo_att' periodo.id_periodo_acao %}"><i class="feather icon-edit"></i> Editar</a>
                                         </td>
                                     </tr>
@@ -107,4 +111,5 @@
         </div>
     </div>    
 </div>
+
 {% endblock %}            
