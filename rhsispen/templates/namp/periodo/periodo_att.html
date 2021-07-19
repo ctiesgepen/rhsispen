@@ -16,9 +16,9 @@
                           {% endfor %}
                         {% endif %}
 
-                        <h5 class="mt-5">Cadastrar Período</h5>
+                        <h5 class="mt-5">Período Editar</h5>
                         <hr>
-                        <form action="{% url 'namp:periodo_criar' %}" method="post">
+                        <form action="{% url 'namp:periodo_att' id_periodo_acao %}" method="post">
                             {% csrf_token %}
                             <div class="form-row">
                                 <div class="form-group col-md-3">
