@@ -410,14 +410,15 @@ def equipe_att(request, id_equipe):
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Equipe editada com suceso!')
-			return HttpResponseRedirect('/equipe_list')
+			return HttpResponseRedirect('/equipes')
 		else:
 			contexto = {
 				'equipe':equipe,
 				'servidor': servidor,
 				'form': form
 			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			messages.warning(request,form.errors.get_json_data(escape_html=False))
 			return render(request, 'namp/equipe/equipe_att.html',contexto)
 	else:
 		contexto = {

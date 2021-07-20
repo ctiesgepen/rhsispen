@@ -7,7 +7,9 @@
                     <div class="card-body">
                         <h5 class="text-center">{{ servidor.fk_setor }}</h5>
                         {% if messages %} {% for message in messages %}
-                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}
+                        <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>
+
                         {% endfor %} {% endif %}
 
                         <h5 class="mt-5">Equipes</h5>
