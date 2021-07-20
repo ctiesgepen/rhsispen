@@ -74,7 +74,6 @@ class StatusFuncional(models.Model):
    ManyToManyField = *..*
    SET_DEFAULT = se apagado a referencia, vai pra outra tabela determinada
 '''
-
 class Setor(models.Model):
 	id_setor = models.CharField('Código', primary_key=True, max_length=50)
 	nome = models.CharField(max_length=100, unique=True)

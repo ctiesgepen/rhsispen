@@ -17,34 +17,98 @@
                           {% endfor %}
                         {% endif %}
 
-                        <h6>Configurações do Setor</h6>
+                        <h6>Editar</h6>
                         <hr>
+                        <table class="table table-bordered text-center table-overflow table-sm">
+                            <thead class="thead-dark">
+                                <tr>
+                                    <th scope="col">Configurações do Setor</th>
+                                </tr>
+                            </thead>
+                        </table>
+
                         <form action="{% url 'namp:setor_att' servidor.fk_setor.id_setor %}" method="post">   
-                            {% csrf_token %}                        
+                            {% csrf_token %}      
+
                             <div class="form-row">
-                                <div class="form-group col-md-3">
-                                    {{form.id_setor|as_crispy_field}}
-                                    {{ form.id_setor.errors }}
+                                <div class="form-group col-md-2">
+                                    {{ data.setorform.id_setor|as_crispy_field }}
+                                    {{ data.setorform.id_setor.errors }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    {{form.nome|as_crispy_field}}
-                                    {{ form.nome.errors }}
+                                <div class="form-group col-md-6">
+                                    {{ data.setorform.nome|as_crispy_field }}
+                                    {{ data.setorform.nome.errors }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    {{form.status|as_crispy_field}}
+                            </div>
+                                      
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    {{ data.setorform.status|as_crispy_field }}
+                                    {{ data.setorform.status.errors }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    {{form.setor_sede|as_crispy_field}}
-                                    {{ form.setor_sede.errors }}
+                                <div class="form-group col-md-2">
+                                    {{ data.setorform.setor_sede|as_crispy_field }}
+                                    {{ data.setorform.setor_sede.errors }}
                                 </div>
-                                <div class="form-group col-md-3">
-                                    {{form.fk_regiao|as_crispy_field}}
-                                    {{ form.fk_regiao.errors }}
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{ data.setorform.fk_regiao|as_crispy_field }}
+                                    {{ data.setorform.fk_regiao.errors }}
                                 </div>
+                            </div>
+
+                            <table class="table table-bordered text-center table-overflow table-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Endereço</th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    {{ data.enderecosetorform.uf|as_crispy_field }}
+                                    {{ data.enderecosetorform.uf.errors }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{ data.enderecosetorform.municipio|as_crispy_field }}
+                                    {{ data.enderecosetorform.municipio.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-2">
+                                    {{ data.enderecosetorform.cep|as_crispy_field }}
+                                    {{ data.enderecosetorform.cep.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    {{ data.enderecosetorform.endereco|as_crispy_field }}
+                                    {{ data.enderecosetorform.endereco.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-6">
+                                    {{ data.enderecosetorform.bairro|as_crispy_field }}
+                                    {{ data.enderecosetorform.bairro.errors }}
+                                </div>
+                                <div class="form-group col-md-2">
+                                    {{ data.enderecosetorform.numero|as_crispy_field }}
+                                    {{ data.enderecosetorform.numero.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    {{ data.enderecosetorform.complemento|as_crispy_field }}
+                                    {{ data.enderecosetorform.complemento.errors }}
+                                </div>
+                            </div> 
+
                             <hr>
                             <div class="submit-row">
-                            <button type="submit" class="btn  btn-dark">Salvar</button>
-                            <a href="{% url 'namp:home' %}" class="btn  btn-dark">Voltar</a>
+                                <button type="submit" class="btn  btn-dark">Salvar</button>
+                                <a href="/" class="btn  btn-dark">Voltar</a>
                             </div>
                         </form>
                     </div>
