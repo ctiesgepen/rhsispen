@@ -12,21 +12,20 @@
                         <h5 class="text-center">{{ servidor.fk_setor }}</h5>
                         {% if messages %}
                           {% for message in messages %}
-                          <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}
-                            <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>    
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                            <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>
                           {% endfor %}
                         {% endif %}
- 
                         <h6>Configurações</h6>
-                        <hr>
-                        <form action="{% url 'namp:equipe_att' equipe.id_equipe %}" method="post">
+                        <hr> 
+                        <form action="{% url 'namp:equipe_att' equipe.id_equipe %}" method="post">   
                             {% csrf_token %}
                             <div class="form-row">
-                                <div class="form-group col-md-3">
+                                <div class="form-group col-md-6">
                                     {{form.nome|as_crispy_field}}
                                     {{ form.nome.errors }}
                                 </div>
-                            </div>
+                            </div>                       
                             <div class="form-row">
                                 <div class="form-group col-md-3">
                                     {{form.categoria|as_crispy_field}}

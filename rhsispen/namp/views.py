@@ -439,7 +439,8 @@ def equipe_att(request, id_equipe):
 				'servidor': servidor,
 				'form': form
 			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			messages.warning(request,form.errors.get_json_data(escape_html=False))
 			return render(request, 'namp/equipe/equipe_att.html',contexto)
 	else:
 		contexto = {
