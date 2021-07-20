@@ -1,7 +1,7 @@
 <!-- Modal: modalPeriodoEventos -->
 <div class="modal fade" id="modalPeriodoEventos" tabindex="-1" role="dialog" aria-labelledby="modalPeriodoEventos"
   aria-hidden="true">
-  <div class="modal-dialog" role="document">
+  <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
     <div class="modal-content">
       <!--Header-->
       <div class="modal-header">
@@ -16,15 +16,14 @@
           <thead class="thead-dark">
             <tr>
               <th>CÓDIGO</th>
-              <th>NOME DO SETOR</th>
-              <th>REGISTRADO</th>
+              <th>SUBMETIDO</th>
+              <th>SETOR</th>
             </tr>
           </thead>
           <tbody>
             {% for setor in setores %}
             <tr>
               <th scope="row">{{ setor.id_setor }}</th>
-              <td>{{ setor.nome }}</td>
               <td>
               {% if setor.status %}
                 <img src="/static/admin/img/icon-yes.svg" alt="{{setor.status}}"> 
@@ -32,6 +31,7 @@
                 <img src="/static/admin/img/icon-no.svg" alt="{{setor.status}}"> 
               {% endif%}
               </td>
+              <td>{{ setor.nome }}</td>
             </tr>
             {% endfor %}
           </tbody>

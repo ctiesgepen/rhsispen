@@ -204,6 +204,9 @@ class EscalaFrequenciaForm(forms.ModelForm):
     class Meta:
         model = EscalaFrequencia
         fields = ('data',)
+        widgets = {
+            'data': DateInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

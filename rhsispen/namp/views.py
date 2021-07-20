@@ -201,7 +201,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	page = request.GET.get('page')
 	paginator = Paginator(periodos, 15)
 	page_obj = paginator.get_page(page)
-	
+
 	form = PeriodoAcaoSearchForm()
 	contexto = { 
 		'form': form,
@@ -242,7 +242,6 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 				contexto = { 
 					'form': form,
 					'page_obj': page_obj,
-					'setores':setores,
 				}
 				return render(request, template_name, contexto)
 			else:
@@ -546,13 +545,26 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 def escala_operador_list(request,template_name='namp/escala/escala_operador_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		escalas = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=1)
+		escalas = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao='GERAR ESCALAS')
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	#form = EscalaFrequenciaSearchForm(request.POST or None)
-	
+	meses = {
+	'Jan':'JANEIRO', 
+	'Feb':'FEVEREIRO', 
+	'Mar':'MARÇO', 
+	'Apr':'ABRIL', 
+	'May':'MAIO', 
+	'Jun':'JUNHO', 
+	'Jul':'JULHO', 
+	'Aug':'AGOSTO', 
+	'Sep':'SETEMBRO', 
+	'Out':'OUTUBRO', 
+	'Nov':'NOVEMBRO', 
+	'Dec':'DEZEMBRO',
+	}
 	page = request.GET.get('page')
 	paginator = Paginator(list(escalas), 15)
 	page_obj = paginator.get_page(page)
@@ -560,18 +572,13 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 	mensagens = {}
 				
 	#Verificando se tem período para consolidar escalas
-	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
-	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	periodo_escala = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
 	if periodo_escala:
 		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
 		if not escalas_geradas:
-			mensagens['mensagem_escalas'] = 'O período para consolidar as escalas do mês de ' + periodo_escala.data_inicial.strftime('%B') + ' encontra-se em aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M')
-	if periodo_frequencia:
-		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
-		if not frequencia_gerada:
-			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
-			
+			mensagens['mensagem_escalas'] = 'O período para gerar as escalas do seu setor para o mês de ' + meses[periodo_escala.data_inicial.replace(month=periodo_escala.data_inicial.month+1).strftime('%b')] + ' encontra-se aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M') + '. Clique no botão GERAR ESCALAS.'
+	
 	contexto = { 
 		'servidor': servidor,
 		'mensagens': mensagens,
@@ -584,25 +591,41 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_operador_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		frequencias = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao=2)
+		frequencias = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS')
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
+	meses = {
+	'Jan':'JANEIRO', 
+	'Feb':'FEVEREIRO', 
+	'Mar':'MARÇO', 
+	'Apr':'ABRIL', 
+	'May':'MAIO', 
+	'Jun':'JUNHO', 
+	'Jul':'JULHO', 
+	'Aug':'AGOSTO', 
+	'Sep':'SETEMBRO', 
+	'Out':'OUTUBRO', 
+	'Nov':'NOVEMBRO', 
+	'Dec':'DEZEMBRO',
+	}
+
 	page = request.GET.get('page')
 	paginator = Paginator(list(frequencias), 15)
 	page_obj = paginator.get_page(page)
 
 	mensagens = {}
 				
-	#Verificando se tem período para consolidar escalas
-	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	#Verificando se tem período para consolidar frequências
+	periodo_frequencia = PeriodoAcao.objects.filter(descricao='CONSOLIDAR FREQUENCIAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
 	if periodo_frequencia:
 		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
 		if not frequencia_gerada:
-			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do mês de ' + (periodo_frequencia.data_inicial - TimeDelta(days=30)).strftime('%B') + ' encontra-se em aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')		
-
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do seu setor, referentes ao mês de ' + meses[periodo_frequencia.data_inicial.replace(month=periodo_frequencia.data_inicial.month-1).strftime('%b')] + ', encontra-se aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')	+ '. Clique no botão CONSOLIDAR FREQUENCIAS.'	
+			
+	
 	form = EscalaFrequenciaForm()
 	if request.method =='POST':
 		form = EscalaFrequenciaForm(request.POST)
@@ -934,6 +957,9 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			continue
 	
 	form = GerarJornadaRegularForm()
+	form.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
+	form.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
+	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
 	
 	if not tem_plantao12:
 		form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
@@ -1065,14 +1091,14 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					fimDoMes)
 			
 			escala = EscalaFrequencia()
-			escala.fk_periodo_acao = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+			escala.fk_periodo_acao = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 			escala.data = DateTime.today()
 			escala.fk_servidor = Servidor.objects.get(fk_user=request.user.id)
-			escala.fk_setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+			escala.fk_setor = setor
 			escala.save()
 
-			messages.success(request, 'As escalas das equipes desta unidade foram atualizadas com suceso!')
-			return redirect('/')
+			messages.success(request, 'As escalas foram atualizadas com suceso!')
+			return redirect('namp:escala_operador_list')
 		else:
 			contexto = {
 			'form':form,
