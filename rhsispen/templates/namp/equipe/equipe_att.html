@@ -15,8 +15,12 @@
                             <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                           {% endfor %}
                         {% endif %}
-                            <h6>Configurações</h6>
-                            <hr>                            
+
+                        <hr> 
+                        <h6>Configurações</h6>
+                        <form action="{% url 'namp:equipe_att' equipe.id_equipe %}" method="post">
+                            {% csrf_token %}
+                          
                             <div class="form-row">
                                 <div class="form-group col-md-3">
                                     {{form.categoria|as_crispy_field}}

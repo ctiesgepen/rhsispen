@@ -278,12 +278,12 @@ def periodo_att(request, id_periodo_acao):
 
 
 #SETOR
-@login_required(login_url='/autenticacao/login/')
+'''@login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def setor_att(request):#, id_setor):
+def setor_att(request, template_name:'namp/setor/setor_att.html' ):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		#setor = Setor.objects.get(id_setor=id_setor)
+		setor = Setor.objects.get(id_setor=id_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -291,7 +291,13 @@ def setor_att(request):#, id_setor):
 		messages.warning(request, 'Setor não encontrada!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	return render(request, 'namp/setor/setor_att.html')
+	form = SetorForm(instance=setor)
+	contexto = {
+		'setor': setor,
+		'servidor': servidor,
+		'form': form,
+	}
+	return render(request, template_name, contexto)'''
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -299,7 +305,7 @@ def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		#equipe = Equipe.objects.get(id_equipe=id_equipe)
-		setor = Servidor.objects.get(fk_setor=id_setor)
+		setor = Setor.objects.get(id_setor=id_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -317,7 +323,7 @@ def setor_att(request, id_setor):
 			contexto = {
 				'setor': setor,
 				'servidor': servidor,
-				'form': form
+				'form': form,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, 'namp/setor/setor_att.html',contexto)
@@ -325,9 +331,9 @@ def setor_att(request, id_setor):
 		contexto = {
 			'setor': setor,
 			'servidor': servidor,
-			'form': form
+			'form': form,
 		}
-		return render(request, 'namp/equipe/setor_att.html',contexto)
+		return render(request, 'namp/setor/setor_att.html',contexto)
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')

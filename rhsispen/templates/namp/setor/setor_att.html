@@ -15,14 +15,21 @@
                             <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                           {% endfor %}
                         {% endif %}
-                            <h6>Configurações</h6>
+                        <form action="{% url 'namp:setor_att' setor.id_setor %}" method="post">
+                            <h6>Configurações do Setor</h6>
                             <hr>                            
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    {{form.categoria|as_crispy_field}}
-                                    {{ form.categoria.errors }}
+                                    {{form.id_setor|as_crispy_field}}
+                                    {{ form.id_setor.errors }}
                                 </div>
-
+                                <div class="form-group col-md-3">
+                                    {{form.nome|as_crispy_field}}
+                                    {{ form.nome.errors }}
+                                </div>
+                                <div class="form-group col-md-3">
+                                    {{form.status|as_crispy_field}}
+                                </div>
                             <hr>
                             <div class="submit-row">
                             <button type="submit" class="btn  btn-dark">Salvar</button>
