@@ -204,6 +204,9 @@ class EscalaFrequenciaForm(forms.ModelForm):
     class Meta:
         model = EscalaFrequencia
         fields = ('data',)
+        widgets = {
+            'data': DateInput(),
+        }
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -212,7 +215,7 @@ class EscalaFrequenciaForm(forms.ModelForm):
 class SetorForm(forms.ModelForm):
     class Meta:
         model = Setor
-        fields = ('id_setor', 'nome', 'status')
+        fields = '__all__'
     
 class ServidorMoverForm(forms.Form):
     servidor = forms.ChoiceField(required=True, label='Servidor')

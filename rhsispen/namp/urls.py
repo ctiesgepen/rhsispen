@@ -27,7 +27,7 @@ urlpatterns = [
 	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'),
 	
 	#Tela do OPERADOR
-	#path('setor_att/<str:id_setor>/', views.setor_att, name='setor_att'),
+	path('setor_att/<str:id_setor>/', views.setor_att, name='setor_att'),
 	#path('setor_att/', views.setor_att, name='setor_att'),
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),

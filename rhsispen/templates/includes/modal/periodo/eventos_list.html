@@ -22,16 +22,18 @@
                     <tbody>
                         {% for setor in setores %}
                         <tr>
-                            <th scope="row">{{ setor.id_setor }}</th>
-                            <td>{{ setor.nome }}</td>
-                            <td>
-                                {% if setor.status %}
-                                <img src="/static/admin/img/icon-yes.svg" alt="{{setor.status}}"> {% else %}
-                                <img src="/static/admin/img/icon-no.svg" alt="{{setor.status}}"> {% endif%}
-                            </td>
+                          <th scope="row">{{ setor.id_setor }}</th>
+                          <td>
+                          {% if setor.status %}
+                            <img src="/static/admin/img/icon-yes.svg" alt="{{setor.status}}"> 
+                          {% else %}
+                            <img src="/static/admin/img/icon-no.svg" alt="{{setor.status}}"> 
+                          {% endif%}
+                          </td>
+                          <td>{{ setor.nome }}</td>
                         </tr>
                         {% endfor %}
-                    </tbody>
+                      </tbody>
                 </table>
 
             </div>

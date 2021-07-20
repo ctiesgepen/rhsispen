@@ -312,7 +312,7 @@ class PeriodoAcao(models.Model):
 		ordering = ["data_inicial"]
 		verbose_name = "Período"
 		verbose_name_plural = "Períodos"
-		
+				
 class EscalaFrequencia(models.Model):
 	id_escala_frequencia = models.AutoField(primary_key=True)
 	data = models.DateField(verbose_name='Criado Em')
