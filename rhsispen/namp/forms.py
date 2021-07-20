@@ -216,6 +216,11 @@ class SetorForm(forms.ModelForm):
     class Meta:
         model = Setor
         fields = '__all__'
+
+class EnderecoSetorForm(forms.ModelForm):
+    class Meta:
+        model = EnderecoSetor
+        fields = '__all__'
     
 class ServidorMoverForm(forms.Form):
     servidor = forms.ChoiceField(required=True, label='Servidor')
