@@ -277,27 +277,6 @@ def periodo_att(request, id_periodo_acao):
 
 
 #SETOR
-'''@login_required(login_url='/autenticacao/login/')
-@staff_member_required(login_url='/autenticacao/login/')
-def setor_att(request, template_name:'namp/setor/setor_att.html' ):
-	try:
-		servidor = Servidor.objects.get(fk_user=request.user.id)
-		setor = Setor.objects.get(id_setor=id_setor)
-	except Servidor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Setor.DoesNotExist:
-		messages.warning(request, 'Setor não encontrada!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
-	form = SetorForm(instance=setor)
-	contexto = {
-		'setor': setor,
-		'servidor': servidor,
-		'form': form,
-	}
-	return render(request, template_name, contexto)'''
-
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def setor_att(request, id_setor):
@@ -518,7 +497,7 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -528,14 +507,14 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 
 	form = ServidorSearchForm(request.POST or None)
 	
-	servidores = list(Servidor.objects.filter(fk_equipe__fk_setor=setor))
+	servidores = list(Servidor.objects.filter(fk_equipe__fk_setor=servidor.fk_setor))
 
 	page = request.GET.get('page')
 	paginator = Paginator(servidores, 15)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 
-		'setor': setor,
+		'servidor': servidor,
 		'form': form,
 		'page_obj': page_obj,
 	}
@@ -553,7 +532,7 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 				page_obj = paginator.get_page(page)
 
 				contexto = { 
-					'setor': setor,
+					'servidor': servidor,
 					'form': form,
 					'page_obj': page_obj,
 				}
@@ -955,12 +934,12 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 	#if request.user.groups.filter(name='Operadores').count():
 	#if request.user.is_staff or request.user.is_superuser:
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	equipes = Equipe.objects.filter(status=True,fk_setor=setor.id_setor)
+	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = False
 	tem_plantao24 = False
@@ -1126,7 +1105,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			contexto = {
 			'form':form,
 			'equipes':equipes,
-			'setor':setor,
+			'servidor':servidor,
 			'tem_plantao12': tem_plantao12,
 			'tem_plantao24': tem_plantao24,
 			'tem_plantao48': tem_plantao48
@@ -1137,7 +1116,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		contexto = {
 			'form':form,
 			'equipes':equipes,
-			'setor':setor,
+			'servidor':servidor,
 			'tem_plantao12': tem_plantao12,
 			'tem_plantao24': tem_plantao24,
 			'tem_plantao48': tem_plantao48
