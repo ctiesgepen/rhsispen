@@ -623,7 +623,7 @@ def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_o
 	if periodo_frequencia:
 		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
 		if not frequencia_gerada:
-			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do seu setor, referentes ao mês de ' + meses[periodo_frequencia.data_inicial.replace(month=periodo_frequencia.data_inicial.month-1).strftime('%b')] + ', encontra-se aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')	+ '. Clique no botão CONSOLIDAR FREQUENCIAS.'	
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do seu setor, referentes ao mês de ' + meses[periodo_frequencia.data_inicial.replace(month=periodo_frequencia.data_inicial.month-1).strftime('%b')] + ', encontra-se aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')	+ '. Clique no botão CONSOLIDAR.'	
 			
 	
 	form = EscalaFrequenciaForm()
