@@ -5,20 +5,31 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="text-center">{{ user.fk_setor }}</h5>
-                        {% if messages %} {% for message in messages %}
+
+                        {% if servidor.id_matricula == user.id_matricula %}
+                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                        {% else %}
+                        <h5 class="text-center">Estado do Tocantins</h5>
+                        {% endif %} {% if messages %} {% for message in messages %}
                         <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                         {% endfor %} {% endif %}
 
-                        <h5 class="mt-5">Editar Dados Pessoais</h5>
+                        <h5 class="mt-5">Editar</h5>
                         <hr>
                         <form action="{% url 'namp:servidor_att' servidor.id_matricula %}" method="post">
                             {% csrf_token %}
+                            <table class="table table-bordered table-overflow table-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Dados Pessoais e Funcionais</th>
+                                    </tr>
+                                </thead>
+                            </table>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
                                     {{ servidorform.nome|as_crispy_field }} {{ servidorform.nome.errors }}
                                 </div>
-                                {% if servidor.id_matricula == user.id_matricula%}
+                                {% if servidor.id_matricula == user.id_matricula %}
                                 <div class="form-group col-md-3 hidden">
                                     {{ servidorform.fk_user|as_crispy_field}} {{ servidorform.fk_user.errors }}
                                 </div>
@@ -76,16 +87,24 @@
                                 </div>
                             </div>
 
-                            <h5 class="mt-5">Editar Endereço</h5>
                             <hr>
+                            <table class="table table-bordered table-overflow table-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">Endereço</th>
+                                    </tr>
+                                </thead>
+                            </table>
 
                             <div class="form-row">
                                 <div class="form-group col-md-2">
                                     {{ enderecoservform.uf|as_crispy_field }} {{ enderecoservform.uf.errors }}
                                 </div>
-                                <div class="form-group col-md-4">
+                                <div class="form-group col-md-6">
                                     {{ enderecoservform.municipio|as_crispy_field }} {{ enderecoservform.municipio.errors }}
                                 </div>
+                            </div>
+                            <div class="form-row">
                                 <div class="form-group col-md-2">
                                     {{ enderecoservform.cep|as_crispy_field }} {{ enderecoservform.cep.errors }}
                                 </div>
@@ -114,7 +133,6 @@
                                 </div>
                             </div>
                             <hr>
-
                             <div class="submit-row">
                                 <button type="submit" class="btn  btn-dark">Salvar</button>
                                 <a href="{% url 'namp:home' %}" class="btn  btn-dark">Cancelar</a>

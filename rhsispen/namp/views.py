@@ -158,9 +158,11 @@ Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
 	form = PeriodoAcaoForm()
 	contexto = {
 		'form': form,
+		'servidor': servidor,
 	}
 	if request.method == 'POST':
 		form = PeriodoAcaoForm(request.POST)		
@@ -281,7 +283,7 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor)
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor) or None
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -326,6 +328,7 @@ def setor_att(request, id_setor):
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
 	form = EquipeForm()
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
@@ -343,13 +346,15 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 			contexto = {
 				'setor': setor,
 				'form': form,
+				'servidor': servidor,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name, contexto)
 	else:
 		contexto = {
 			'setor': setor,
-			'form': form
+			'form': form,
+			'servidor': servidor,
 		}
 		return render(request,template_name, contexto)
 
@@ -456,6 +461,7 @@ def equipe_delete(request, id_equipe):
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
 		servidores = Servidor.objects.filter(fk_setor=setor)
 		equipes = Equipe.objects.filter(fk_setor=setor)
@@ -466,16 +472,17 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 		messages.warning(request, 'Não há equipes cadastradas para esse setor!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	form = ServidorMoverForm()
+	form = ServidorMoverIntForm()
 	form.fields['servidor'].choices = [('', '--Selecione--')] + list(servidores.values_list('id_matricula','nome'))
 	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
 	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
 	contexto = {
 		'setor':setor,
 		'form': form,
+		'servidor': servidor,
 	}
 	if request.method == 'POST':
-		form = ServidorMoverForm(request.POST)
+		form = ServidorMoverIntForm(request.POST)
 		if form.is_valid():
 			try:
 				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
@@ -496,10 +503,67 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 			contexto = {
 				'setor':setor,
 				'form': form,
+				'servidor': servidor,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name,contexto)
 	return render(request, template_name,contexto)
+
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		setores = list(Setor.objects.all())
+		servidores = list(Servidor.objects.all())
+		equipes = Equipe.objects.filter(fk_setor=setores)
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Não setores cadastradas!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	form = ServidorMoverExtForm()
+	form.fields['servidor'].choices = [('', '--Selecione--')] #+ list(servidores.values_list('id_matricula','nome'))
+	form.fields['setor_origem'].choices = [('', '--Selecione--')]
+	form.fields['setor_destino'].choices = [('', '--Selecione--')]# + setores.values('id_setor','nome')
+	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
+	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
+
+	contexto = {
+		'setor':setores,
+		'form': form,
+		'servidores': servidores,
+		'servidor': servidor,
+	}
+	if request.method == 'POST':
+		form = ServidorMoverExtForm(request.POST)
+		if form.is_valid():
+			try:
+				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
+				setor = Setor.objects.get(id_setor=form.cleaned_data['setor_destino'])
+			except Servidor.DoesNotExist:
+				messages.warning(request, 'Servidor não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			except Setor.DoesNotExist:
+				messages.warning(request, 'Setor não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
+			
+			servidor.fk_setor = setor
+			servidor.save()
+			messages.success(request, 'Movimentação realizada com suceso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			#return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
+		else:
+			contexto = {
+				'setor':setores,
+				'form': form,
+				'servidores': servidores,
+				'servidor': servidor,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name,contexto)
+	return render(request, template_name,contexto)
+
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -698,17 +762,18 @@ def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.
 	return render(request, template_name, contexto)
 
 #SERVIDOR
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def servidor_att(request, id_matricula):
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
-		enderecoservidor = EnderecoServ.objects.get(fk_servidor=id_matricula or None)
+		enderecoservidor = EnderecoServ.objects.get(fk_servidor=servidor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	except EnderecoServ.DoesNotExist:
-		messages.warning(request, 'Endereço não encontrado!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		enderecoservidor = None
 	
 	enderecoservform = EnderecoServForm(instance=enderecoservidor)
 	enderecoservform.fields['fk_servidor'].choices = list(Servidor.objects.filter(id_matricula=servidor.id_matricula).values_list('id_matricula', 'nome'))
@@ -732,24 +797,24 @@ def servidor_att(request, id_matricula):
 
 	if request.method == 'POST':
 		contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
-		contexto['enderecoservform'] = EnderecoServForm(request.POST, instance=enderecoservidor or None)
+		contexto['enderecoservform'] = EnderecoServForm(request.POST, instance=enderecoservidor) or None
 		if contexto['servidorform'].is_valid():
 			servidor = contexto['servidorform'].save(commit=False)
 			if contexto['enderecoservform'].is_valid():
 				endereco = contexto['enderecoservform'].save(commit=False)
-				#servidor.save()
+				servidor.save()
 				endereco.save()
 				messages.success(request, 'Servidor editado com suceso!')
 				return HttpResponseRedirect('/')
 			else:
 				contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
-				contexto['enderecoservform'] = EnderecoServForm(request.POST)
+				contexto['enderecoservform'] = EnderecoServForm(request.POST) or None
 				
 				messages.warning(request, 'Erro no formulário do endereço')
 				return render(request, 'namp/servidor/servidor_att.html',contexto)
 		else:
 			contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
-			contexto['enderecoservform'] = EnderecoServForm(request.POST or None)
+			contexto['enderecoservform'] = EnderecoServForm(request.POST) or None
 
 		messages.warning(request, 'Erro no formulário do servidor')
 		return render(request, 'namp/servidor/servidor_att.html',contexto)

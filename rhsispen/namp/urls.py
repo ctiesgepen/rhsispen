@@ -13,12 +13,13 @@ urlpatterns = [
 	#Tela do GESTOR
 	path('admin_afastamento/', views.admin_afastamento, name='admin_afastamento'),
 	path('admin_servidor/', views.admin_servidor, name='admin_servidor'), #falta fazer
+	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), 
+	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
 	path('admin_setores/', views.admin_setores, name='admin_setores'), #falta fazer
 	path('admin_unidades/', views.admin_unidades, name='admin_unidades'), 
 	path('admin_historico/', views.admin_unidades, name='admin_historico'), #falta fazer
 	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), #falta fazer
-	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), #falta fazer
-	
+
 	#Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 	path('periodos/', views.periodo_listar, name='periodo_listar'),
 	#Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
