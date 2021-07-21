@@ -4,7 +4,7 @@ from typing import Pattern
 import xlwt
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia
+from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia, EnderecoSetor
 from django.http import HttpResponse, HttpResponseRedirect
 from weasyprint import HTML
 from django.template.loader import render_to_string
@@ -281,6 +281,7 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor) or None
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -288,7 +289,7 @@ def setor_att(request, id_setor):
 	'''
 	Atribuindo o formulário do setor a uma variável e setando alguns campos choices para inicialização.
 	'''
-	enderecosetorform = EnderecoSetorForm()
+	enderecosetorform = EnderecoSetorForm(instance=enderecosetor)
 	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=servidor.fk_setor.id_setor).values_list('id_setor', 'nome'))
 
 	contexto = {
@@ -299,12 +300,13 @@ def setor_att(request, id_setor):
 
 	if request.method == 'POST':
 		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
 		if contexto['setorform'].is_valid():
 			setor = contexto['setorform'].save(commit=False)
 			if contexto['enderecosetorform'].is_valid():
 				endereco = contexto['enderecosetorform'].save(commit=False)
-
+				setor.save()
+				endereco.save()
 				messages.success(request, 'Setor editado com suceso!')
 				return HttpResponseRedirect('/')
 			else:
