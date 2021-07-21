@@ -46,7 +46,6 @@ urlpatterns = [
 	path('servidor_escala/', views.servidor_escala, name='servidor_escala'), #falta fazer
 	path('servidor_hist/', views.servidor_hist, name='servidor_hist'), #falta fazer
 
-
 	#path('equipe_operador_change_form/', views.equipe_operador_change_form, name='equipe_operador_change_form'),
 	#path('equipe_operador_change_list/', views.equipe_operador_change_list, name='equipe_operador_change_list'),
 	#path('equipe_operador_att_form/<int:id_equipe>/', views.equipe_operador_att_form, name='equipe_operador_att_form'),

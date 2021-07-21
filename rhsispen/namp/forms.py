@@ -167,6 +167,10 @@ class ServidorForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
         
+class EnderecosServForm():
+    class Meta:
+        model = EnderecoServ
+        fields = '__all__'
 
 class ServidorSearchForm(forms.ModelForm):
     class Meta:
