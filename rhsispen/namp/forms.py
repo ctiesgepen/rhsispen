@@ -183,6 +183,17 @@ class ServidorSearchForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['nome'].label = ""
 
+class SetorSearchForm(forms.ModelForm):
+    class Meta:
+        model = Setor
+        fields = ('nome',)
+        widgets = {
+            'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de setor'}),
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nome'].label = ""
+
 class AfastamentoForm(forms.ModelForm):
     class Meta:
         model = HistAfastamento

@@ -1,0 +1,52 @@
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">Estado do Tocantins</h5>
+                        {% if messages %} {% for message in messages %}
+                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                        {% endfor %} {% endif %}
+
+                        <h5 class="mt-5">Cadastrar Setor</h5>
+                        <hr>
+                        <form action="{% url 'namp:admin_setor_criar' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.id_setor|as_crispy_field }} {{ form.id_setor.errors }}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{ form.nome|as_crispy_field}} {{ form.nome.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.status|as_crispy_field}}
+                                </div>
+                                <div class="form-group col-md-6">
+                                    {{ form.setor_sede|as_crispy_field}}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    {{ form.fk_regiao|as_crispy_field}} {{ form.fk_regiao.errors }}
+                                </div>
+                            </div>
+
+
+                            <hr>
+                            <div class="submit-row">
+                                <button type="submit" class="btn  btn-dark">Salvar</button>
+                                <a href="{% url 'namp:admin_setor' %}" class="btn  btn-dark">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

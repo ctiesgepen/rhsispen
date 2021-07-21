@@ -13,12 +13,14 @@ urlpatterns = [
 	#Tela do GESTOR
 	path('admin_afastamento/', views.admin_afastamento, name='admin_afastamento'),
 	path('admin_servidor/', views.admin_servidor, name='admin_servidor'), #falta fazer
+	#path('admin_historico/', views.admin_unidades, name='admin_historico'), #falta fazer
+	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), #falta fazer
+
+	path('admin_setor/cadastrar/', views.admin_setor_criar, name='admin_setor_criar'),
+	path('admin_setor/', views.admin_setor, name='admin_setor'),
+	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
 	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
-	path('admin_setores/', views.admin_setores, name='admin_setores'), #falta fazer
-	path('admin_unidades/', views.admin_unidades, name='admin_unidades'), 
-	path('admin_historico/', views.admin_unidades, name='admin_historico'), #falta fazer
-	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), #falta fazer
 
 	#Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 	path('periodos/', views.periodo_listar, name='periodo_listar'),
@@ -29,18 +31,17 @@ urlpatterns = [
 	
 	#Tela do OPERADOR
 	path('setor_att/<str:id_setor>/', views.setor_att, name='setor_att'),
-	#path('setor_att/', views.setor_att, name='setor_att'),
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
 	path('servidor_list/', views.servidor_list, name='servidor_list'),
+	path('afastamentos/afastamento_criar/', views.afastamento_criar, name='afastamento_criar'), 	
+	path('afastamentos/', views.afastamento_list, name='afastamento_list'),
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
-	path('afastamentos/afastamento_criar/', views.afastamento_criar, name='afastamento_criar'), 	
-	path('afastamentos/', views.afastamento_list, name='afastamento_list'),
 	
 	#Tela do SERVIDOR
 	path('servidores/<int:id_matricula>/editar/', views.servidor_att, name='servidor_att'),

@@ -64,34 +64,84 @@ def admin_servidor(request):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_setores(request):
-	return render(request, 'admin_setores.html')
+def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
+	form = SetorForm()
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	if request.method == 'POST':
+		form = SetorForm(request.POST)		
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Setor adicionada com sucesso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		else:
+			contexto = {
+				'setor': setor,
+				'form': form,
+				'servidor': servidor,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name, contexto)
+	else:
+		contexto = {
+			'setor': setor,
+			'form': form,
+			'servidor': servidor,
+		}
+		return render(request,template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
+def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		#setor = Servidor.objects.filter(fk_servidor=setor.id_codigo)
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		setor = list(Setor.objects.all())
+		setores = list(Setor.objects.all())
 	except Setor.DoesNotExist:
-		messages.warning(request, 'Setores não encontrado!')
+		messages.warning(request, 'Setor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
-	form = SetorForm()
-	contexto = { 
-		'setor': setor,
-		'form': form
-	}
-	if request.method == 'POST':
-		form = SetorForm(request.POST)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Novo setor cadastrado com sucesso!')	
-			return HttpResponseRedirect('/')
-		else:
-			contexto['form'] = form
-			return render(request, template_name, contexto)
-	return render(request, template_name, contexto)
+	
+	form = SetorSearchForm(request.POST or None)
 
+	page = request.GET.get('page')
+	paginator = Paginator(setor, 15)
+	page_obj = paginator.get_page(page)
+
+	contexto = { 
+		'servidor': servidor,
+		'setor': setor,
+		'form': form,
+		'page_obj': page_obj,
+	}
+
+	if request.method == 'POST':
+		if form.is_valid():
+			setores2 = []
+			pattern = re.compile(form.cleaned_data['nome'].upper())
+			for setor in setores:
+				if pattern.search(setor.nome.upper()):
+					setores2.append(setor)
+			if setores2:
+				page = request.GET.get('page')
+				paginator = Paginator(setores2, 15)
+				page_obj = paginator.get_page(page)
+
+				contexto = { 
+					'servidor': servidor,
+					'setor': setor,
+					'form': form,
+					'page_obj': page_obj,
+				}
+				return render(request, template_name, contexto)
+			else:
+				print('entrei no form invalid')
+				messages.warning(request, 'Setor com este nome não encontrado!')
+				return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
