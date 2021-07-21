@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} {% include 'includes/modal/periodo/equipe_list.html' %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -7,7 +7,9 @@
                     <div class="card-body">
                         <h5 class="text-center">{{ servidor.fk_setor }}</h5>
                         {% if messages %} {% for message in messages %}
-                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}
+                        <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>
+
                         {% endfor %} {% endif %}
 
                         <h5 class="mt-5">Equipes</h5>
@@ -76,41 +78,4 @@
         </div>
     </div>
 </div>
-<!-- Modal: modalCart -->
-<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <!--Header-->
-            <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Servidores dessa Equipe</h4>
-            </div>
-            <!--Body-->
-            <div class="modal-body">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Servidores</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Stive Chefe de plantão</td>
-                        </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Stive Operacional</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-            <!--Footer-->
-            <div class="modal-footer">
-                <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Fechar</button>
-            </div>
-        </div>
-    </div>
-</div>
-<!--Div da Modal-->
 {% endblock %}

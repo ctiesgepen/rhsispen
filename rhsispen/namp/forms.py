@@ -167,6 +167,10 @@ class ServidorForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
         
+class EnderecosServForm():
+    class Meta:
+        model = EnderecoServ
+        fields = '__all__'
 
 class ServidorSearchForm(forms.ModelForm):
     class Meta:
@@ -212,11 +216,16 @@ class EscalaFrequenciaForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['data'].required = False
 
-class SetorForm(forms.Form):
+class SetorForm(forms.ModelForm):
     class Meta:
         model = Setor
         fields = '__all__'
 
+class EnderecoSetorForm(forms.ModelForm):
+    class Meta:
+        model = EnderecoSetor
+        fields = '__all__'
+    
 class ServidorMoverForm(forms.Form):
     servidor = forms.ChoiceField(required=True, label='Servidor')
     equipe_origem = forms.ChoiceField(required=True,label='Equipe Atual')
@@ -229,12 +238,6 @@ class ServidorMoverForm(forms.Form):
         self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
 
 class PeriodoAcaoForm(forms.ModelForm):
-    #data_inicial = forms.DateField(widget=DateInput()) 
-    #data_final = forms.DateField(widget=DateInput()) 
-    #hora_inicial = forms.TimeField(widget=TimeInput())
-    #hora_final = forms.TimeField(widget=TimeInput())
-    #descricao = forms.ChoiceField()
-
     class Meta:
         model = PeriodoAcao
         fields = '__all__'

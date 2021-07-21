@@ -27,7 +27,8 @@ urlpatterns = [
 	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'),
 	
 	#Tela do OPERADOR
-	path('setor_att/<int:id_setore>/', views.setor_att, name='setor_att'), #falta fazer
+	path('setor_att/<str:id_setor>/', views.setor_att, name='setor_att'),
+	#path('setor_att/', views.setor_att, name='setor_att'),
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
@@ -44,7 +45,6 @@ urlpatterns = [
 	path('servidores/<int:id_matricula>/editar/', views.servidor_att, name='servidor_att'),
 	path('servidor_escala/', views.servidor_escala, name='servidor_escala'), #falta fazer
 	path('servidor_hist/', views.servidor_hist, name='servidor_hist'), #falta fazer
-
 
 	#path('equipe_operador_change_form/', views.equipe_operador_change_form, name='equipe_operador_change_form'),
 	#path('equipe_operador_change_list/', views.equipe_operador_change_list, name='equipe_operador_change_list'),

@@ -107,27 +107,20 @@ def admin_add_noturno(request):
 @staff_member_required(login_url='/autenticacao/login/')
 def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		equipes = Equipe.objects.filter(fk_setor=setor)
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		servidores = list(Servidor.objects.all())
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Equipe.DoesNotExist:
-		messages.warning(request, 'Unidade não possui equipes cadastradas')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
+	
 	form = ServidorSearchForm(request.POST or None)
-	servidores = []
-	for	equipe in equipes:
-		for servidor in Servidor.objects.filter(fk_equipe=equipe):
-			servidores.append(servidor)
-
+	
 	page = request.GET.get('page')
 	paginator = Paginator(servidores, 15)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 
-		'setor': setor,
+		'servidor': servidor,
 		'servidores': servidores,
 		'form': form,
 		'page_obj': page_obj,
@@ -146,7 +139,7 @@ def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 				page_obj = paginator.get_page(page)
 
 				contexto = { 
-					'setor': setor,
+					'servidor': servidor,
 					'servidores': servidores2,
 					'form': form,
 					'page_obj': page_obj,
@@ -189,6 +182,7 @@ Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	
 	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 		periodos = list(PeriodoAcao.objects.all())
 		setores = list(Setor.objects.all())
 	except PeriodoAcao.DoesNotExist:
@@ -207,6 +201,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 		'form': form,
 		'setores':setores,
 		'page_obj': page_obj,
+		'servidor':servidor,
 	}
 	if request.method == 'POST':
 		form = PeriodoAcaoSearchForm(request.POST)
@@ -242,6 +237,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 				contexto = { 
 					'form': form,
 					'page_obj': page_obj,
+					'servidor':servidor,
 				}
 				return render(request, template_name, contexto)
 			else:
@@ -253,15 +249,18 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_att(request, id_periodo_acao):
 	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 		periodo = PeriodoAcao.objects.get(id_periodo_acao=id_periodo_acao)
 	except PeriodoAcao.DoesNotExist:
 		messages.warning(request, 'Período ou evento não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
 	form = PeriodoAcaoForm(instance=periodo)
+	form.fields['descricao'].choices = [(periodo.descricao,periodo.descricao)]
 	contexto = {
 			'form': form,
 			'id_periodo_acao':id_periodo_acao,
+			'servidor':servidor,
 		}
 	if request.method == 'POST':
 		form = PeriodoAcaoForm(request.POST,instance=periodo)
@@ -282,36 +281,50 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		#equipe = Equipe.objects.get(id_equipe=id_equipe)
-		setor = Servidor.objects.get(fk_setor=id_setor)
+		#setor = Setor.objects.get(id_setor=id_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	except Setor.DoesNotExist:
-		messages.warning(request, 'Setor não encontrada!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	form = SetorForm(instance=setor)
+	
+	data = {
+		'setorform': SetorForm(instance=servidor.fk_setor),
+		'enderecosetorform': EnderecoSetorForm(),
+	}
+
+	#bloqueio de fields
+	#data['setorform'].fields['fk_regiao'].choices = [(data['setorform'])]  
+	contexto = {
+		'data':data,
+		'servidor':servidor,
+	}
+
 	if request.method == 'POST':
-		form = SetorForm(request.POST, instance=setor)
-		if form.is_valid():
-			form.save()
+		print(data['setorform'].fields['nome'])
+		data['setorform']= SetorForm(request.POST, instance=str(data['setorform'].fields['id_setor']))	
+		#data['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+		data['enderecoform']=EnderecoSetorForm(request.POST)
+
+		if data['setorform'].is_valid() and data['enderecosetorform'].is_valid():
+		#	data['setorform'].save()
+		#	data['enderecosetorform'].save()
 			messages.success(request, 'Setor editado com suceso!')
+			print(request.POST['data']['setorform'])
 			return HttpResponseRedirect('/')
 		else:
 			contexto = {
-				'setor': setor,
-				'servidor': servidor,
-				'form': form
+						'data':data,
+						'servidor':servidor,
 			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			#messages.warning(request, data['setorform'].errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			#messages.warning(request, data['enderecosetorform'].errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			messages.warning(request, 'Erro no formulário')
 			return render(request, 'namp/setor/setor_att.html',contexto)
 	else:
 		contexto = {
-			'setor': setor,
-			'servidor': servidor,
-			'form': form
+			'data':data,
+			'servidor':servidor,
 		}
-		return render(request, 'namp/equipe/setor_att.html',contexto)
+		return render(request, 'namp/setor/setor_att.html',contexto)
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')
@@ -410,14 +423,15 @@ def equipe_att(request, id_equipe):
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Equipe editada com suceso!')
-			return HttpResponseRedirect('/equipe_list')
+			return HttpResponseRedirect('/equipes')
 		else:
 			contexto = {
 				'equipe':equipe,
 				'servidor': servidor,
 				'form': form
 			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			messages.warning(request,form.errors.get_json_data(escape_html=False))
 			return render(request, 'namp/equipe/equipe_att.html',contexto)
 	else:
 		contexto = {
@@ -495,7 +509,7 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -505,14 +519,14 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 
 	form = ServidorSearchForm(request.POST or None)
 	
-	servidores = list(Servidor.objects.filter(fk_equipe__fk_setor=setor))
+	servidores = list(Servidor.objects.filter(fk_equipe__fk_setor=servidor.fk_setor))
 
 	page = request.GET.get('page')
 	paginator = Paginator(servidores, 15)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 
-		'setor': setor,
+		'servidor': servidor,
 		'form': form,
 		'page_obj': page_obj,
 	}
@@ -530,7 +544,7 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 				page_obj = paginator.get_page(page)
 
 				contexto = { 
-					'setor': setor,
+					'servidor': servidor,
 					'form': form,
 					'page_obj': page_obj,
 				}
@@ -570,7 +584,7 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 	page_obj = paginator.get_page(page)
 
 	mensagens = {}
-				
+
 	#Verificando se tem período para consolidar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
@@ -696,34 +710,78 @@ def servidor_att(request, id_matricula):
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	form = ServidorForm(instance=servidor)
-	
+	data = {
+		'servidorform' : ServidorForm(instance=servidor),
+		'enderecoservform' : EnderecosServForm(),
+	}
+
 	if not request.user.is_superuser:
-		if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
-		else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
-		form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
-		form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
-		form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
-		form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
-		form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
-		form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
+		if servidor.sexo == 'M': data['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+		else: data['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+		data['servidorform'].fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+		data['servidorform'].fields['cf'].choices = [(servidor.cf,servidor.cf)]
+		data['servidorform'].fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+		data['servidorform'].fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+		data['servidorform'].fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+		data['servidorform'].fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
 
 	contexto = {
-		'form': form,
+		'data': data,
 		'user':user,
 		'servidor': servidor,
 	}
+
 	if request.method == 'POST':
-		form = ServidorForm(request.POST, instance=servidor)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Servidor editado com suceso!')
-			return HttpResponseRedirect('/')
+		data['servidorform']= ServidorForm(request.POST, instance=request.POST.get('data.servidorform'))	
+		data['enderecoservform']=EnderecosServForm(request.POST)
+
+		if data['servidorform'].is_valid() and data['enderecoservform'].is_valid():
+			data['servidorform'].save()
+			data['enderecoservform'].save()
+			messages.success(request, 'Servidor editado com sucesso!')
+			return HttpResponseRedirect('/servidor_list')
 		else:
-			contexto['form'] = form
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			contexto = {
+				'data': data,
+				'user':user,
+				'servidor': servidor,
+			}
+			messages.warning(request, data['serviorform'].errors)
+			messages.warning(request, data['enderecoservform'].errors)
 			return render(request, 'namp/servidor/servidor_att.html',contexto)
 	return render(request, 'namp/servidor/servidor_att.html',contexto)
+
+#O CÓD ABAIXO ESTÁ FUNCIONAL 
+	#PORÉM SEM O FORM DE ENDERECO SERVIDOR
+
+	#form = ServidorForm(instance=servidor)
+	#if not request.user.is_superuser:
+	#	if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+	#	else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+	#	form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+	#	form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+	#	form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+	#	form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+	#	form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+	#	form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
+
+	#contexto = {
+	#	'form': form,
+	#	'user':user,
+	#	'servidor': servidor,
+	#}
+
+	#if request.method == 'POST':
+	#	form = ServidorForm(request.POST, instance=servidor)
+	#	if form.is_valid():
+	#		form.save()
+	#		messages.success(request, 'Servidor editado com sucesso!')
+	#		return HttpResponseRedirect('/servidor_list')
+	#	else:
+	#		contexto['form'] = form
+	#		messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+	#		return render(request, 'namp/servidor/servidor_att.html',contexto)
+	#return render(request, 'namp/servidor/servidor_att.html',contexto)
 
 def servidor_escala(request):
 	return render(request, 'servidor_escala.html')
@@ -740,6 +798,7 @@ def servidor_operador_change_form(request,id_matricula):
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 	form = ServidorForm(instance=servidor)
 
 	if request.method == 'POST':
@@ -932,12 +991,12 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 	#if request.user.groups.filter(name='Operadores').count():
 	#if request.user.is_staff or request.user.is_superuser:
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	equipes = Equipe.objects.filter(status=True,fk_setor=setor.id_setor)
+	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = False
 	tem_plantao24 = False
@@ -1103,7 +1162,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			contexto = {
 			'form':form,
 			'equipes':equipes,
-			'setor':setor,
+			'servidor':servidor,
 			'tem_plantao12': tem_plantao12,
 			'tem_plantao24': tem_plantao24,
 			'tem_plantao48': tem_plantao48
@@ -1114,7 +1173,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		contexto = {
 			'form':form,
 			'equipes':equipes,
-			'setor':setor,
+			'servidor':servidor,
 			'tem_plantao12': tem_plantao12,
 			'tem_plantao24': tem_plantao24,
 			'tem_plantao48': tem_plantao48
