@@ -4,14 +4,14 @@ from typing import Pattern
 import xlwt
 from django.shortcuts import render, redirect, get_object_or_404
 
-from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia
+from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia, EnderecoServ
 from django.http import HttpResponse, HttpResponseRedirect
 from weasyprint import HTML
 from django.template.loader import render_to_string
 from django.core.files.storage import FileSystemStorage
 from .forms import *
 from django.urls import resolve
-from urllib.parse import urlparse
+from urllib.parse import SplitResult, urlparse
 from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date, time as Time
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -281,14 +281,14 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	
 	'''
 	Atribuindo o formulário do setor a uma variável e setando alguns campos choices para inicialização.
 	'''
-	enderecosetorform = EnderecoSetorForm()
+	enderecosetorform = EnderecoSetorForm(instance=enderecosetor)
 	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=servidor.fk_setor.id_setor).values_list('id_setor', 'nome'))
 
 	contexto = {
@@ -299,12 +299,13 @@ def setor_att(request, id_setor):
 
 	if request.method == 'POST':
 		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
 		if contexto['setorform'].is_valid():
 			setor = contexto['setorform'].save(commit=False)
 			if contexto['enderecosetorform'].is_valid():
 				endereco = contexto['enderecosetorform'].save(commit=False)
-
+				setor.save()
+				endereco.save()
 				messages.success(request, 'Setor editado com suceso!')
 				return HttpResponseRedirect('/')
 			else:
@@ -701,50 +702,60 @@ def servidor_att(request, id_matricula):
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
+		enderecoservidor = EnderecoServ.objects.get(fk_servidor=id_matricula or None)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except EnderecoServ.DoesNotExist:
+		messages.warning(request, 'Endereço não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	data = {
-		'servidorform' : ServidorForm(instance=servidor),
-		'enderecoservform' : EnderecosServForm(),
+	enderecoservform = EnderecoServForm(instance=enderecoservidor)
+	enderecoservform.fields['fk_servidor'].choices = list(Servidor.objects.filter(id_matricula=servidor.id_matricula).values_list('id_matricula', 'nome'))
+
+	contexto = {
+		'user': user,
+		'servidor':servidor,
+		'servidorform': ServidorForm(instance=servidor),
+		'enderecoservform': enderecoservform,
 	}
 
 	if not request.user.is_superuser:
-		if servidor.sexo == 'M': data['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Masculino')]
-		else: data['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Feminino')]
-		data['servidorform'].fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
-		data['servidorform'].fields['cf'].choices = [(servidor.cf,servidor.cf)]
-		data['servidorform'].fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
-		data['servidorform'].fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
-		data['servidorform'].fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
-		data['servidorform'].fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
-
-	contexto = {
-		'data': data,
-		'user':user,
-		'servidor': servidor,
-	}
+		if servidor.sexo == 'M': contexto.servidorform.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+		else: contexto.servidorform.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+		contexto.servidorform.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+		contexto.servidorform.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+		contexto.servidorform.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+		contexto.servidorform.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+		contexto.servidorform.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+		contexto.servidorform.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
 
 	if request.method == 'POST':
-		data['servidorform']= ServidorForm(request.POST, instance=request.POST.get('data.servidorform'))	
-		data['enderecoservform']=EnderecosServForm(request.POST)
-
-		if data['servidorform'].is_valid() and data['enderecoservform'].is_valid():
-			data['servidorform'].save()
-			data['enderecoservform'].save()
-			messages.success(request, 'Servidor editado com sucesso!')
-			return HttpResponseRedirect('/servidor_list')
+		contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
+		contexto['enderecoservform'] = EnderecoServForm(request.POST, instance=enderecoservidor or None)
+		if contexto['servidorform'].is_valid():
+			servidor = contexto['servidorform'].save(commit=False)
+			if contexto['enderecoservform'].is_valid():
+				endereco = contexto['enderecoservform'].save(commit=False)
+				#servidor.save()
+				endereco.save()
+				messages.success(request, 'Servidor editado com suceso!')
+				return HttpResponseRedirect('/')
+			else:
+				contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
+				contexto['enderecoservform'] = EnderecoServForm(request.POST)
+				
+				messages.warning(request, 'Erro no formulário do endereço')
+				return render(request, 'namp/servidor/servidor_att.html',contexto)
 		else:
-			contexto = {
-				'data': data,
-				'user':user,
-				'servidor': servidor,
-			}
-			messages.warning(request, data['serviorform'].errors)
-			messages.warning(request, data['enderecoservform'].errors)
-			return render(request, 'namp/servidor/servidor_att.html',contexto)
+			contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
+			contexto['enderecoservform'] = EnderecoServForm(request.POST or None)
+
+		messages.warning(request, 'Erro no formulário do servidor')
+		return render(request, 'namp/servidor/servidor_att.html',contexto)
 	return render(request, 'namp/servidor/servidor_att.html',contexto)
+
+
 
 #O CÓD ABAIXO ESTÁ FUNCIONAL 
 	#PORÉM SEM O FORM DE ENDERECO SERVIDOR
