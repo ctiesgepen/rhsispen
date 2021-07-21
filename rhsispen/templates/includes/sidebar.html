@@ -81,7 +81,7 @@
                 <li class="nav-item pcoded-hasmenu">
                     <a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Atualizar</span></a>
                     <ul class="pcoded-submenu">
-                        <li><a href="#">Dados Pessoais</a></li>
+                        <li><a href="{% url 'namp:servidor_att' servidor.id_matricula %}">Dados Pessoais</a></li>
                         <li><a href="{% url 'namp:servidor_escala'%}">Ver escala</a></li>
                         <li><a href="{% url 'namp:servidor_hist'%}">Ver Histórico</a></li>
                     </ul>
