@@ -281,50 +281,45 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		#setor = Setor.objects.get(id_setor=id_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	data = {
-		'setorform': SetorForm(instance=servidor.fk_setor),
-		'enderecosetorform': EnderecoSetorForm(),
-	}
+	'''
+	Atribuindo o formulário do setor a uma variável e setando alguns campos choices para inicialização.
+	'''
+	enderecosetorform = EnderecoSetorForm()
+	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=servidor.fk_setor.id_setor).values_list('id_setor', 'nome'))
 
-	#bloqueio de fields
-	#data['setorform'].fields['fk_regiao'].choices = [(data['setorform'])]  
 	contexto = {
-		'data':data,
 		'servidor':servidor,
+		'setorform': SetorForm(instance=servidor.fk_setor),
+		'enderecosetorform': enderecosetorform,
 	}
 
 	if request.method == 'POST':
-		print(data['setorform'].fields['nome'])
-		data['setorform']= SetorForm(request.POST, instance=str(data['setorform'].fields['id_setor']))	
-		#data['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Masculino')]
-		data['enderecoform']=EnderecoSetorForm(request.POST)
+		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+		if contexto['setorform'].is_valid():
+			setor = contexto['setorform'].save(commit=False)
+			if contexto['enderecosetorform'].is_valid():
+				endereco = contexto['enderecosetorform'].save(commit=False)
 
-		if data['setorform'].is_valid() and data['enderecosetorform'].is_valid():
-		#	data['setorform'].save()
-		#	data['enderecosetorform'].save()
-			messages.success(request, 'Setor editado com suceso!')
-			print(request.POST['data']['setorform'])
-			return HttpResponseRedirect('/')
+				messages.success(request, 'Setor editado com suceso!')
+				return HttpResponseRedirect('/')
+			else:
+				contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+				contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+				
+				messages.warning(request, 'Erro no formulário do endereço')
+				return render(request, 'namp/setor/setor_att.html',contexto)
 		else:
-			contexto = {
-						'data':data,
-						'servidor':servidor,
-			}
-			#messages.warning(request, data['setorform'].errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			#messages.warning(request, data['enderecosetorform'].errors.get_json_data(escape_html=False)['__all__'][0]['message'])
-			messages.warning(request, 'Erro no formulário')
+			contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+
+			messages.warning(request, 'Erro no formulário do setor')
 			return render(request, 'namp/setor/setor_att.html',contexto)
-	else:
-		contexto = {
-			'data':data,
-			'servidor':servidor,
-		}
-		return render(request, 'namp/setor/setor_att.html',contexto)
+	return render(request, 'namp/setor/setor_att.html',contexto)
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')

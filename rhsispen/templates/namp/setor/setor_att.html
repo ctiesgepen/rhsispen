@@ -19,7 +19,7 @@
 
                         <h6>Editar</h6>
                         <hr>
-                        <table class="table table-bordered text-center table-overflow table-sm">
+                        <table class="table table-bordered table-overflow table-sm">
                             <thead class="thead-dark">
                                 <tr>
                                     <th scope="col">Configurações do Setor</th>
@@ -32,33 +32,33 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ data.setorform.id_setor|as_crispy_field }}
-                                    {{ data.setorform.id_setor.errors }}
+                                    {{ setorform.id_setor|as_crispy_field }}
+                                    {{ setorform.id_setor.errors }}
                                 </div>
                                 <div class="form-group col-md-6">
-                                    {{ data.setorform.nome|as_crispy_field }}
-                                    {{ data.setorform.nome.errors }}
+                                    {{ setorform.nome|as_crispy_field }}
+                                    {{ setorform.nome.errors }}
                                 </div>
                             </div>
                                       
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ data.setorform.status|as_crispy_field }}
-                                    {{ data.setorform.status.errors }}
+                                    {{ setorform.status|as_crispy_field }}
+                                    {{ setorform.status.errors }}
                                 </div>
                                 <div class="form-group col-md-2">
-                                    {{ data.setorform.setor_sede|as_crispy_field }}
-                                    {{ data.setorform.setor_sede.errors }}
+                                    {{ setorform.setor_sede|as_crispy_field }}
+                                    {{ setorform.setor_sede.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-4">
-                                    {{ data.setorform.fk_regiao|as_crispy_field }}
-                                    {{ data.setorform.fk_regiao.errors }}
+                                    {{ setorform.fk_regiao|as_crispy_field }}
+                                    {{ setorform.fk_regiao.errors }}
                                 </div>
                             </div>
 
-                            <table class="table table-bordered text-center table-overflow table-sm">
+                            <table class="table table-bordered table-overflow table-sm">
                                 <thead class="thead-dark">
                                     <tr>
                                         <th scope="col">Endereço</th>
@@ -68,40 +68,46 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ data.enderecosetorform.uf|as_crispy_field }}
-                                    {{ data.enderecosetorform.uf.errors }}
+                                    {{ enderecosetorform.uf|as_crispy_field }}
+                                    {{ enderecosetorform.uf.errors }}
                                 </div>
                                 <div class="form-group col-md-6">
-                                    {{ data.enderecosetorform.municipio|as_crispy_field }}
-                                    {{ data.enderecosetorform.municipio.errors }}
+                                    {{ enderecosetorform.municipio|as_crispy_field }}
+                                    {{ enderecosetorform.municipio.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ data.enderecosetorform.cep|as_crispy_field }}
-                                    {{ data.enderecosetorform.cep.errors }}
+                                    {{ enderecosetorform.cep|as_crispy_field }}
+                                    {{ enderecosetorform.cep.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    {{ data.enderecosetorform.endereco|as_crispy_field }}
-                                    {{ data.enderecosetorform.endereco.errors }}
+                                    {{ enderecosetorform.endereco|as_crispy_field }}
+                                    {{ enderecosetorform.endereco.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{ data.enderecosetorform.bairro|as_crispy_field }}
-                                    {{ data.enderecosetorform.bairro.errors }}
+                                    {{ enderecosetorform.bairro|as_crispy_field }}
+                                    {{ enderecosetorform.bairro.errors }}
                                 </div>
                                 <div class="form-group col-md-2">
-                                    {{ data.enderecosetorform.numero|as_crispy_field }}
-                                    {{ data.enderecosetorform.numero.errors }}
+                                    {{ enderecosetorform.numero|as_crispy_field }}
+                                    {{ enderecosetorform.numero.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    {{ data.enderecosetorform.complemento|as_crispy_field }}
-                                    {{ data.enderecosetorform.complemento.errors }}
+                                    {{ enderecosetorform.complemento|as_crispy_field }}
+                                    {{ enderecosetorform.complemento.errors }}
+                                </div>
+                            </div> 
+                            <div class="form-row">
+                                <div class="form-group col-md-8">
+                                    {{ enderecosetorform.fk_setor|as_crispy_field }}
+                                    {{ enderecosetorform.fk_setor.errors }}
                                 </div>
                             </div> 
 
