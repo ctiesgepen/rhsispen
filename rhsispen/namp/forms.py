@@ -31,7 +31,7 @@ class GerarJornadaRegularForm(forms.Form):
     data_plantao24h = forms.DateField(required=True,label='Data de entrada:')
     equipe_plantao48h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 48H do mês:')
     data_plantao48h = forms.DateField(required=True,label='Data de entrada:')
-    
+
     def __init__(self, *args, **kwargs):
         super(GerarJornadaRegularForm, self).__init__(*args, **kwargs)
         self.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
@@ -124,8 +124,10 @@ class JornadaFormAdmin(forms.ModelForm):
 class TimeInput(forms.TimeInput):
     input_type = "time"
 
+
 class DateInput(forms.DateInput):
-    input_type = 'date'
+    input_type = "date"
+    startDate = "-3d"
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'datetime-local'
@@ -163,6 +165,7 @@ class ServidorForm(forms.ModelForm):
     class Meta:
         model = Servidor
         fields = '__all__'
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
