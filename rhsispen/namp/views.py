@@ -1109,7 +1109,6 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 	}
 	return render(request, template_name, contexto)'''
 	
-
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):

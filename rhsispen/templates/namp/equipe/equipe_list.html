@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} {% include 'includes/modal/equipe/equipe_servidores.html' %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -52,7 +52,8 @@
                                                 <td> {{equipe.categoria}} </td>
                                                 <td> {{equipe.get_servidores | default:0 }} </td>
                                                 <td>
-                                                    <a type="modalCart" data-toggle="modal" data-target="#modalCart"><i class="feather icon-eye"></i> Servidores</a>
+                                                    <a type="modalCart" data-toggle="modal" data-target="#modalEquipeServidores"><i class="feather icon-eye"></i> Servidores </a>
+                                                    <a href="{% url 'namp:equipe_att' equipe.id_equipe %}"><i class="feather icon-edit"></i> Editar </a>
                                                 </td>
                                             </tr>
                                             {% endfor %}
