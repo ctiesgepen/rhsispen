@@ -109,8 +109,9 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	page = request.GET.get('page')
 	paginator = Paginator(list(setores), 15)
 	page_obj = paginator.get_page(page)
-
-	contexto = { 
+	setor = None
+	contexto = {
+		'setorzinho':setor,
 		'servidor': servidor,
 		'setores': setores,
 		'form': form,
@@ -130,6 +131,7 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 				page_obj = paginator.get_page(page)
 
 				contexto = { 
+					'setorzinho':setor,
 					'servidor': servidor,
 					'setores': setores,
 					'form': form,
