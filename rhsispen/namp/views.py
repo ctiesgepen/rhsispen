@@ -99,7 +99,6 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		setor = list(Setor.objects.all())
 		setores = list(Setor.objects.all())
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Setor não encontrado!')
@@ -108,12 +107,12 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	form = SetorSearchForm(request.POST or None)
 
 	page = request.GET.get('page')
-	paginator = Paginator(setor, 15)
+	paginator = Paginator(setores, 15)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 
 		'servidor': servidor,
-		'setor': setor,
+		'setores': setores,
 		'form': form,
 		'page_obj': page_obj,
 	}
@@ -132,7 +131,7 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 
 				contexto = { 
 					'servidor': servidor,
-					'setor': setor,
+					'setores': setores,
 					'form': form,
 					'page_obj': page_obj,
 				}
@@ -1118,10 +1117,25 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 	#if request.user.is_staff or request.user.is_superuser:
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
+		periodo_escala = PeriodoAcao.objects.get(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today())
+		escala_gerada = EscalaFrequencia.objects.get(fk_periodo_acao=periodo_escala)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	
+	except PeriodoAcao.DoesNotExist:
+		#Quando não encontrado o período de gerar escala na data de acesso da template jornadas_operador, 
+		#uma mensagem de warning é retornada junto com a template de listar escalas da unidade.
+		periodo_escala = None
+		messages.warning(request, 'O prazo para gerar escala regular está encerrado!')
+		return redirect('namp:escala_operador_list')
+	except EscalaFrequencia.DoesNotExist:
+		#Quando não encontrada escala regular para o período atual 
+		escala_gerada = None
+		
+	if escala_gerada:
+		messages.warning(request, 'Seu setor já possui escala regular para o período atual!')
+		return redirect('namp:escala_operador_list')
+
 	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = False
@@ -1276,10 +1290,10 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					fimDoMes)
 			
 			escala = EscalaFrequencia()
-			escala.fk_periodo_acao = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+			escala.fk_periodo_acao = periodo_escala
 			escala.data = DateTime.today()
-			escala.fk_servidor = Servidor.objects.get(fk_user=request.user.id)
-			escala.fk_setor = setor
+			escala.fk_servidor = servidor
+			escala.fk_setor = servidor.fk_setor
 			escala.save()
 
 			messages.success(request, 'As escalas foram atualizadas com suceso!')
