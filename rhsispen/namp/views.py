@@ -334,6 +334,7 @@ def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor) or None
+		setores = list(Setor.objects.all())
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -349,30 +350,60 @@ def setor_att(request, id_setor):
 		'enderecosetorform': enderecosetorform,
 	}
 
+	#if servidor == request.user.is_superuser:
 	if request.method == 'POST':
-		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+		contexto['setorform'] = SetorForm(request.POST, instance=setores)
 		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
-		if contexto['setorform'].is_valid():
-			setor = contexto['setorform'].save(commit=False)
-			if contexto['enderecosetorform'].is_valid():
-				endereco = contexto['enderecosetorform'].save(commit=False)
-				setor.save()
-				endereco.save()
-				messages.success(request, 'Setor editado com suceso!')
-				return HttpResponseRedirect('/')
-			else:
-				contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-				contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
-				
-				messages.warning(request, 'Erro no formulário do endereço')
-				return render(request, 'namp/setor/setor_att.html',contexto)
-		else:
-			contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
 
-			messages.warning(request, 'Erro no formulário do setor')
+	if contexto['setorform'].is_valid():
+		setor = contexto['setorform'].save(commit=False)
+		if contexto['enderecosetorform'].is_valid():
+			endereco = contexto['enderecosetorform'].save(commit=False)
+			setor.save()
+			endereco.save()
+			messages.success(request, 'Setor editado com suceso!')
+			return HttpResponseRedirect('/')
+		else:
+			contexto['setorform'] = SetorForm(request.POST, instance=setores)
+			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+			
+			messages.warning(request, 'Erro no formulário do endereço')
 			return render(request, 'namp/setor/setor_att.html',contexto)
-	return render(request, 'namp/setor/setor_att.html',contexto)
+	else:
+		contexto['setorform'] = SetorForm(request.POST, instance=setores)
+		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+
+		messages.warning(request, 'Erro no formulário do setor')
+		return render(request, 'namp/setor/setor_att.html',contexto)
+return render(request, 'namp/setor/setor_att.html',contexto)
+
+
+	#if servidor == request.user.is_staff:
+	#	if request.method == 'POST':
+	#		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+	#		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
+
+	#	if contexto['setorform'].is_valid():
+	#		setor = contexto['setorform'].save(commit=False)
+	#		if contexto['enderecosetorform'].is_valid():
+	#			endereco = contexto['enderecosetorform'].save(commit=False)
+	#			setor.save()
+	#			endereco.save()
+	#			messages.success(request, 'Setor editado com suceso!')
+	#			return HttpResponseRedirect('/')
+	#		else:
+	#			contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+	#			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+				
+	#			messages.warning(request, 'Erro no formulário do endereço')
+	#			return render(request, 'namp/setor/setor_att.html',contexto)
+	#	else:
+	#		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+	#		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+
+	#		messages.warning(request, 'Erro no formulário do setor')
+	#		return render(request, 'namp/setor/setor_att.html',contexto)
+	#return render(request, 'namp/setor/setor_att.html',contexto)
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')

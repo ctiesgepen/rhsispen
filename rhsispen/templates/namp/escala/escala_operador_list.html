@@ -21,22 +21,19 @@
                                 <button type="input" class="btn btn-dark">
                                 <i class="fas fa-search"></i>
                                 </button>
-                                <a class=" col float-right" href="{% url 'namp:escala_operador_list' %}">ver todos</a>
-                                {% if mensagens.mensagem_escalas %}
+                                <a class=" col float-right" href="{% url 'namp:escala_operador_list' %}">ver todos</a> {% if mensagens.mensagem_escalas %}
                                 <div class="float-right" style="padding: 0;">
                                     <a href="{% url 'namp:jornadas_operador' %}" class="btn btn-dark float-right"><i class="fas fa-plus"></i> Gerar Escalas</a>
                                 </div>
                                 {% endif %}
                             </div>
                         </form>
-                        <br>
-
-                        {% if mensagens.mensagem_escalas %}
+                        <br> {% if mensagens.mensagem_escalas %}
                         <div class="submit-row">
                             <div class="alert alert-warning" role="alert" id="alert-prazo">{{ mensagens.mensagem_escalas }}</div>
                         </div>
                         {% endif %}
-                        
+
                         <div class="table-responsive">
                             <table class="table table-striped table-sm shadow-sm">
                                 <thead class="thead-dark">
@@ -67,20 +64,26 @@
                             </table>
                         </div>
                         <hr>
+                        <!-- PAGINAÇÃO INICIO -->
                         <div class="pagination justify-content-center">
-                            <span class="step-links">
-                            {% if page_obj.has_previous %}
-                                <a href="?page=1">&laquo;</a>          
-                                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                            {% endif %}
-                
-                            <span class="current">
-                                Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                            </span> {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                            <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
-                            </span>
+                            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                <div class="btn-group mr-2 mb-1" role="group" aria-label="First group">
+                                    <span class="step-links">
+                                        {% if page_obj.has_previous %}
+                                            <a href="?page=1"><button type="button" class="btn btn-dark" >&laquo;</button></a>       
+                                            <a href="?page={{ page_obj.previous_page_number }}"><button type="button" class="btn btn-dark" >&lt;</button></a>
+                                        {% endif %}
+                            
+                                        <span class="current">
+                                            <button border-color="ffff" type="button" class="btn btn-dark">{{ page_obj.number  }}</button>
+                                        </span> {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}"><button type="button" class="btn btn-dark" >&gt;</button></a>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}"><button type="button" class="btn btn-dark">&raquo;</button></a> {% endif %}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+                        <!-- PAGINAÇÃO FIM -->
                     </div>
                 </div>
             </div>
