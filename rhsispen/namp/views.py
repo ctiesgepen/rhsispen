@@ -375,7 +375,7 @@ def setor_att(request, id_setor):
 
 		messages.warning(request, 'Erro no formulário do setor')
 		return render(request, 'namp/setor/setor_att.html',contexto)
-return render(request, 'namp/setor/setor_att.html',contexto)
+	return render(request, 'namp/setor/setor_att.html',contexto)
 
 
 	#if servidor == request.user.is_staff:
