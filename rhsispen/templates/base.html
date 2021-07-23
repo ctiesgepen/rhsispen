@@ -1,45 +1,22 @@
-{% extends 'admin/base_site.html' %}
-{% load i18n static %}
-{% load static %}
+{% extends 'admin/base_site.html' %} {% load i18n static %} {% load static %} {% block extrastyle %}{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}"> {% endblock %} {% block branding %}
+<a href="{% url 'namp:home' %}">
+    <img style="float: left;" src="{% static 'images/logoppto.png' %}" alt="logo" width="45" height="50">
+</a>
+<h1>Núcleo de Apoio e Movimentação de Pessoal</h1>
+{% endblock %} {% block breadcrumbs %}
+<div class="breadcrumbs">
+    <a href="{% url 'namp:home' %}">{% translate 'Home' %}</a>
+</div>
+{% endblock %} {%block usertools %}
+<div id="user-tools">
+    {% if user.is_authenticated %} {% block welcome-msg %} {% trans 'Bem-vindo,' %}
+    <strong>{% firstof user.get_short_name user.get_username %}</strong>. {% endblock %} {% endif %} {% block userlinks %} {% if user.is_authenticated %} {% if request.user.is_staff %}
+    <a href="{% url 'admin:index' %}">{% trans 'Acesso Admin' %}</a> / {% endif %}
+    <a href="{% url 'autenticacao:alterar_senha' %}">{% trans 'Alterar Senha' %}</a> /
+    <a href="{% url 'autenticacao:logout' %}">{% trans ' Encerrar sessão' %}</a> {% else %}
+    <a href="{% url 'autenticacao:login' %}">{% trans 'Entrar' %}</a> /
+    <a href="{% url 'autenticacao:cadastro' %}">{% trans 'Cadastrar-se' %}</a> {% endif %} {% endblock %}
+</div>
 
-{% block extrastyle %}{{ block.super }}<link rel="stylesheet" type="text/css" href="{% static 'css/base.css' %}">
 {% endblock %}
-
-{% block branding %}
- 	<a href="{% url 'namp:home' %}">
-	<img style="float: left;" src="{% static 'images/logoppto.png' %}" alt="logo" width="45" height="50">
-	</a>
-	<h1>Núcleo de Apoio e Movimentação de Pessoal</h1>
-{% endblock %}
-
-{% block breadcrumbs %}
-	<div class="breadcrumbs">
-	<a href="{% url 'namp:home' %}">{% translate 'Home' %}</a>
-	</div>
-{% endblock %}
-
-{%block usertools %}
-	<div id="user-tools">
-		{% if user.is_authenticated %}	
-			{% block welcome-msg %}
-			    {% trans 'Bem-vindo,' %}
-			    <strong>{% firstof user.get_short_name user.get_username %}</strong>.
-			{% endblock %}
-		{% endif %}
-
-		{% block userlinks %}
-			{% if user.is_authenticated %}	
-				{% if request.user.is_staff %}                      
-				<a href="{% url 'admin:index' %}">{% trans 'Acesso Admin' %}</a> /
-				{% endif %}             
-				<a href="{% url 'autenticacao:alterar_senha' %}">{% trans 'Alterar Senha' %}</a> /
-			    <a href="{% url 'autenticacao:logout' %}">{% trans ' Encerrar sessão' %}</a>
-			{% else %}
-			  	<a href="{% url 'autenticacao:login' %}">{% trans 'Entrar' %}</a> /
-			    <a href="{% url 'autenticacao:cadastro' %}">{% trans 'Cadastrar-se' %}</a>
-			{% endif %}
-		{% endblock %}
-	</div>
-	
-{% endblock %}
-
