@@ -332,44 +332,50 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor) or None
+		setor = Setor.objects.get(id_setor=id_setor)
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	except EnderecoSetor.DoesNotExist:
 		enderecosetor = None
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Não foi possível carregar o setor!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 	
 	'''
 	Atribuindo o formulário do setor a uma variável e setando alguns campos choices para inicialização.
 	'''
 	enderecosetorform = EnderecoSetorForm(instance=enderecosetor)
-	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=servidor.fk_setor.id_setor).values_list('id_setor', 'nome'))
+	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=setor.id_setor).values_list('id_setor', 'nome'))
 
 	contexto = {
 		'servidor':servidor,
-		'setorform': SetorForm(instance=servidor.fk_setor),
+		'setorform': SetorForm(instance=setor),
 		'enderecosetorform': enderecosetorform,
 	}
 
 	if request.method == 'POST':
-		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+		contexto['setorform'] = SetorForm(request.POST, instance=setor)
 		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
+
 		if contexto['setorform'].is_valid():
-			setor = contexto['setorform'].save(commit=False)
+			setorform = contexto['setorform'].save(commit=False)
 			if contexto['enderecosetorform'].is_valid():
-				endereco = contexto['enderecosetorform'].save(commit=False)
-				setor.save()
-				endereco.save()
+				enderecoform = contexto['enderecosetorform'].save(commit=False)
+				setorform.save()
+				enderecoform.save()
 				messages.success(request, 'Setor editado com suceso!')
 				return HttpResponseRedirect('/')
 			else:
-				contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+				contexto['setorform'] = SetorForm(request.POST, instance=setor)
 				contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
 				
 				messages.warning(request, 'Erro no formulário do endereço')
 				return render(request, 'namp/setor/setor_att.html',contexto)
 		else:
-			contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
+			contexto['setorform'] = SetorForm(request.POST, instance=setor)
 			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
 
 			messages.warning(request, 'Erro no formulário do setor')
@@ -1080,25 +1086,26 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		#Pegando do banco o período atual para gerar escalas. Só pega se a data de hoje estiver dentro desse período.
-		periodo_escala = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
-		#Pegando do banco a escala gerada para o período acima. Só pega se tiver escala gerada entro desse período.
-		escala_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
+
+		periodo_escala = PeriodoAcao.objects.get(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today())
+		escala_gerada = EscalaFrequencia.objects.get(fk_periodo_acao=periodo_escala)
+
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	except PeriodoAcao.DoesNotExist:
+		#Quando não encontrado o período de gerar escala na data de acesso da template jornadas_operador, 
+		#uma mensagem de warning é retornada junto com a template de listar escalas da unidade.
 		periodo_escala = None
-		messages.warning(request, 'O período para gerar a escala regular de trabalho está encerrado!')
+		messages.warning(request, 'O prazo para gerar escala regular está encerrado!')
 		return redirect('namp:escala_operador_list')
 	except EscalaFrequencia.DoesNotExist:
+		#Quando não encontrada escala regular para o período atual 
 		escala_gerada = None
-
+		
 	if escala_gerada:
-		messages.warning(request, 'Seu setor já possui escala gerada para o mês de ' + periodo_escala.data_inicial.strftime('%B'))
+		messages.warning(request, 'Seu setor já possui escala regular para o período atual!')
 		return redirect('namp:escala_operador_list')
-
-	minimoDate = Date.today().replace(day=1, month=periodo_escala.data_inicial.month()+1,eyar=periodo_escala.data_inicial.eyar())
 
 	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
 
@@ -1264,9 +1271,9 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					fimDoMes)
 			
 			escala = EscalaFrequencia()
-			escala.fk_periodo_acao = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+			escala.fk_periodo_acao = periodo_escala
 			escala.data = DateTime.today()
-			escala.fk_servidor = Servidor.objects.get(fk_user=request.user.id)
+			escala.fk_servidor = servidor
 			escala.fk_setor = servidor.fk_setor
 			escala.save()
 

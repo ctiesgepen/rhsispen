@@ -1,12 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %}
-
-{% load crispy_forms_tags %}
-
-{% load namp_extras %}
-
-{% block content %}
-
-{% include 'includes/modal/periodo/eventos_list.html' %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% load namp_extras %} {% block content %} {% include 'includes/modal/periodo/eventos_list.html' %}
 
 <div class="pcoded-main-container">
     <div class="pcoded-content">
@@ -17,8 +9,7 @@
                         <h5 class="text-center">TEXTO INSTITUCIONAL AQUI</h5>
                         {% if messages %} {% for message in messages %}
                         <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
-                        <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a>
-                        {{ message|safe }}
+                            <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a> {{ message|safe }}
                         </div>
                         {% endfor %} {% endif %}
 
@@ -87,20 +78,26 @@
                             </table>
                         </div>
                         <hr>
+                        <!-- PAGINAÇÃO INICIO -->
                         <div class="pagination justify-content-center">
-                            <span class="step-links">
-                            {% if page_obj.has_previous %}
-                                <a href="?page=1">&laquo;</a>          
-                                <a href="?page={{ page_obj.previous_page_number }}">Anterior</a>
-                            {% endif %}
-                
-                            <span class="current">
-                                Pág {{ page_obj.number }} de {{ page_obj.paginator.num_pages }}.
-                            </span> {% if page_obj.has_next %}
-                            <a href="?page={{ page_obj.next_page_number }}">Próximo</a>
-                            <a href="?page={{ page_obj.paginator.num_pages }}"> &raquo;</a> {% endif %}
-                            </span>
+                            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                <div class="btn-group mr-2 mb-1" role="group" aria-label="First group">
+                                    <span class="step-links">
+                                        {% if page_obj.has_previous %}
+                                            <a href="?page=1"><button type="button" class="btn btn-dark" >&laquo;</button></a>       
+                                            <a href="?page={{ page_obj.previous_page_number }}"><button type="button" class="btn btn-dark" >&lt;</button></a>
+                                        {% endif %}
+                            
+                                        <span class="current">
+                                            <button border-color="ffff" type="button" class="btn btn-dark">{{ page_obj.number  }}</button>
+                                        </span> {% if page_obj.has_next %}
+                                    <a href="?page={{ page_obj.next_page_number }}"><button type="button" class="btn btn-dark" >&gt;</button></a>
+                                    <a href="?page={{ page_obj.paginator.num_pages }}"><button type="button" class="btn btn-dark">&raquo;</button></a> {% endif %}
+                                    </span>
+                                </div>
+                            </div>
                         </div>
+                        <!-- PAGINAÇÃO FIM -->
                     </div>
                 </div>
             </div>
