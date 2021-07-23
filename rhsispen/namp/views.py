@@ -376,10 +376,18 @@ def setor_att(request, id_setor):
 		else:
 			contexto['setorform'] = SetorForm(request.POST, instance=setor)
 			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+<<<<<<< HEAD
 
 			messages.warning(request, 'Erro no formulário do setor')
 			return render(request, 'namp/setor/setor_att.html',contexto)
 	return render(request, 'namp/setor/setor_att.html',contexto)
+=======
+
+			messages.warning(request, 'Erro no formulário do setor')
+			return render(request, 'namp/setor/setor_att.html',contexto)
+	return render(request, 'namp/setor/setor_att.html',contexto)
+
+>>>>>>> a3d5c1ecd7160902f7f243f4b30e86978d4d202a
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')
