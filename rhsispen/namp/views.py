@@ -76,7 +76,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Setor adicionada com sucesso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			return redirect('namp:admin_setor')
 		else:
 			contexto = {
 				'setor': setor,
@@ -98,8 +98,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		setor = list(Setor.objects.all())
-		setores = list(Setor.objects.all())
+		setores = Setor.objects.all()
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Setor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
@@ -107,12 +106,13 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	form = SetorSearchForm(request.POST or None)
 
 	page = request.GET.get('page')
-	paginator = Paginator(setor, 15)
+	paginator = Paginator(list(setores), 15)
 	page_obj = paginator.get_page(page)
-
-	contexto = { 
+	setor = None
+	contexto = {
+		'setorzinho':setor,
 		'servidor': servidor,
-		'setor': setor,
+		'setores': setores,
 		'form': form,
 		'page_obj': page_obj,
 	}
@@ -130,8 +130,9 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 				page_obj = paginator.get_page(page)
 
 				contexto = { 
+					'setorzinho':setor,
 					'servidor': servidor,
-					'setor': setor,
+					'setores': setores,
 					'form': form,
 					'page_obj': page_obj,
 				}
@@ -1056,13 +1057,11 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 	page = request.GET.get('page')
 	paginator = Paginator(list(escalas), 15)
 	page_obj = paginator.get_page(page)
-
 	mensagens = {}
 				
 	#Verificando se tem período para consolidar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
-
 	if periodo_escala:
 		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
 		if not escalas_geradas:
@@ -1077,7 +1076,6 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 		'mensagens': mensagens,
 		'page_obj': page_obj,
 	}
-
 	return render(request, template_name, contexto)'''
 	
 
