@@ -81,8 +81,19 @@ class Setor(models.Model):
 	setor_sede = models.BooleanField(default=False)
 	#RESTRICT: proibe a exclussão de região referenciada em setor
 	fk_regiao = models.ForeignKey(Regiao, on_delete = models.RESTRICT, verbose_name='Região')
+	
 	def __str__(self):
 		return self.nome
+
+	def get_equipes(self, ):
+		return Equipe.objects.filter(fk_setor=self)
+
+	def get_servidores(self):
+		total = 0
+		for equipe in Equipe.objects.filter(fk_setor=self):
+			total = total + equipe.get_servidores()
+		return total
+
 	class Meta:
 		ordering = ['nome']
 		verbose_name = "Setor"

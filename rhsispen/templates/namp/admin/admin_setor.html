@@ -59,7 +59,7 @@
                                                 <img src="/static/admin/img/icon-no.svg" alt="{{setor.setor_sede}}"> {% endif%}
                                             </td>
 
-                                            <td> {{ servidor.get_servidores | default:0 }} </td>
+                                            <td> {{ setor.get_servidores|default:0 }} </td>
                                             <td>
                                                 <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i> Editar </a>
                                             </td>
