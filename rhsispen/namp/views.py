@@ -333,9 +333,14 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor) or None
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor)
 		setores = list(Setor.objects.all())
 	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except EnderecoSetor.DoesNotExist:
+		enderecosetor = None
+	except Setor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	'''
