@@ -100,6 +100,8 @@ class Setor(models.Model):
 		verbose_name_plural = "Setores"
 		#Campos que devem ser únicos juntos
 		unique_together = ('id_setor','nome', 'fk_regiao')
+	
+
 
 class EnderecoSetor(models.Model):
 	id_endereco_setor = models.AutoField(primary_key=True)
@@ -272,6 +274,7 @@ class HistLotacao(models.Model):
 	fk_equipe = models.ForeignKey(Equipe, on_delete = models.RESTRICT, verbose_name='Equipe')
 	def __str__(self):
 		return str(self.id_hist_lotacao)
+
 	class Meta:
 		verbose_name = "Lotação"
 		verbose_name_plural = "Lotações"

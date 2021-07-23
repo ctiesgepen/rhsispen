@@ -77,7 +77,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Setor adicionada com sucesso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			return redirect('namp:admin_setor')
 		else:
 			contexto = {
 				'setor': setor,
@@ -1088,13 +1088,11 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 	page = request.GET.get('page')
 	paginator = Paginator(list(escalas), 15)
 	page_obj = paginator.get_page(page)
-
 	mensagens = {}
 				
 	#Verificando se tem período para consolidar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
-
 	if periodo_escala:
 		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
 		if not escalas_geradas:
@@ -1109,7 +1107,6 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 		'mensagens': mensagens,
 		'page_obj': page_obj,
 	}
-
 	return render(request, template_name, contexto)'''
 	
 

@@ -39,8 +39,16 @@
                                     {{ setorform.nome.errors }}
                                 </div>
                             </div>
-                                      
-                            
+                            <div class="form-row">                                
+                                <div class="form-group col-md-2">
+                                    {{ setorform.status|as_crispy_field }}
+                                    {{ setorform.status.errors }}
+                                </div>                                
+                                <div class="form-group col-md-2">
+                                    {{ setorform.setor_sede|as_crispy_field }}
+                                    {{ setorform.setor_sede.errors }}
+                                </div>
+                            </div>
                             <div class="form-row">
                                 <div class="form-group col-md-4">
                                     {{ setorform.fk_regiao|as_crispy_field }}
