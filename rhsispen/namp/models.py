@@ -86,7 +86,7 @@ class Setor(models.Model):
 		return self.nome
 
 	def get_equipes(self, ):
-		return Equipe.objects.filter(fk_setor=self)
+		return list(Equipe.objects.filter(fk_setor=self))
 
 	def get_servidores(self):
 		total = 0

@@ -99,7 +99,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		setores = list(Setor.objects.all())
+		setores = Setor.objects.all()
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Setor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
@@ -107,7 +107,7 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	form = SetorSearchForm(request.POST or None)
 
 	page = request.GET.get('page')
-	paginator = Paginator(setores, 15)
+	paginator = Paginator(list(setores), 15)
 	page_obj = paginator.get_page(page)
 
 	contexto = { 
