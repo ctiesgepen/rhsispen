@@ -1,12 +1,12 @@
-<!-- Modal: modalEquipesAdmin -->
-<div class="modal fade" id="modalEquipesAdmin" tabindex="-1" role="dialog" aria-labelledby="modalEquipesAdmin" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
+<!-- Modal: modalEquipeAdmin -->
+<div class="modal fade" id="modalEquipeAdmin" tabindex="-1" role="dialog" aria-labelledby="modalEquipeAdmin" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Equipes</h4>
+                <h4 class="modal-title" id="myModalLabel">Equipes desse Setor</h4>
             </div>
-            <!--Body-->
+            <!--Body -->
             <div class="modal-body table-responsive">
                 <table class="table table-striped table-sm shadow-sm">
                     <thead class="thead-dark">
@@ -16,14 +16,14 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for equipe in setor.get_equipes %}
+                        {% for setor in setores %}
                         <tr>
-                            <th scope="row">{{ setor.id_setor }}</th>
-                            <td>{{ equipe.nome }}</td>
-                            <td>{{ equipe.get_servidores }}</td>
+                            <td>{{ setor.get_equipes }}</td>
+                            <td>{{ setor.get_servidores  }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
+
                 </table>
 
             </div>
