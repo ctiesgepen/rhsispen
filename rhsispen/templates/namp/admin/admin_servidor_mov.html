@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block javascripts %}
+<script type="text/javascript">
+    $(function() {
+        // inspect html to check id of category select dropdown.
+        $(document).on("change", "#id_servidor", function() {
+            $.getJSON("/getSetorServidor/", {
+                id_matricula: $("#id_servidor").val()
+            }, function(j) {
+                var options = '<option value="' + j[0].id_setor + '">' + j[0].nome + "</option>";
+                $("#id_setor_origem").html(options);
+            });
+        });
+    });
+</script>
+{% endblock javascripts %} {% block content %}
+<div class="pcoded-main-container">
+    <div class="pcoded-content">
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="text-center">Estado do Tocantins</h5>
+                        {% if messages %} {% for message in messages %}
+                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                        {% endfor %} {% endif %}
+
+                        <h5 class="mt-5">Movimentação Externa</h5>
+                        <hr>
+
+                        <form action="{% url 'namp:admin_servidor_mov' %}" method="post">
+                            {% csrf_token %}
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{ form.servidor|as_crispy_field }} {{ form.servidor.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{ form.setor_origem|as_crispy_field}} {{ form.setor_origem.errors }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ form.setor_destino|as_crispy_field}} {{ form.setor_destino.errors }}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group col-md-4">
+                                    {{ form.equipe_origem|as_crispy_field}} {{ form.equipe_origem.errors }}
+                                </div>
+                                <div class="form-group col-md-4">
+                                    {{ form.equipe_destino|as_crispy_field}} {{ form.equipe_destino.errors }}
+                                </div>
+                            </div>
+                            <hr>
+                            <div class="submit-row">
+                                <button type="submit" class="btn  btn-dark">Salvar</button>
+                                <a href="{% url 'namp:admin_servidores' %}" class="btn  btn-dark">Cancelar</a>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

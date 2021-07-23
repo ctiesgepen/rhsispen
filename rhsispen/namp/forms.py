@@ -167,6 +167,10 @@ class ServidorForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['fk_equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_setor=self.instance.fk_setor).values_list('id_equipe', 'nome'))
         
+class EnderecoServForm(forms.ModelForm):
+    class Meta:
+        model = EnderecoServ
+        fields = '__all__'
 
 class ServidorSearchForm(forms.ModelForm):
     class Meta:
@@ -174,6 +178,17 @@ class ServidorSearchForm(forms.ModelForm):
         fields = ('nome',)
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de servidor'}),
+        }
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['nome'].label = ""
+
+class SetorSearchForm(forms.ModelForm):
+    class Meta:
+        model = Setor
+        fields = ('nome',)
+        widgets = {
+            'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de setor'}),
         }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -222,16 +237,30 @@ class EnderecoSetorForm(forms.ModelForm):
         model = EnderecoSetor
         fields = '__all__'
     
-class ServidorMoverForm(forms.Form):
+class ServidorMoverIntForm(forms.Form):
     servidor = forms.ChoiceField(required=True, label='Servidor')
     equipe_origem = forms.ChoiceField(required=True,label='Equipe Atual')
     equipe_destino = forms.ChoiceField(required=True, label='Equipe Destino')
-    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['servidor'].choices = [('', '--Selecione--')] + list(Servidor.objects.all().values_list('id_matricula', 'nome'))
         self.fields['equipe_origem'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+
+class ServidorMoverExtForm(forms.Form):
+    servidor = forms.ChoiceField(required=True, label='Servidor')
+    setor_origem = forms.ChoiceField(required=True,label='Setor Atual')
+    setor_destino = forms.ChoiceField(required=True, label='Setor Destino')
+    equipe_origem = forms.ChoiceField(required=True,label='Equipe Atual')
+    equipe_destino = forms.ChoiceField(required=True, label='Equipe Destino')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['servidor'].choices = [('', '--Selecione--')] + list(Servidor.objects.all().values_list('id_matricula', 'nome'))
+        self.fields['setor_origem'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
+        self.fields['setor_destino'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
+        self.fields['equipe_origem'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+        self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+
 
 class PeriodoAcaoForm(forms.ModelForm):
     class Meta:
