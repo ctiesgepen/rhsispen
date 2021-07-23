@@ -77,7 +77,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Setor adicionada com sucesso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			return redirect('namp:admin_setor')
 		else:
 			contexto = {
 				'setor': setor,
@@ -333,82 +333,54 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor)
-		setores = list(Setor.objects.all())
+		setor = Setor.objects.get(id_setor=id_setor)
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	except EnderecoSetor.DoesNotExist:
 		enderecosetor = None
 	except Setor.DoesNotExist:
-		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		messages.warning(request, 'Não foi possível carregar o setor!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	
 	'''
 	Atribuindo o formulário do setor a uma variável e setando alguns campos choices para inicialização.
 	'''
 	enderecosetorform = EnderecoSetorForm(instance=enderecosetor)
-	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=servidor.fk_setor.id_setor).values_list('id_setor', 'nome'))
+	enderecosetorform.fields['fk_setor'].choices = list(Setor.objects.filter(id_setor=setor.id_setor).values_list('id_setor', 'nome'))
 
 	contexto = {
 		'servidor':servidor,
-		'setorform': SetorForm(instance=servidor.fk_setor),
+		'setorform': SetorForm(instance=setor),
 		'enderecosetorform': enderecosetorform,
 	}
 
-	#if servidor == request.user.is_superuser:
 	if request.method == 'POST':
-		contexto['setorform'] = SetorForm(request.POST, instance=setores)
+		contexto['setorform'] = SetorForm(request.POST, instance=setor)
 		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
 
-	if contexto['setorform'].is_valid():
-		setor = contexto['setorform'].save(commit=False)
-		if contexto['enderecosetorform'].is_valid():
-			endereco = contexto['enderecosetorform'].save(commit=False)
-			setor.save()
-			endereco.save()
-			messages.success(request, 'Setor editado com suceso!')
-			return HttpResponseRedirect('/')
-		else:
-			contexto['setorform'] = SetorForm(request.POST, instance=setores)
-			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
-			
-			messages.warning(request, 'Erro no formulário do endereço')
-			return render(request, 'namp/setor/setor_att.html',contexto)
-	else:
-		contexto['setorform'] = SetorForm(request.POST, instance=setores)
-		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
-
-		messages.warning(request, 'Erro no formulário do setor')
-		return render(request, 'namp/setor/setor_att.html',contexto)
-	return render(request, 'namp/setor/setor_att.html',contexto)
-
-
-	#if servidor == request.user.is_staff:
-	#	if request.method == 'POST':
-	#		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-	#		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST, instance=enderecosetor)
-
-	#	if contexto['setorform'].is_valid():
-	#		setor = contexto['setorform'].save(commit=False)
-	#		if contexto['enderecosetorform'].is_valid():
-	#			endereco = contexto['enderecosetorform'].save(commit=False)
-	#			setor.save()
-	#			endereco.save()
-	#			messages.success(request, 'Setor editado com suceso!')
-	#			return HttpResponseRedirect('/')
-	#		else:
-	#			contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-	#			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+		if contexto['setorform'].is_valid():
+			setorform = contexto['setorform'].save(commit=False)
+			if contexto['enderecosetorform'].is_valid():
+				enderecoform = contexto['enderecosetorform'].save(commit=False)
+				setorform.save()
+				enderecoform.save()
+				messages.success(request, 'Setor editado com suceso!')
+				return HttpResponseRedirect('/')
+			else:
+				contexto['setorform'] = SetorForm(request.POST, instance=setor)
+				contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
 				
-	#			messages.warning(request, 'Erro no formulário do endereço')
-	#			return render(request, 'namp/setor/setor_att.html',contexto)
-	#	else:
-	#		contexto['setorform'] = SetorForm(request.POST, instance=servidor.fk_setor)
-	#		contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
+				messages.warning(request, 'Erro no formulário do endereço')
+				return render(request, 'namp/setor/setor_att.html',contexto)
+		else:
+			contexto['setorform'] = SetorForm(request.POST, instance=setor)
+			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
 
-	#		messages.warning(request, 'Erro no formulário do setor')
-	#		return render(request, 'namp/setor/setor_att.html',contexto)
-	#return render(request, 'namp/setor/setor_att.html',contexto)
+			messages.warning(request, 'Erro no formulário do setor')
+			return render(request, 'namp/setor/setor_att.html',contexto)
+	return render(request, 'namp/setor/setor_att.html',contexto)
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')
@@ -1117,13 +1089,11 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 	page = request.GET.get('page')
 	paginator = Paginator(list(escalas), 15)
 	page_obj = paginator.get_page(page)
-
 	mensagens = {}
 				
 	#Verificando se tem período para consolidar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao=1, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	periodo_frequencia = PeriodoAcao.objects.filter(descricao=2, data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
-
 	if periodo_escala:
 		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
 		if not escalas_geradas:
@@ -1138,7 +1108,6 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 		'mensagens': mensagens,
 		'page_obj': page_obj,
 	}
-
 	return render(request, template_name, contexto)'''
 	
 

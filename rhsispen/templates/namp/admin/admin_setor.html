@@ -8,7 +8,8 @@
                     <div class="card-body">
                         <h5 class="text-center">Estado do Tocantins</h5>
                         {% if messages %} {% for message in messages %}
-                        <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
+                            <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a>
                         {% endfor %} {% endif %}
 
                         <h5 class="mt-5">Todos os Setores</h5>
