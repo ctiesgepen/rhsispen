@@ -63,34 +63,84 @@ def admin_servidor(request):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_setores(request):
-	return render(request, 'admin_setores.html')
+def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
+	form = SetorForm()
+	try:
+		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	if request.method == 'POST':
+		form = SetorForm(request.POST)		
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Setor adicionada com sucesso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		else:
+			contexto = {
+				'setor': setor,
+				'form': form,
+				'servidor': servidor,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name, contexto)
+	else:
+		contexto = {
+			'setor': setor,
+			'form': form,
+			'servidor': servidor,
+		}
+		return render(request,template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_unidades(request, template_name='namp/admin/admin_unidades.html'):
+def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	try:
-		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
-		#setor = Servidor.objects.filter(fk_servidor=setor.id_codigo)
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		setor = list(Setor.objects.all())
+		setores = list(Setor.objects.all())
 	except Setor.DoesNotExist:
-		messages.warning(request, 'Setores não encontrado!')
+		messages.warning(request, 'Setor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER')) 
-	form = SetorForm()
-	contexto = { 
-		'setor': setor,
-		'form': form
-	}
-	if request.method == 'POST':
-		form = SetorForm(request.POST)
-		if form.is_valid():
-			form.save()
-			messages.success(request, 'Novo setor cadastrado com sucesso!')	
-			return HttpResponseRedirect('/')
-		else:
-			contexto['form'] = form
-			return render(request, template_name, contexto)
-	return render(request, template_name, contexto)
+	
+	form = SetorSearchForm(request.POST or None)
 
+	page = request.GET.get('page')
+	paginator = Paginator(setor, 15)
+	page_obj = paginator.get_page(page)
+
+	contexto = { 
+		'servidor': servidor,
+		'setor': setor,
+		'form': form,
+		'page_obj': page_obj,
+	}
+
+	if request.method == 'POST':
+		if form.is_valid():
+			setores2 = []
+			pattern = re.compile(form.cleaned_data['nome'].upper())
+			for setor in setores:
+				if pattern.search(setor.nome.upper()):
+					setores2.append(setor)
+			if setores2:
+				page = request.GET.get('page')
+				paginator = Paginator(setores2, 15)
+				page_obj = paginator.get_page(page)
+
+				contexto = { 
+					'servidor': servidor,
+					'setor': setor,
+					'form': form,
+					'page_obj': page_obj,
+				}
+				return render(request, template_name, contexto)
+			else:
+				print('entrei no form invalid')
+				messages.warning(request, 'Setor com este nome não encontrado!')
+				return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -157,9 +207,11 @@ Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
 	form = PeriodoAcaoForm()
 	contexto = {
 		'form': form,
+		'servidor': servidor,
 	}
 	if request.method == 'POST':
 		form = PeriodoAcaoForm(request.POST)		
@@ -280,7 +332,7 @@ def periodo_att(request, id_periodo_acao):
 def setor_att(request, id_setor):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor)
+		enderecosetor = EnderecoSetor.objects.get(fk_setor=servidor.fk_setor) or None
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -328,6 +380,7 @@ def setor_att(request, id_setor):
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
 	form = EquipeForm()
 	try:
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
@@ -345,13 +398,15 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 			contexto = {
 				'setor': setor,
 				'form': form,
+				'servidor': servidor,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name, contexto)
 	else:
 		contexto = {
 			'setor': setor,
-			'form': form
+			'form': form,
+			'servidor': servidor,
 		}
 		return render(request,template_name, contexto)
 
@@ -458,6 +513,7 @@ def equipe_delete(request, id_equipe):
 @staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
 		setor = Servidor.objects.get(fk_user=request.user.id).fk_setor
 		servidores = Servidor.objects.filter(fk_setor=setor)
 		equipes = Equipe.objects.filter(fk_setor=setor)
@@ -468,16 +524,17 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 		messages.warning(request, 'Não há equipes cadastradas para esse setor!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	form = ServidorMoverForm()
+	form = ServidorMoverIntForm()
 	form.fields['servidor'].choices = [('', '--Selecione--')] + list(servidores.values_list('id_matricula','nome'))
 	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
 	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
 	contexto = {
 		'setor':setor,
 		'form': form,
+		'servidor': servidor,
 	}
 	if request.method == 'POST':
-		form = ServidorMoverForm(request.POST)
+		form = ServidorMoverIntForm(request.POST)
 		if form.is_valid():
 			try:
 				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
@@ -498,10 +555,67 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 			contexto = {
 				'setor':setor,
 				'form': form,
+				'servidor': servidor,
 			}
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name,contexto)
 	return render(request, template_name,contexto)
+
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		setores = list(Setor.objects.all())
+		servidores = list(Servidor.objects.all())
+		equipes = Equipe.objects.filter(fk_setor=setores)
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Não setores cadastradas!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	form = ServidorMoverExtForm()
+	form.fields['servidor'].choices = [('', '--Selecione--')] #+ list(servidores.values_list('id_matricula','nome'))
+	form.fields['setor_origem'].choices = [('', '--Selecione--')]
+	form.fields['setor_destino'].choices = [('', '--Selecione--')]# + setores.values('id_setor','nome')
+	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
+	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
+
+	contexto = {
+		'setor':setores,
+		'form': form,
+		'servidores': servidores,
+		'servidor': servidor,
+	}
+	if request.method == 'POST':
+		form = ServidorMoverExtForm(request.POST)
+		if form.is_valid():
+			try:
+				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
+				setor = Setor.objects.get(id_setor=form.cleaned_data['setor_destino'])
+			except Servidor.DoesNotExist:
+				messages.warning(request, 'Servidor não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			except Setor.DoesNotExist:
+				messages.warning(request, 'Setor não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
+			
+			servidor.fk_setor = setor
+			servidor.save()
+			messages.success(request, 'Movimentação realizada com suceso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			#return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
+		else:
+			contexto = {
+				'setor':setores,
+				'form': form,
+				'servidores': servidores,
+				'servidor': servidor,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name,contexto)
+	return render(request, template_name,contexto)
+
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -700,6 +814,8 @@ def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.
 	return render(request, template_name, contexto)
 
 #SERVIDOR
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def servidor_att(request, id_matricula):
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
@@ -745,13 +861,13 @@ def servidor_att(request, id_matricula):
 				return HttpResponseRedirect('/')
 			else:
 				contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
-				contexto['enderecoservform'] = EnderecoServForm(request.POST)
+				contexto['enderecoservform'] = EnderecoServForm(request.POST) or None
 				
 				messages.warning(request, 'Erro no formulário do endereço')
 				return render(request, 'namp/servidor/servidor_att.html',contexto)
 		else:
 			contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
-			contexto['enderecoservform'] = EnderecoServForm(request.POST or None)
+			contexto['enderecoservform'] = EnderecoServForm(request.POST) or None
 
 			messages.warning(request, 'Erro no formulário do servidor')
 			return render(request, 'namp/servidor/servidor_att.html',contexto)
@@ -964,10 +1080,26 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
+		#Pegando do banco o período atual para gerar escalas. Só pega se a data de hoje estiver dentro desse período.
+		periodo_escala = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+		#Pegando do banco a escala gerada para o período acima. Só pega se tiver escala gerada entro desse período.
+		escala_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-	
+	except PeriodoAcao.DoesNotExist:
+		periodo_escala = None
+		messages.warning(request, 'O período para gerar a escala regular de trabalho está encerrado!')
+		return redirect('namp:escala_operador_list')
+	except EscalaFrequencia.DoesNotExist:
+		escala_gerada = None
+
+	if escala_gerada:
+		messages.warning(request, 'Seu setor já possui escala gerada para o mês de ' + periodo_escala.data_inicial.strftime('%B'))
+		return redirect('namp:escala_operador_list')
+
+	minimoDate = Date.today().replace(day=1, month=periodo_escala.data_inicial.month()+1,eyar=periodo_escala.data_inicial.eyar())
+
 	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = False
@@ -1004,6 +1136,15 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
 		form.fields['data_plantao48h'].required = tem_plantao48
 
+	contexto = {
+		'form':form,
+		'equipes':equipes,
+		'servidor':servidor,
+		'tem_plantao12': tem_plantao12,
+		'tem_plantao24': tem_plantao24,
+		'tem_plantao48': tem_plantao48
+	}
+	
 	if request.method == 'POST':
 		form = GerarJornadaRegularForm(request.POST)
 		if form.is_valid():
@@ -1126,7 +1267,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			escala.fk_periodo_acao = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 			escala.data = DateTime.today()
 			escala.fk_servidor = Servidor.objects.get(fk_user=request.user.id)
-			escala.fk_setor = setor
+			escala.fk_setor = servidor.fk_setor
 			escala.save()
 
 			messages.success(request, 'As escalas foram atualizadas com suceso!')
@@ -1142,16 +1283,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			}
 			messages.warning(request, 'Ops! Verifique os campos do formulário!')
 			return render(request, template_name, contexto)
-	else:
-		contexto = {
-			'form':form,
-			'equipes':equipes,
-			'servidor':servidor,
-			'tem_plantao12': tem_plantao12,
-			'tem_plantao24': tem_plantao24,
-			'tem_plantao48': tem_plantao48
-		}
-		return render(request,template_name, contexto)
+	return render(request,template_name, contexto)
 '''
 	Recuperar do banco as equipes da unidade penal escolhida no momento do cadastro de servidor e
 	as envia para a página populando o campo select fk_equipe

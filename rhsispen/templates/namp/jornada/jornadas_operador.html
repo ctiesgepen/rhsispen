@@ -4,6 +4,15 @@
 
 {% load namp_extras %}
 
+{% block javascripts %}
+<script type="text/javascript">
+    var today = new Date();
+    today.setDate(today.getDate() + 9); //Voalá
+    today = today.toISOString().split('T')[0];
+    document.getElementsByName("data_plantao12h")[0].setAttribute('min', today);
+</script>
+{% endblock javascripts %}
+
 {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
@@ -211,9 +220,3 @@
     </div>    
 </div>
 {% endblock %}            
-
-{% block javascripts %}
-<script type="text/javascript">
-     $("#id_data_plantao12h").dateinput({ min: -10, max: 30 });
-</script>
-{% endblock javascripts %}

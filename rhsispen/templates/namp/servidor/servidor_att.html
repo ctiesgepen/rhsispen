@@ -5,8 +5,12 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="text-center">{{ user.fk_setor }}</h5>
-                        {% if messages %} {% for message in messages %}
+
+                        {% if servidor.id_matricula == user.id_matricula %}
+                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                        {% else %}
+                        <h5 class="text-center">Estado do Tocantins</h5>
+                        {% endif %} {% if messages %} {% for message in messages %}
                         <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                         {% endfor %} {% endif %}
 
@@ -25,7 +29,7 @@
                                 <div class="form-group col-md-6">
                                     {{ servidorform.nome|as_crispy_field }}
                                 </div>
-                                {% if servidor.id_matricula == user.id_matricula%}
+                                {% if servidor.id_matricula == user.id_matricula %}
                                 <div class="form-group col-md-3 hidden">
                                     {{ servidorform.fk_user|as_crispy_field}}
                                 </div>
@@ -99,7 +103,6 @@
                                 </div>
                                 <div class="form-group col-md-6">
                                     {{ enderecoservform.municipio|as_crispy_field }}
-                                    
                                 </div>
                             </div>
                             <div class="form-row">
