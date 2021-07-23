@@ -1,31 +1,31 @@
-<!-- Modal: modalCart -->
-<div class="modal fade" id="modalCart" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
+<!-- Modal: modalEquipesAdmin -->
+<div class="modal fade" id="modalEquipesAdmin" tabindex="-1" role="dialog" aria-labelledby="modalEquipesAdmin" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Servidores dessa Equipe</h4>
+                <h4 class="modal-title" id="myModalLabel">Equipes</h4>
             </div>
             <!--Body-->
-            <div class="modal-body">
-                <table class="table table-hover">
-                    <thead>
+            <div class="modal-body table-responsive">
+                <table class="table table-striped table-sm shadow-sm">
+                    <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
-                            <th>Servidores</th>
+                            <th>EQUIPES</th>
+                            <th>TOTAL SERVIDORES</th>
                         </tr>
                     </thead>
                     <tbody>
+                        {% for equipe in setor.get_equipes %}
                         <tr>
-                            <th scope="row">1</th>
-                            <td>Stive Chefe de plantão</td>
+                            <th scope="row">{{ setor.id_setor }}</th>
+                            <td>{{ equipe.nome }}</td>
+                            <td>{{ equipe.get_servidores }}</td>
                         </tr>
-                        <tr>
-                            <th scope="row">2</th>
-                            <td>Stive Operacional</td>
-                        </tr>
+                        {% endfor %}
                     </tbody>
                 </table>
+
             </div>
             <!--Footer-->
             <div class="modal-footer">
@@ -34,4 +34,4 @@
         </div>
     </div>
 </div>
-<!--Div da Modal-->
+<!-- Modal: modalPeriodoEventos -->
