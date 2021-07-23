@@ -200,6 +200,12 @@ def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def admin_servidor_criar(request,template_name='namp/admin/admin_servidor_criar.html'):
+	return render(request, template_name)
+
+
 
 '''
 Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
@@ -376,18 +382,11 @@ def setor_att(request, id_setor):
 		else:
 			contexto['setorform'] = SetorForm(request.POST, instance=setor)
 			contexto['enderecosetorform'] = EnderecoSetorForm(request.POST)
-<<<<<<< HEAD
-
-			messages.warning(request, 'Erro no formulário do setor')
-			return render(request, 'namp/setor/setor_att.html',contexto)
-	return render(request, 'namp/setor/setor_att.html',contexto)
-=======
 
 			messages.warning(request, 'Erro no formulário do setor')
 			return render(request, 'namp/setor/setor_att.html',contexto)
 	return render(request, 'namp/setor/setor_att.html',contexto)
 
->>>>>>> a3d5c1ecd7160902f7f243f4b30e86978d4d202a
 
 #Esta view foi revisada em 14/07 e está funcional
 @login_required(login_url='/autenticacao/login/')

@@ -20,6 +20,8 @@ urlpatterns = [
 	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
 	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
+	path('admin_servidor_cadastrar/<int:id_matricula>/', views.admin_servidor_criar, name='admin_servidor_criar'),
+
 
 	#Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 	path('periodos/', views.periodo_listar, name='periodo_listar'),
