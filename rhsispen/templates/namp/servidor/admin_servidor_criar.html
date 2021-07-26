@@ -18,7 +18,7 @@
 
                         <h5 class="mt-5">Cadastrar um novo Servidor no Sistema</h5>
                         <hr>
-                        <form action="{% url 'namp:servidor_att' servidor.id_matricula %}" method="post">
+                        <form action="{% url 'namp:admin_servidor_criar' %}" method="post">
                             {% csrf_token %}
                             <table class="table table-bordered table-overflow table-sm">
                                 <thead class="thead-dark">

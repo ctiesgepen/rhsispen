@@ -20,15 +20,11 @@ urlpatterns = [
 	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
 	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
-	path('admin_servidor_cadastrar/<int:id_matricula>/', views.admin_servidor_criar, name='admin_servidor_criar'),
+	#path('admin_servidor_cadastrar/', views.admin_servidor_criar, name='admin_servidor_criar'), TEM QUE MELHORAR
 
-
-	#Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
-	path('periodos/', views.periodo_listar, name='periodo_listar'),
-	#Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
-	path('periodos/cadastrar', views.periodo_criar, name='periodo_criar'),
-	#Acionada pelo botão EDITAR, localizado na template de PERÍODOS.
-	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'),
+	path('periodos/', views.periodo_listar, name='periodo_listar'), #Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
+	path('periodos/cadastrar', views.periodo_criar, name='periodo_criar'), #Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
+	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'), #Acionada pelo botão EDITAR, localizado na template de PERÍODOS.
 	
 	#Tela do OPERADOR
 	path('setor_att/<str:id_setor>/', views.setor_att, name='setor_att'),

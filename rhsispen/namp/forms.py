@@ -159,6 +159,11 @@ class EquipeSearchForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['nome'].label = ""
 
+class ServidorCriarForm(forms.ModelForm):
+    class Meta:
+        model = Servidor
+        fields = '__all__'
+
 class ServidorForm(forms.ModelForm):
     class Meta:
         model = Servidor
@@ -260,7 +265,6 @@ class ServidorMoverExtForm(forms.Form):
         self.fields['setor_destino'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
         self.fields['equipe_origem'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
-
 
 class PeriodoAcaoForm(forms.ModelForm):
     class Meta:

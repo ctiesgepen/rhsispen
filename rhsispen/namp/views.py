@@ -202,10 +202,29 @@ def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_servidor_criar(request,template_name='namp/admin/admin_servidor_criar.html'):
-	return render(request, template_name)
+def admin_servidor_criar(request,template_name='namp/servidor/admin_servidor_criar.html'):
+	servidor = Servidor.objects.get(fk_user=request.user.id)
+	form = ServidorCriarForm()
 
-
+	if request.method == 'POST':
+		form = ServidorCriarForm(request.POST)		
+		if form.is_valid():
+			form.save()
+			messages.success(request, 'Servidor adicionada com suceso!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		else:
+			contexto = {
+				'form': form,
+				'servidor': servidor,
+			}
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			return render(request, template_name, contexto)
+	else:
+		contexto = {
+			'form': form,
+			'servidor': servidor,
+		}
+	return render(request,template_name)
 
 '''
 Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
@@ -579,17 +598,19 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		setores = list(Setor.objects.all())
-		servidores = list(Servidor.objects.all())
-		equipes = Equipe.objects.filter(fk_setor=setores)
+		#setores = list(Setor.objects.all())
+		#servidores = list(Servidor.objects.all())
+		servidores = Servidor.objects.filter()
+		setores = Setor.objects.filter()
+		equipes = Equipe.objects.filter()
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Não setores cadastradas!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	form = ServidorMoverExtForm()
-	form.fields['servidor'].choices = [('', '--Selecione--')] #+ list(servidores.values_list('id_matricula','nome'))
-	form.fields['setor_origem'].choices = [('', '--Selecione--')]
-	form.fields['setor_destino'].choices = [('', '--Selecione--')]# + setores.values('id_setor','nome')
+	form.fields['servidor'].choices = [('', '--Selecione--')] + list(servidores.values_list('id_matricula','nome'))
+	form.fields['setor_origem'].choices = [('', '--Selecione--')] 
+	form.fields['setor_destino'].choices = [('', '--Selecione--')] + list(setores.values_list('id_setor', 'nome'))
 	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
 	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
 
@@ -605,18 +626,21 @@ def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.htm
 			try:
 				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
 				setor = Setor.objects.get(id_setor=form.cleaned_data['setor_destino'])
+				equipe = Equipe.objects.get(id_equipe=form.cleaned_data['equipe_destino'])
 			except Servidor.DoesNotExist:
 				messages.warning(request, 'Servidor não encontrado!')
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 			except Setor.DoesNotExist:
 				messages.warning(request, 'Setor não encontrado!')
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
-			
+			except Equipe.DoesNotExist:
+				messages.warning(request, 'Equipe não encontrado!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
+
 			servidor.fk_setor = setor
 			servidor.save()
 			messages.success(request, 'Movimentação realizada com suceso!')
 			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-			#return HttpResponseRedirect(request.META.get('HTTP_REFERER'))	
 		else:
 			contexto = {
 				'setor':setores,
@@ -1329,7 +1353,6 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 	Recuperar do banco as equipes da unidade penal escolhida no momento do cadastro de servidor e
 	as envia para a página populando o campo select fk_equipe
 '''
-
 def get_equipes(request):
 	result = list(Equipe.objects.none())
 	id_setor = request.GET.get('id_setor', '')
@@ -1370,6 +1393,13 @@ def get_equipe_servidor(request):
 		print('achei o servidor')
 		result = list(Equipe.objects.filter(id_equipe=Servidor.objects.get(id_matricula=id_matricula).fk_equipe.id_equipe).values('id_equipe', 'nome'))
 	print('vou sair do get equipe')
+	return HttpResponse(json.dumps(result), content_type="application/json")
+
+def get_setor_servidor(request):
+	result = list(Setor.objects.none())
+	id_matricula = request.GET.get('id_matricula', '')
+	if (id_matricula):
+		result = list(Setor.objects.filter(id_setor=Servidor.objects.get(id_matricula=id_matricula).fk_setor.id_setor).values('id_setor', 'nome'))
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def exportar_pdf(request):
