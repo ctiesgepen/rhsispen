@@ -1133,7 +1133,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		messages.warning(request, 'Seu setor já possui escala regular para o período atual!')
 		return redirect('namp:escala_operador_list')
 
-	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
+	equipes = Equipe.objects.filter(status=True).filter(fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = False
 	tem_plantao24 = False
@@ -1152,25 +1152,22 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			tem_plantao48 = True
 			continue
 	
-	form = GerarJornadaRegularForm()
+	form = GerarJornadaRegularForm({'tem_plantao12': tem_plantao12, 'tem_plantao24': tem_plantao24, 'tem_plantao48': tem_plantao48})
 	form.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
 	
-	if not tem_plantao12:
-		form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
-		form.fields['equipe_plantao12h'].required = tem_plantao12
-
-	if not tem_plantao24:
-		form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
-		form.fields['equipe_plantao24h'].required = tem_plantao24
-
-	if not tem_plantao48:
-		form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
-		form.fields['data_plantao48h'].required = tem_plantao48
+	contexto = {
+		'form':form,
+		'equipes':equipes,
+		'servidor':servidor,
+		'tem_plantao12': tem_plantao12,
+		'tem_plantao24': tem_plantao24,
+		'tem_plantao48': tem_plantao48
+	}
 
 	if request.method == 'POST':
-		form = GerarJornadaRegularForm(request.POST)
+		form = GerarJornadaRegularForm(request.POST, {'tem_plantao12': tem_plantao12, 'tem_plantao24': tem_plantao24, 'tem_plantao48': tem_plantao48})
 		if form.is_valid():
 			'''
 			Trecho onde se captura a equipe de 12h do formulário,
@@ -1306,16 +1303,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			}
 			messages.warning(request, 'Ops! Verifique os campos do formulário!')
 			return render(request, template_name, contexto)
-	else:
-		contexto = {
-			'form':form,
-			'equipes':equipes,
-			'servidor':servidor,
-			'tem_plantao12': tem_plantao12,
-			'tem_plantao24': tem_plantao24,
-			'tem_plantao48': tem_plantao48
-		}
-		return render(request,template_name, contexto)
+	return render(request,template_name, contexto)
 '''
 	Recuperar do banco as equipes da unidade penal escolhida no momento do cadastro de servidor e
 	as envia para a página populando o campo select fk_equipe

@@ -40,12 +40,13 @@ class GerarJornadaRegularForm(forms.Form):
         self.fields['data_plantao12h'].widget = DateInput()
         self.fields['data_plantao24h'].widget = DateInput()
         self.fields['data_plantao48h'].widget = DateInput()
-        '''                     self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-                                self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-                                self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-                                self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-                                self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
-                                self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']'''
+
+        self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
+        self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
+        self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
+        self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
+        self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
+        self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']
 
 class ServidorFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
