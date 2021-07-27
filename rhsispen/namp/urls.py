@@ -69,6 +69,7 @@ urlpatterns = [
 	url('getEquipes48h/$', views.get_equipes48h),
 	url('getTipoJornada/', views.get_tipo_jornada),
 	url('getEquipeServidor/$', views.get_equipe_servidor),
+	url('getSetorServidor/$', views.get_setor_servidor),
 	url('escala-regular/', views.definirjornadaregular, name='definirjornadaregular'),
 	url('gerarescalaregular/', views.gerarescalaregular, name='gerarescalaregular'),
 	#Exportações

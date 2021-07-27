@@ -599,26 +599,14 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		#setores = list(Setor.objects.all())
-		#servidores = list(Servidor.objects.all())
-		servidores = Servidor.objects.filter()
-		setores = Setor.objects.filter()
-		equipes = Equipe.objects.filter()
-	except Setor.DoesNotExist:
-		messages.warning(request, 'Não setores cadastradas!')
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	form = ServidorMoverExtForm()
-	form.fields['servidor'].choices = [('', '--Selecione--')] + list(servidores.values_list('id_matricula','nome'))
-	form.fields['setor_origem'].choices = [('', '--Selecione--')] 
-	form.fields['setor_destino'].choices = [('', '--Selecione--')] + list(setores.values_list('id_setor', 'nome'))
-	form.fields['equipe_origem'].choices = [('', '--Selecione--')]
-	form.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(equipes.values_list('id_equipe','nome'))
-
+	
 	contexto = {
-		'setor':setores,
 		'form': form,
-		'servidores': servidores,
 		'servidor': servidor,
 	}
 	if request.method == 'POST':
@@ -627,7 +615,7 @@ def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.htm
 			try:
 				servidor = Servidor.objects.get(id_matricula=form.cleaned_data['servidor'])
 				setor = Setor.objects.get(id_setor=form.cleaned_data['setor_destino'])
-				equipe = Equipe.objects.get(id_equipe=form.cleaned_data['equipe_destino'])
+				equipe = Equipe.objects.get(fk_setor=setor,id_equipe=form.cleaned_data['equipe_destino'])
 			except Servidor.DoesNotExist:
 				messages.warning(request, 'Servidor não encontrado!')
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -635,21 +623,18 @@ def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.htm
 				messages.warning(request, 'Setor não encontrado!')
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
 			except Equipe.DoesNotExist:
-				messages.warning(request, 'Equipe não encontrado!')
+				messages.warning(request, 'Equipe não encontrada!')
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))			
-
-			servidor.fk_setor = setor
-			servidor.save()
-			messages.success(request, 'Movimentação realizada com suceso!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			else:
+				servidor.fk_setor = setor
+				servidor.fk_equipe = equipe
+				servidor.save()
+				messages.success(request, 'Movimentação realizada com suceso!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 		else:
-			contexto = {
-				'setor':setores,
-				'form': form,
-				'servidores': servidores,
-				'servidor': servidor,
-			}
-			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+			contexto['form'] = form
+			messages.warning(request,'Algo de errado aconteceu!')
+			#messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name,contexto)
 	return render(request, template_name,contexto)
 
@@ -1133,7 +1118,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		messages.warning(request, 'Seu setor já possui escala regular para o período atual!')
 		return redirect('namp:escala_operador_list')
 
-	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
+	equipes = Equipe.objects.filter(status=True).filter(fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = False
 	tem_plantao24 = False
@@ -1152,25 +1137,22 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			tem_plantao48 = True
 			continue
 	
-	form = GerarJornadaRegularForm()
+	form = GerarJornadaRegularForm({'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
 	form.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
-	
-	if not tem_plantao12:
-		form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
-		form.fields['equipe_plantao12h'].required = tem_plantao12
 
-	if not tem_plantao24:
-		form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
-		form.fields['equipe_plantao24h'].required = tem_plantao24
-
-	if not tem_plantao48:
-		form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
-		form.fields['data_plantao48h'].required = tem_plantao48
+	contexto = {
+		'form':form,
+		'equipes':equipes,
+		'servidor':servidor,
+		'tem_plantao12': tem_plantao12,
+		'tem_plantao24': tem_plantao24,
+		'tem_plantao48': tem_plantao48,
+	}
 
 	if request.method == 'POST':
-		form = GerarJornadaRegularForm(request.POST)
+		form = GerarJornadaRegularForm(request.POST,{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
 		if form.is_valid():
 			'''
 			Trecho onde se captura a equipe de 12h do formulário,
@@ -1296,26 +1278,11 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			messages.success(request, 'As escalas foram atualizadas com suceso!')
 			return redirect('namp:escala_operador_list')
 		else:
-			contexto = {
-			'form':form,
-			'equipes':equipes,
-			'servidor':servidor,
-			'tem_plantao12': tem_plantao12,
-			'tem_plantao24': tem_plantao24,
-			'tem_plantao48': tem_plantao48
-			}
+			contexto['form'] = form
+			
 			messages.warning(request, 'Ops! Verifique os campos do formulário!')
 			return render(request, template_name, contexto)
-	else:
-		contexto = {
-			'form':form,
-			'equipes':equipes,
-			'servidor':servidor,
-			'tem_plantao12': tem_plantao12,
-			'tem_plantao24': tem_plantao24,
-			'tem_plantao48': tem_plantao48
-		}
-		return render(request,template_name, contexto)
+	return render(request,template_name, contexto)
 '''
 	Recuperar do banco as equipes da unidade penal escolhida no momento do cadastro de servidor e
 	as envia para a página populando o campo select fk_equipe

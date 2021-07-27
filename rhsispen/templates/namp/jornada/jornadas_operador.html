@@ -11,7 +11,7 @@
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="text-center">{{ user.servidor.fk_setor }}</h5>
+                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
                         {% if messages %}
                           {% for message in messages %}
                             <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
@@ -20,40 +20,8 @@
 
                         <h5 class="mt-5">Gerar Escala Regular</h5>
                         <hr>
-                        <!--<form method="POST" action="{% url 'namp:escala_operador_list' %}">{% csrf_token %}
-                            <div class="form-inline">
-                                {{ form.data }}
-                                <button type="input" class="btn btn-dark">
-                                <i class="fas fa-search"></i>
-                                </button>
-                                <a href="{% url 'namp:escala_operador_list' %}">ver todos</a>
-                            </div>
-                        </form>-->
-                        {% if mensagens.mensagem_escalas %}
-                        <div class="row gx-2 p-3 bg-light" id="lista-setores-botao-gerar">
-                            <div class="col-md-9 ms-md-auto text-center">
-                                <div class="dropdown">
-                                    CRIE ESCALAS DO MÊS ( SUB-SEQUENTE ) NO BOTÃO AO LADO:
-                                </div>
-                            </div>
-                            <div class="col-md-3 ms-md-auto text-center">
-                                <button type="button" class="btn btn-secondary" id="botao-gerar-escala"><a href="{% url 'namp:jornadas_operador' %}" style="color: white; text-decoration-line: none;">Gerar Escala Regular</a></button>
-                            </div>
-                        </div>
-                        {% endif %}
-
-                        {% if mensagens.mensagem_escalas %}
-                        <div class="row gx-2 p-1 bg-light" id="div-alerta-prazo-escala">
-                            <div class="col text-center">
-                                <div class="alert alert-warning" role="alert" id="alert-prazo">
-                                    {{ mensagens.mensagem_escalas }}
-                                </div>
-                            </div>
-                        </div>
-                        {% endif %}
                         <br>
                         <div class="table-responsive">
-                            
                             <h6>Equipes em Jornada de Expediente</h6>
                             <table class="table table-striped table-sm shadow-sm">
                                 <thead class="thead-dark">
@@ -65,39 +33,43 @@
                                 </thead>
                                 <tbody>
                                     {% for equipe in equipes %}
+                                    {% if equipe.categoria == "Expediente" %}
                                     <tr>
-                                        {% if equipe.categoria == "Expediente" %}
                                         <td><a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
                                         <td>{{ equipe.get_servidores }}</td>
                                         <td>{{ equipe.fk_tipo_jornada.tipificacao }}</td>
-                                        {% endif %}
                                     </tr>
+                                    {% endif %}
                                     {% endfor %}
                                 </tbody>
                             </table>
                             <br>
-                            {% if tem_plantao12%}
-                            <h6>Equipes em Jornada de Plantão 12hrs</h6>
-                            <table class="table table-striped table-sm shadow-sm">
-                                <thead class="thead-dark">
-                                    <tr>
-                                        <th scope="col">EQUIPE: </th>
-                                        <th scope="col">QTDE DE SERVIDORES:</th>
-                                        <th scope="col">TIPO DE JORNADA:</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for equipe in equipes %} {% if equipe.fk_tipo_jornada.carga_horaria == 12 %}
-                                    <tr>
-                                        <td><a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                                        <td>{{equipe.get_servidores}}</td>
-                                        <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
-                                    </tr>
-                                    {% endif %} {% endfor %}
-                                </tbody>
-                            </table>
-                            <br>
+
+                            {% if tem_plantao12 %}
+                                <h6>Equipes em Jornada de Plantão 12 horas</h6>
+                                <table class="table table-striped table-sm shadow-sm">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th scope="col">EQUIPE: </th>
+                                            <th scope="col">QTDE DE SERVIDORES:</th>
+                                            <th scope="col">TIPO DE JORNADA:</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for equipe in equipes %} 
+                                        {% if equipe.fk_tipo_jornada.carga_horaria == 12 %}
+                                        <tr>
+                                            <td><a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                            <td>{{equipe.get_servidores}}</td>
+                                            <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
+                                        </tr>
+                                        {% endif %}
+                                        {% endfor %} 
+                                    </tbody>
+                                </table>
+                                <br>
                             {% endif %}
+
                             {% if tem_plantao24 %}
                             <h6>Equipes em Jornada de Plantão 1X3</h6>
                             <table class="table table-striped table-sm shadow-sm">
@@ -109,17 +81,20 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for equipe in equipes %} {% if equipe.fk_tipo_jornada.carga_horaria == 24 %}
+                                    {% for equipe in equipes %} 
+                                    {% if equipe.fk_tipo_jornada.carga_horaria == 24 %}
                                     <tr>
                                         <td><a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
                                         <td>{{equipe.get_servidores}}</td>
                                         <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
                                     </tr>
-                                    {% endif %} {% endfor %}
+                                    {% endif %} 
+                                    {% endfor %}
                                 </tbody>
                             </table>
                             <br>
                             {% endif %}
+
                             {% if tem_plantao48 %}
                             <h6>Equipes em Jornada de Plantão 2x6</h6>
                             <table class="table table-striped table-sm shadow-sm">
@@ -131,13 +106,15 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for equipe in equipes %} {% if tem_plantao48 and equipe.fk_tipo_jornada.carga_horaria == 48 %}
+                                    {% for equipe in equipes %} 
+                                    {% if tem_plantao48 and equipe.fk_tipo_jornada.carga_horaria == 48 %}
                                     <tr>
                                         <td><a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
                                         <td>{{equipe.get_servidores}}</td>
                                         <td>{{equipe.fk_tipo_jornada.tipificacao}}</td>
                                     </tr>
-                                    {% endif %} {% endfor %}
+                                    {% endif %}
+                                    {% endfor %}
                                 </tbody>
                             </table>
                             <br>
@@ -151,57 +128,58 @@
                                     </tr>
                                 </thead>
                             </table>
-                            <br> {% endif %}
+                            <br> 
+                            {% endif %}
                             
-                                <form method="post" action="{% url 'namp:jornadas_operador' %}">{% csrf_token %}
+                            <form method="post" action="{% url 'namp:jornadas_operador' %}">{% csrf_token %}
+                                <div class="col-md-12 row">
+                                    {% if tem_plantao12 %}
                                     <div class="col-md-12 row">
-                                        {% if tem_plantao12 %}
-                                        <div class="col-md-12 row">
-                                            <div class="col-md-3">
-                                                {{ form.equipe_plantao12h|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                {{ form.data_plantao12h|as_crispy_field  }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span class="form-text text-right">Equipe que encerrará o mês 04/2021:</span>
-                                            </div>
+                                        <div class="col-md-3">
+                                            {{ form.equipe_plantao12h|as_crispy_field }}
                                         </div>
-                                        {% endif %}
-
-                                        {% if tem_plantao24 %}
-                                        <div class="col-md-12 row">
-                                            <div class="col-md-3">
-                                                {{ form.equipe_plantao24h|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                {{ form.data_plantao24h|as_crispy_field  }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span class="form-text text-right">Equipe que encerrará o mês 04/2021:</span>
-                                            </div>
+                                        <div class="col-md-3">
+                                            {{ form.data_plantao12h|as_crispy_field  }}
                                         </div>
-                                        {% endif %}
-
-                                        {% if tem_plantao48 %}
-                                            <div class="col-md-12 row">
-                                            <div class="col-md-3">
-                                                {{ form.equipe_plantao48h|as_crispy_field }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                {{ form.data_plantao48h|as_crispy_field  }}
-                                            </div>
-                                            <div class="col-md-3">
-                                                <span class="form-text text-right">Equipe que encerrará o mês 04/2021:</span>
-                                            </div>
+                                        <div class="col-md-3">
+                                            <span class="form-text text-right">Equipe que encerrará o mês 04/2021:</span>
                                         </div>
-                                        {% endif %}
                                     </div>
-                                    <div class="submit-row">
-                                        <button type="submit" class="btn  btn-dark">Gerar</button>
-                                        <a href="{% url 'namp:escala_operador_list' %}" class="btn  btn-dark">Voltar</a>
+                                    {% endif %}
+
+                                    {% if tem_plantao24 %}
+                                    <div class="col-md-12 row">
+                                        <div class="col-md-3">
+                                            {{ form.equipe_plantao24h|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {{ form.data_plantao24h|as_crispy_field  }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <span class="form-text text-right">Equipe que encerrará o mês 04/2021:</span>
+                                        </div>
                                     </div>
-                                </form>
+                                    {% endif %}
+
+                                    {% if tem_plantao48 %}
+                                        <div class="col-md-12 row">
+                                        <div class="col-md-3">
+                                            {{ form.equipe_plantao48h|as_crispy_field }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            {{ form.data_plantao48h|as_crispy_field  }}
+                                        </div>
+                                        <div class="col-md-3">
+                                            <span class="form-text text-right">Equipe que encerrará o mês 04/2021:</span>
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                                <div class="submit-row">
+                                    <button type="submit" class="btn  btn-dark">Gerar</button>
+                                    <a href="{% url 'namp:escala_operador_list' %}" class="btn  btn-dark">Voltar</a>
+                                </div>
+                            </form>
                         </div>
                         <hr>
                     </div>
