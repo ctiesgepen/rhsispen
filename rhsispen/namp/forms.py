@@ -20,7 +20,9 @@ class DefinirJornadaRegularForm(forms.Form):
         super(DefinirJornadaRegularForm, self).__init__(*args, **kwargs)
         self.fields['setor'].widget.attrs['readonly'] = True
         self.fields['data_inicial'].widget.attrs['readonly'] = True
+        self.fields['data_inicial'].widget = DateInput()
         self.fields['data_final'].widget.attrs['readonly'] = True
+        self.fields['data_final'].widget = DateInput()
         self.fields['equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         #self.fields['tipo_jornada'].choices = [('', '--Selecione--')] + list(TipoJornada.objects.all().values_list('carga_horaria', 'tipificacao'))
 

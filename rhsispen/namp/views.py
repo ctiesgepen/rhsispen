@@ -718,7 +718,7 @@ def servidor_list(request,template_name='namp/servidor/servidor_list.html'):
 def escala_operador_list(request,template_name='namp/escala/escala_operador_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		escalas = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor, fk_periodo_acao__descricao='GERAR ESCALAS')
+		escalas = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor).filter(fk_periodo_acao__descricao='GERAR ESCALAS')
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -1434,6 +1434,7 @@ def datasportipodejornada(data_inicial, data_final, tipo_jornada):
 		return datas
 
 def funcaogeraescalaporequipe(equipe, servidores, data_inicial, data_final):
+	print('Fui chamada para gerar as escalas')
 	for servidor in servidores:
 		#Verifica se o servidor está ativo
 		if servidor.situacao:
