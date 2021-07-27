@@ -1406,7 +1406,6 @@ def datasportipodejornada(data_inicial, data_final, tipo_jornada):
 		"republica": Date(2021,11,15),
 		"natal": Date(2021,12,25),
 	}
-
 	if tipo_jornada == 6 or tipo_jornada == 8:
 		intervalo = TimeDelta(days=1)
 		while data_inicial <= data_final:
