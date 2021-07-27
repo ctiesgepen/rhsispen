@@ -1,6 +1,5 @@
 <!-- Modal: modalEquipeAdmin -->
 <div class="modal fade" id="modalEquipeAdmin" tabindex="-1" role="dialog" aria-labelledby="modalEquipeAdmin" aria-hidden="true">
-
     <div class="modal-dialog modal-lg modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <!--Header-->
@@ -17,19 +16,12 @@
                         </tr>
                     </thead>
                     <tbody>
-    <!--                    {% for setorzin in setores %}
-                            {% for equipe in setorzin.get_equipes %}
-                            <tr>
-                                <td>{{ equipe.nome }}</td>
-                                <td>{{ equipe.get_servidores  }}</td>
-                            </tr>
-                            {% endfor %}
-                        {% endfor %}-->
-                        
+                        {% for setor in setores %}
                         <tr>
-                            <td>{{ setorzinho.nome }}</td>
-                            <td>{{ setorzinho.get_servidores  }}</td>
+                            <td>{{ setor.get_equipes }}</td>
+                            <td>{{ setor.get_servidores  }}</td>
                         </tr>
+                        {% endfor %}
                     </tbody>
 
                 </table>
@@ -42,4 +34,4 @@
         </div>
     </div>
 </div>
-<!-- Modal: modalPeriodoEventos -->
+<!-- Modal: modalEquipeAdmin -->
