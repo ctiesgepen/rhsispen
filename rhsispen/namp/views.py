@@ -151,8 +151,33 @@ def admin_historico(request):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_add_noturno(request):
-	return render(request, 'admin_add_noturno.html')
+def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.html'):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		setores = Setor.objects.all()
+	except Setor.DoesNotExist:
+		messages.warning(request, 'Setor não encontrado!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	form = AddNoturnoForm(request.POST or None)
+ 
+	page = request.GET.get('page')
+	paginator = Paginator(list(setores), 15)
+	page_obj = paginator.get_page(page)
+	setor = None
+	
+	contexto = {
+		'servidor': servidor,
+		'setores': setores,
+		'form': form,
+		'page_obj': page_obj,
+	}
+
+	if request.method == 'POST':
+		if form.is_valid():
+			setores = []
+		return render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -1330,6 +1355,13 @@ def get_equipe_servidor(request):
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_setor_servidor(request):
+	result = list(Setor.objects.none())
+	id_matricula = request.GET.get('id_matricula', '')
+	if (id_matricula):
+		result = list(Setor.objects.filter(id_setor=Servidor.objects.get(id_matricula=id_matricula).fk_setor.id_setor).values('id_setor', 'nome'))
+	return HttpResponse(json.dumps(result), content_type="application/json")
+
+def get_add_noturno(request):
 	result = list(Setor.objects.none())
 	id_matricula = request.GET.get('id_matricula', '')
 	if (id_matricula):

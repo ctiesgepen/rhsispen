@@ -278,14 +278,19 @@ class PeriodoAcaoForm(forms.ModelForm):
             'data_inicial': DateTimeInput(),
             'data_final': DateTimeInput(),
         }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 class PeriodoAcaoSearchForm(forms.Form):
     descricao = forms.CharField(max_length=25)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['descricao'].label = ""
         self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
+
+class AddNoturnoForm(forms.Form):
+    setor = forms.ChoiceField(required=True, label='Setor')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['setor'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
+        self.fields['setor'].label = Setor.nome
