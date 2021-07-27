@@ -2,7 +2,9 @@
 from django.db.models.signals import post_save,pre_save
 from django.dispatch import receiver
 from namp.models import Servidor, HistFuncao, HistLotacao, HistAfastamento, Jornada, Equipe
+from namp.views import *
 import datetime
+from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date, time as Time
 
 '''
 	Este Signal popula a tabela HistLotação sempre que uma
@@ -22,6 +24,7 @@ def post_save_create_histlotacao(sender, instance, created, **kargs):
 	else:
 		print('Servidor foi alterado.')	
 		try:
+			servidores = Servidor.objects.filter(id_matricula=instance.id_matricula)
 			print('Buscando lotação do servidor.')	
 			oldHistLotacao = HistLotacao.objects.filter(
 				fk_servidor=instance,
@@ -40,10 +43,25 @@ def post_save_create_histlotacao(sender, instance, created, **kargs):
 						fk_servidor=instance,
 						fk_setor=instance.fk_setor,
 						fk_equipe=instance.fk_equipe)
-					jornadas = Jornada.objects.filter(fk_servidor=instance,data_jornada__gte=datetime.date.today())
+					#Apagando as jornadas futuras do servidor movimentado
+					jornadas = Jornada.objects.filter(fk_servidor=instance,data_jornada__gt=datetime.date.today())
 					if jornadas:
 						for jornada in jornadas: 
 							jornada.delete()
+
+					#Criando jornadas futuras para o servidor movimento em sua nova equipe
+					jornadaNovaEquipe = Jornada.objects.filter(fk_equipe=instance.fk_equipe,data_jornada__gt=datetime.date.today()).order_by('data_jornada').first()
+					print('Já tinha histórico')
+					print(jornadaNovaEquipe)
+					if jornadaNovaEquipe:
+						dataFinal = jornadaNovaEquipe.data_jornada + TimeDelta(days=30)
+						dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
+						funcaogeraescalaporequipe(instance.fk_equipe, servidores, jornadaNovaEquipe.data_jornada, dataFinal)
+					else:
+						dataFinal = datetime.date.today() + TimeDelta(days=30)
+						dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
+						funcaogeraescalaporequipe(instance.fk_equipe, servidores, datetime.date.today()+TimeDelta(days=1), dataFinal)
+
 			else:
 				HistLotacao.objects.create(
 					data_inicial=datetime.date.today(),
@@ -51,11 +69,24 @@ def post_save_create_histlotacao(sender, instance, created, **kargs):
 					fk_setor=instance.fk_setor,
 					fk_equipe=instance.fk_equipe)
 
-				jornadas = Jornada.objects.filter(fk_servidor=instance,data_jornada__gte=datetime.date.today())
+				#Apagando as jornadas futuras do servidor movimentado
+				jornadas = Jornada.objects.filter(fk_servidor=instance,data_jornada__gt=datetime.date.today())
 				if jornadas:
 					for jornada in jornadas: 
 						jornada.delete()
 
+				#Criando jornadas futuras para o servidor movimento em sua nova equipe
+				jornadaNovaEquipe = Jornada.objects.filter(fk_equipe=instance.fk_equipe,data_jornada__gt=datetime.date.today()).order_by('data_jornada').first()
+				print('Não tinha histórico')
+				print(jornadaNovaEquipe)
+				if jornadaNovaEquipe:
+					dataFinal = jornadaNovaEquipe.data_jornada + TimeDelta(days=30)
+					dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
+					funcaogeraescalaporequipe(instance.fk_equipe, servidores, jornadaNovaEquipe.data_jornada, dataFinal)
+				else:
+					dataFinal = datetime.date.today() + TimeDelta(days=30)
+					dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
+					funcaogeraescalaporequipe(instance.fk_equipe, servidores, datetime.date.today()+TimeDelta(days=1), dataFinal)
 
 '''
 '''
