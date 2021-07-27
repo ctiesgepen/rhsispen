@@ -592,7 +592,6 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 			return render(request, template_name,contexto)
 	return render(request, template_name,contexto)
 
-
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.html'):
