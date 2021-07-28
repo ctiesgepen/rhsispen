@@ -1,4 +1,6 @@
-{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block javascripts %}
+{% extends "layouts/base.html" %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} 
+
+{% block javascripts %}
 <script type="text/javascript">
     $(function() {
         // inspect html to check id of category select dropdown.
@@ -12,7 +14,42 @@
         });
     });
 </script>
-{% endblock javascripts %} {% block content %}
+
+<script type="text/javascript">
+    $(function() {
+        // inspect html to check id of category select dropdown.
+        $(document).on("change", "#id_servidor", function() {
+            $.getJSON("/getEquipeServidor/", {
+                id_matricula: $("#id_servidor").val()
+            }, function(j) {
+                var options = '<option value="' + j[0].id_equipe + '">' + j[0].nome + "</option>";
+                $("#id_equipe_origem").html(options);
+            });
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    $(function() {
+        // inspect html to check id of category select dropdown.
+        $(document).on("change", "#id_setor_destino", function() {
+            $.getJSON("/getEquipes/", {
+                id_setor: $("#id_setor_destino").val()
+            }, function(j) {
+                var options = '<option value="">--Selecione--</option>';
+                for (var i = 0; i < j.length; i++) {
+                  options +=
+                  '<option value="' + j[i].id_equipe + '">' + j[i].nome + "</option>";
+                }
+                // inspect html to check id of subcategory select dropdown.
+                $("#id_equipe_destino").html(options);
+            });
+        });
+    });
+</script>
+{% endblock javascripts %} 
+
+{% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">

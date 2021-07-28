@@ -14,19 +14,17 @@ urlpatterns = [
 	path('admin_afastamento/', views.admin_afastamento, name='admin_afastamento'),
 	path('admin_servidor/', views.admin_servidor, name='admin_servidor'), #falta fazer
 	#path('admin_historico/', views.admin_unidades, name='admin_historico'), #falta fazer
-	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), #falta fazer
+	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), 
 	path('admin_setor/cadastrar/', views.admin_setor_criar, name='admin_setor_criar'),
 	path('admin_setor/', views.admin_setor, name='admin_setor'),
 	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
 	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
+	#path('admin_servidor_cadastrar/', views.admin_servidor_criar, name='admin_servidor_criar'), TEM QUE MELHORAR
 
-	#Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
-	path('periodos/', views.periodo_listar, name='periodo_listar'),
-	#Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
-	path('periodos/cadastrar', views.periodo_criar, name='periodo_criar'),
-	#Acionada pelo botão EDITAR, localizado na template de PERÍODOS.
-	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'),
+	path('periodos/', views.periodo_listar, name='periodo_listar'), #Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
+	path('periodos/cadastrar', views.periodo_criar, name='periodo_criar'), #Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
+	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'), #Acionada pelo botão EDITAR, localizado na template de PERÍODOS.
 	
 	#Tela do OPERADOR
 	path('setor_att/<str:id_setor>/', views.setor_att, name='setor_att'),
@@ -71,6 +69,7 @@ urlpatterns = [
 	url('getEquipes48h/$', views.get_equipes48h),
 	url('getTipoJornada/', views.get_tipo_jornada),
 	url('getEquipeServidor/$', views.get_equipe_servidor),
+	url('getSetorServidor/$', views.get_setor_servidor),
 	url('escala-regular/', views.definirjornadaregular, name='definirjornadaregular'),
 	url('gerarescalaregular/', views.gerarescalaregular, name='gerarescalaregular'),
 	#Exportações

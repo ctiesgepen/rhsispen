@@ -1,29 +1,41 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} {% include 'includes/modal/equipe/equipe_servidores.html' %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %}
+
+{% block javascripts %}
+<script type="text/javascript">
+    $(function() {
+        // inspect html to check id of category select dropdown.
+        $(document).on("change", "#id_setor", function() {
+            $.getJSON("/getAddNoturno/", {
+                id_matricula: $("#id_setor").val()
+            }, function(j) {
+                var options = '<option value="' + j[0].id_setor + '">' + j[0].nome + "</option>";
+                $("#id_setor").html(options);
+            });
+        });
+    });
+</script>
+{% endblock javascripts %}
+
+{% block content %} 
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
             <div class="col-sm-12">
                 <div class="card">
                     <div class="card-body">
-                        <h5 class="text-center">{{ servidor.fk_setor }}</h5>
+                        <h5 class="text-center">Estado do Tocantins</h5>
                         {% if messages %} {% for message in messages %}
                         <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}
                             <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>
-
                         {% endfor %} {% endif %}
 
-                        <h5 class="mt-5">Equipes</h5>
+                        <h5 class="mt-5">Adicionais Noturno:</h5>
                         <hr>
-                        <form method="POST" action="{% url 'namp:equipe_list' %}">{% csrf_token %}
+                        <form method="POST" action="{% url 'namp:admin_add_noturno' %}">{% csrf_token %}
                             <div class="form-inline">
-                                {{ form.nome|as_crispy_field }}
-                                <button type="input" class="btn btn-dark">
-                                <i class="fas fa-search"></i>
+                                {{ form.setor|as_crispy_field }}
                                 </button>
-                                <a class=" col float-right" href="{% url 'namp:equipe_list' %}">ver todos</a>
-                                <div class="float-right" style="padding: 0;">
-                                    <a href="{% url 'namp:equipe_criar' %}" class="btn btn-dark float-right"><i class="fas fa-plus"></i> Adicionar</a>
-                                </div>
+                                <a class=" col float-right" href="{% url 'namp:admin_add_noturno' %}">voltar para todos</a>
                             </div>
                         </form>
                         <br>
@@ -34,26 +46,17 @@
                                         <thead class="thead-dark">
                                             <tr>
                                                 <th scope="col">MÊS DE REFERÊNCIA</th>
-                                                <th scope="col">EQUIPE ATIVA</th>
-                                                <th scope="col">CATEGORIA</th>
-                                                <th scope="col">SERVIDORES</th>
-                                                <th scope="col">VISUALIZAR</th>
+                                                <th scope="col">UNIDADE</th>
+                                                <th scope="col">AÇÕES</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {% for equipe in page_obj %}
+                                            {% for setor in page_obj %}
                                             <tr class="{% cycle 'row1' 'row2' %}">
-                                                <td> <a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                                                <td class="field-status">
-                                                    {% if equipe.status %}
-                                                    <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
-                                                    <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
-                                                </td>
-                                                <td> {{equipe.categoria}} </td>
-                                                <td> {{equipe.get_servidores | default:0 }} </td>
+                                                <td> 'MES DE REFERENCIA'</td>
+                                                <td> {{ setor.nome |as_crispy_field}}</td>
                                                 <td>
-                                                    <a type="modalCart" data-toggle="modal" data-target="#modalEquipeServidores"><i class="feather icon-eye"></i> Servidores </a>
-                                                    <a href="{% url 'namp:equipe_att' equipe.id_equipe %}"><i class="feather icon-edit"></i> Editar </a>
+                                                    <i class="feather icon-download"></i> Baixar </a>
                                                 </td>
                                             </tr>
                                             {% endfor %}

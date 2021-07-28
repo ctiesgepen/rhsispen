@@ -20,7 +20,9 @@ class DefinirJornadaRegularForm(forms.Form):
         super(DefinirJornadaRegularForm, self).__init__(*args, **kwargs)
         self.fields['setor'].widget.attrs['readonly'] = True
         self.fields['data_inicial'].widget.attrs['readonly'] = True
+        self.fields['data_inicial'].widget = DateInput()
         self.fields['data_final'].widget.attrs['readonly'] = True
+        self.fields['data_final'].widget = DateInput()
         self.fields['equipe'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         #self.fields['tipo_jornada'].choices = [('', '--Selecione--')] + list(TipoJornada.objects.all().values_list('carga_horaria', 'tipificacao'))
 
@@ -40,12 +42,13 @@ class GerarJornadaRegularForm(forms.Form):
         self.fields['data_plantao12h'].widget = DateInput()
         self.fields['data_plantao24h'].widget = DateInput()
         self.fields['data_plantao48h'].widget = DateInput()
-        '''                     self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-                                self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-                                self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-                                self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-                                self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
-                                self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']'''
+
+        self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
+        self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
+        self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
+        self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
+        self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
+        self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']
 
 class ServidorFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -159,6 +162,11 @@ class EquipeSearchForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['nome'].label = ""
 
+class ServidorCriarForm(forms.ModelForm):
+    class Meta:
+        model = Servidor
+        fields = '__all__'
+
 class ServidorForm(forms.ModelForm):
     class Meta:
         model = Servidor
@@ -253,6 +261,7 @@ class ServidorMoverExtForm(forms.Form):
     setor_destino = forms.ChoiceField(required=True, label='Setor Destino')
     equipe_origem = forms.ChoiceField(required=True,label='Equipe Atual')
     equipe_destino = forms.ChoiceField(required=True, label='Equipe Destino')
+    
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['servidor'].choices = [('', '--Selecione--')] + list(Servidor.objects.all().values_list('id_matricula', 'nome'))
@@ -260,7 +269,6 @@ class ServidorMoverExtForm(forms.Form):
         self.fields['setor_destino'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
         self.fields['equipe_origem'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         self.fields['equipe_destino'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
-
 
 class PeriodoAcaoForm(forms.ModelForm):
     class Meta:
@@ -270,14 +278,19 @@ class PeriodoAcaoForm(forms.ModelForm):
             'data_inicial': DateTimeInput(),
             'data_final': DateTimeInput(),
         }
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
 class PeriodoAcaoSearchForm(forms.Form):
     descricao = forms.CharField(max_length=25)
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['descricao'].label = ""
         self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
+
+class AddNoturnoForm(forms.Form):
+    setor = forms.ChoiceField(required=True, label='Setor')
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['setor'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
+        self.fields['setor'].label = Setor.nome
