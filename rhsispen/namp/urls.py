@@ -21,8 +21,11 @@ urlpatterns = [
 	path('admin_servidores/', views.admin_servidores, name='admin_servidores'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
 
+	#Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 	path('periodos/', views.periodo_listar, name='periodo_listar'),
+	#Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 	path('periodos/cadastrar', views.periodo_criar, name='periodo_criar'),
+	#Acionada pelo botão EDITAR, localizado na template de PERÍODOS.
 	path('periodos/<int:id_periodo_acao>/editar', views.periodo_att, name='periodo_att'),
 	
 	#Tela do OPERADOR

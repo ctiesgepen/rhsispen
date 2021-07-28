@@ -1,7 +1,6 @@
 
 {% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} 
-{% include 'includes/modal/equipe/equipe_list.html' with setorzinho=setor %}
-
+{% include 'includes/modal/equipe/equipe_list.html' %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -37,19 +36,24 @@
                                     <thead class="thead-dark">
                                         <tr>
                                             <th scope="col">CÓDIGO</th>
+                                            <th scope="col">AÇÕES</th>
                                             <th scope="col">NOME</th>
                                             <th scope="col">REGIÃO</th>
                                             <th scope="col">SETOR ATIVO</th>
                                             <th scope="col">SETOR SEDE</th>
                                             <th scope="col">QTD DE SERVIDORES</th>
                                             <th scope="col">QTD DE EQUIPES</th>
-                                            <th scope="col">AÇÕES</th>
+                                            
                                         </tr>
                                     </thead>
                                     <tbody>
                                         {% for setor in page_obj %}
-                                        <tr class="{% cycle 'row1' 'row2' %}">
+                                        <tr>
                                             <td> {{ setor.id_setor }} </td>
+                                            <td>
+                                                <a type="text" data-toggle="modal" data-setor-id="{{setor.id_setor}}" data-target="#modalEquipeAdmin"><i class="feather icon-eye"></i> Visualizar </a>
+                                                <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i>  Editar </a>
+                                            </td>
                                             <td> {{ setor.nome }}</td>
                                             <td> {{ setor.fk_regiao }} </td>
                                             <td class="field-status">
@@ -64,12 +68,10 @@
                                             </td>
                                             <td> {{ setor.get_equipes | length |default:0 }} </td>
                                             <td> {{ setor.get_servidores |default:0 }} </td>
-                                            <td>
-                                                <a type="text" data-toggle="modal" data-target="#modalEquipeAdmin"><i class="feather icon-eye"></i> Visualizar </a>
-                                                <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i>  Editar </a>
-                                            </td>
+                                            
                                         </tr>
                                         {% endfor %}
+
                                     </tbody>
                                 </table>
 
@@ -100,4 +102,6 @@
             </div>
         </div>
     </div>
-{% endblock %}
+   {% endblock %}
+
+                                                

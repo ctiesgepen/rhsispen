@@ -27,63 +27,63 @@
                             </table>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{ servidorform.nome|as_crispy_field }}
+                                    {{ servidorform.nome|as_crispy_field }} {{ servidorform.nome.errors }}
                                 </div>
                                 {% if servidor.id_matricula == user.id_matricula %}
                                 <div class="form-group col-md-3 hidden">
-                                    {{ servidorform.fk_user|as_crispy_field}}
+                                    {{ servidorform.fk_user|as_crispy_field}} {{ servidorform.fk_user.errors }}
                                 </div>
                                 {% endif%}
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.cpf|as_crispy_field}}
+                                    {{ servidorform.cpf|as_crispy_field}} {{ servidorform.cpf.errors }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.dt_nasc|as_crispy_field}}
+                                    {{ servidorform.dt_nasc|as_crispy_field}} {{ servidorform.dt_nasc.errors }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.sexo|as_crispy_field}}
+                                    {{ servidorform.sexo|as_crispy_field}} {{ servidorform.sexo.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ servidorform.id_matricula|as_crispy_field}}
+                                    {{ servidorform.id_matricula|as_crispy_field}} {{ servidorform.id_matricula.errors }}
                                 </div>
                                 <div class="form-group col-md-1">
-                                    {{ servidorform.vinculo|as_crispy_field}}
+                                    {{ servidorform.vinculo|as_crispy_field}} {{ servidorform.vinculo.errors }}
                                 </div>
                                 <div class="form-group col-md-4">
-                                    {{ servidorform.cargo|as_crispy_field}}
+                                    {{ servidorform.cargo|as_crispy_field}} {{ servidorform.cargo.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ servidorform.situacao|as_crispy_field}}
+                                    {{ servidorform.situacao|as_crispy_field}} {{ servidorform.situacao.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.cf|as_crispy_field}}
+                                    {{ servidorform.cf|as_crispy_field}} {{ servidorform.cf.errors }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.tipo_vinculo|as_crispy_field}}
+                                    {{ servidorform.tipo_vinculo|as_crispy_field}} {{ servidorform.tipo_vinculo.errors }}
                                 </div>
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.regime_juridico|as_crispy_field}}
+                                    {{ servidorform.regime_juridico|as_crispy_field}} {{ servidorform.regime_juridico.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-3">
-                                    {{ servidorform.contato|as_crispy_field}}
+                                    {{ servidorform.contato|as_crispy_field}} {{ servidorform.contato.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    {{ servidorform.fk_setor|as_crispy_field}}
+                                    {{ servidorform.fk_setor|as_crispy_field}} {{ servidorform.fk_setor.errors }}
                                 </div>
                                 <div class="form-group col-md-4">
-                                    {{ servidorform.fk_equipe|as_crispy_field}}
+                                    {{ servidorform.fk_equipe|as_crispy_field}} {{ servidorform.fk_equipe.errors }}
                                 </div>
                             </div>
 
@@ -98,45 +98,38 @@
 
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ enderecoservform.uf|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.uf|as_crispy_field }} {{ enderecoservform.uf.errors }}
                                 </div>
                                 <div class="form-group col-md-6">
-                                    {{ enderecoservform.municipio|as_crispy_field }}
+                                    {{ enderecoservform.municipio|as_crispy_field }} {{ enderecoservform.municipio.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-2">
-                                    {{ enderecoservform.cep|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.cep|as_crispy_field }} {{ enderecoservform.cep.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    {{ enderecoservform.endereco|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.endereco|as_crispy_field }} {{ enderecoservform.endereco.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-6">
-                                    {{ enderecoservform.bairro|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.bairro|as_crispy_field }} {{ enderecoservform.bairro.errors }}
                                 </div>
                                 <div class="form-group col-md-2">
-                                    {{ enderecoservform.numero|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.numero|as_crispy_field }} {{ enderecoservform.numero.errors }}
                                 </div>
                             </div>
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    {{ enderecoservform.complemento|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.complemento|as_crispy_field }} {{ enderecoservform.complemento.errors }}
                                 </div>
-                            </div> 
+                            </div>
                             <div class="form-row">
                                 <div class="form-group col-md-8">
-                                    {{ enderecoservform.fk_servidor|as_crispy_field }}
-                                    
+                                    {{ enderecoservform.fk_servidor|as_crispy_field }} {{ enderecoservform.fk_servidor.errors }}
                                 </div>
                             </div>
                             <hr>

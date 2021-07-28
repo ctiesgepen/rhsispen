@@ -3,7 +3,8 @@ import json
 from typing import Pattern
 import xlwt
 from django.shortcuts import render, redirect, get_object_or_404
-from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia, EnderecoSetor, EnderecoServ
+
+from .models import Equipe, Servidor, TipoJornada, Jornada, HistAfastamento, PeriodoAcao, EscalaFrequencia, EnderecoServ
 from django.http import HttpResponse, HttpResponseRedirect
 from weasyprint import HTML
 from django.template.loader import render_to_string
@@ -108,9 +109,9 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 	page = request.GET.get('page')
 	paginator = Paginator(list(setores), 15)
 	page_obj = paginator.get_page(page)
-	setor = None
+	setor = ""
 	contexto = {
-		'setorzinho':setor,
+		'setorselecionado':setor,
 		'servidor': servidor,
 		'setores': setores,
 		'form': form,
@@ -130,7 +131,7 @@ def admin_setor(request, template_name='namp/admin/admin_setor.html'):
 				page_obj = paginator.get_page(page)
 
 				contexto = { 
-					'setorzinho':setor,
+					'setorselecionado':setor,
 					'servidor': servidor,
 					'setores': setores,
 					'form': form,
@@ -343,7 +344,6 @@ def setor_att(request, id_setor):
 	except Setor.DoesNotExist:
 		messages.warning(request, 'Não foi possível carregar o setor!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
 	
 	'''
 	Atribuindo o formulário do setor a uma variável e setando alguns campos choices para inicialização.
@@ -836,7 +836,7 @@ def servidor_att(request, id_matricula):
 	
 	enderecoservform = EnderecoServForm(instance=enderecoservidor)
 	enderecoservform.fields['fk_servidor'].choices = list(Servidor.objects.filter(id_matricula=servidor.id_matricula).values_list('id_matricula', 'nome'))
-	
+
 	contexto = {
 		'user': user,
 		'servidor':servidor,
@@ -845,19 +845,18 @@ def servidor_att(request, id_matricula):
 	}
 
 	if not request.user.is_superuser:
-		if servidor.sexo == 'M': contexto['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Masculino')]
-		else: contexto['servidorform'].fields['sexo'].choices = [(servidor.sexo,'Feminino')]
-		contexto['servidorform'].fields['fk_user'].choices = [(servidor.fk_user.id,servidor.fk_user)]
-		contexto['servidorform'].fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
-		contexto['servidorform'].fields['cf'].choices = [(servidor.cf,servidor.cf)]
-		contexto['servidorform'].fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
-		contexto['servidorform'].fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
-		contexto['servidorform'].fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
-		contexto['servidorform'].fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
+		if servidor.sexo == 'M': contexto.servidorform.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+		else: contexto.servidorform.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+		contexto.servidorform.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+		contexto.servidorform.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+		contexto.servidorform.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+		contexto.servidorform.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+		contexto.servidorform.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+		contexto.servidorform.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
 
 	if request.method == 'POST':
 		contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
-		contexto['enderecoservform'] = EnderecoServForm(request.POST, instance=enderecoservidor)
+		contexto['enderecoservform'] = EnderecoServForm(request.POST, instance=enderecoservidor) or None
 		if contexto['servidorform'].is_valid():
 			servidor = contexto['servidorform'].save(commit=False)
 			if contexto['enderecoservform'].is_valid():
@@ -876,9 +875,43 @@ def servidor_att(request, id_matricula):
 			contexto['servidorform'] = ServidorForm(request.POST, instance=servidor)
 			contexto['enderecoservform'] = EnderecoServForm(request.POST) or None
 
-			messages.warning(request, 'Erro no formulário do servidor')
-			return render(request, 'namp/servidor/servidor_att.html',contexto)
+		messages.warning(request, 'Erro no formulário do servidor')
+		return render(request, 'namp/servidor/servidor_att.html',contexto)
 	return render(request, 'namp/servidor/servidor_att.html',contexto)
+
+
+
+#O CÓD ABAIXO ESTÁ FUNCIONAL 
+	#PORÉM SEM O FORM DE ENDERECO SERVIDOR
+
+	#form = ServidorForm(instance=servidor)
+	#if not request.user.is_superuser:
+	#	if servidor.sexo == 'M': form.fields['sexo'].choices = [(servidor.sexo,'Masculino')]
+	#	else: form.fields['sexo'].choices = [(servidor.sexo,'Feminino')]
+	#	form.fields['cargo'].choices = [(servidor.cargo,servidor.cargo)]
+	#	form.fields['cf'].choices = [(servidor.cf,servidor.cf)]
+	#	form.fields['tipo_vinculo'].choices = [(servidor.tipo_vinculo,servidor.tipo_vinculo)]
+	#	form.fields['regime_juridico'].choices = [(servidor.regime_juridico,servidor.regime_juridico)]
+	#	form.fields['fk_setor'].choices = [(servidor.fk_setor.id_setor,servidor.fk_setor.nome)]
+	#	form.fields['fk_equipe'].choices = [(servidor.fk_equipe.id_equipe,servidor.fk_equipe.nome)]
+
+	#contexto = {
+	#	'form': form,
+	#	'user':user,
+	#	'servidor': servidor,
+	#}
+
+	#if request.method == 'POST':
+	#	form = ServidorForm(request.POST, instance=servidor)
+	#	if form.is_valid():
+	#		form.save()
+	#		messages.success(request, 'Servidor editado com sucesso!')
+	#		return HttpResponseRedirect('/servidor_list')
+	#	else:
+	#		contexto['form'] = form
+	#		messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
+	#		return render(request, 'namp/servidor/servidor_att.html',contexto)
+	#return render(request, 'namp/servidor/servidor_att.html',contexto)
 
 def servidor_escala(request):
 	return render(request, 'servidor_escala.html')
@@ -1082,12 +1115,12 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
+	#if request.user.groups.filter(name='Operadores').count():
+	#if request.user.is_staff or request.user.is_superuser:
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-
 		periodo_escala = PeriodoAcao.objects.get(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today())
 		escala_gerada = EscalaFrequencia.objects.get(fk_periodo_acao=periodo_escala)
-
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -1141,15 +1174,6 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
 		form.fields['data_plantao48h'].required = tem_plantao48
 
-	contexto = {
-		'form':form,
-		'equipes':equipes,
-		'servidor':servidor,
-		'tem_plantao12': tem_plantao12,
-		'tem_plantao24': tem_plantao24,
-		'tem_plantao48': tem_plantao48
-	}
-	
 	if request.method == 'POST':
 		form = GerarJornadaRegularForm(request.POST)
 		if form.is_valid():
@@ -1251,7 +1275,6 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial do mês de referência e a data final desse
 			mesmo mês.
 			'''
-
 			equipesExpediente = list(equipes.filter(
 				fk_tipo_jornada__carga_horaria__lt=24))
 			inicioDoMes = DateTime.today().replace(day=1, month=DateTime.today().month+1)
@@ -1288,7 +1311,16 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			}
 			messages.warning(request, 'Ops! Verifique os campos do formulário!')
 			return render(request, template_name, contexto)
-	return render(request,template_name, contexto)
+	else:
+		contexto = {
+			'form':form,
+			'equipes':equipes,
+			'servidor':servidor,
+			'tem_plantao12': tem_plantao12,
+			'tem_plantao24': tem_plantao24,
+			'tem_plantao48': tem_plantao48
+		}
+		return render(request,template_name, contexto)
 '''
 	Recuperar do banco as equipes da unidade penal escolhida no momento do cadastro de servidor e
 	as envia para a página populando o campo select fk_equipe

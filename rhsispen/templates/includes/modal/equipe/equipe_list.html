@@ -9,6 +9,7 @@
             </div>
             <!--Body -->
             <div class="modal-body table-responsive">
+                <input type="hidden" name="setorId" id="setorId" value="040.DAF"/>
                 <table class="table table-striped table-sm shadow-sm">
                     <thead class="thead-dark">
                         <tr>
@@ -17,23 +18,18 @@
                         </tr>
                     </thead>
                     <tbody>
-    <!--                    {% for setorzin in setores %}
-                            {% for equipe in setorzin.get_equipes %}
+                    {% for setor in setores %}
+                        {% if setor.id_setor %}
+                            {% for equipe in setor.get_equipes %}
                             <tr>
-                                <td>{{ equipe.nome }}</td>
+                                <td>{{ equipe.nome }} - {{setor.nome}}</td>
                                 <td>{{ equipe.get_servidores  }}</td>
                             </tr>
-                            {% endfor %}
-                        {% endfor %}-->
-                        
-                        <tr>
-                            <td>{{ setorzinho.nome }}</td>
-                            <td>{{ setorzinho.get_servidores  }}</td>
-                        </tr>
+                            {% endfor%}
+                        {% endif%}
+                    {% endfor%}
                     </tbody>
-
                 </table>
-
             </div>
             <!--Footer-->
             <div class="modal-footer">
