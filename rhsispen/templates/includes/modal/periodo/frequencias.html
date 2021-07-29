@@ -1,10 +1,10 @@
-<!-- Modal: modalPeriodoEventos -->
-<div class="modal fade" id="modalPeriodoEventos" tabindex="-1" role="dialog" aria-labelledby="modalPeriodoEventos" aria-hidden="true">
+<!-- Modal: modalPeriodoFrequencia -->
+<div class="modal fade" id="modalPeriodoFrequencia" tabindex="-1" role="dialog" aria-labelledby="modalPeriodoFrequencia" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
         <div class="modal-content">
             <!--Header-->
             <div class="modal-header">
-                <h4 class="modal-title" id="myModalLabel">Controle de Envios</h4>
+                <h4 class="modal-title" id="myModalLabel">Controle de Frequências por Setor</h4>
             </div>
             <!--Body-->
             <div class="modal-body table-responsive">
@@ -12,7 +12,7 @@
                     <thead class="thead-dark">
                         <tr>
                             <th>CÓDIGO</th>
-                            <th>REGISTRO</th>
+                            <th>STATUS ATUAL</th>
                             <th>NOME DO SETOR</th>
                         </tr>
                     </thead>
@@ -20,11 +20,11 @@
                         {% for setor in setores %}
                         <tr>
                             <th scope="row">{{ setor.id_setor }}</th>
-                            <td>
-                                {% if setor.status %}
-                                <img src="/static/admin/img/icon-yes.svg" alt="{{setor.status}}"> {% else %}
-                                <img src="/static/admin/img/icon-no.svg" alt="{{setor.status}}"> {% endif%}
-                            </td>
+                            {% if setor.id_setor in frequencias %}
+                                <td><img src="/static/admin/img/icon-yes.svg" alt="True"></td>
+                            {% else %}
+                                <td><img src="/static/admin/img/icon-no.svg" alt="False"></td>
+                            {% endif %}
                             <td>{{ setor.nome }}</td>
                         </tr>
                         {% endfor %}
@@ -39,4 +39,4 @@
         </div>
     </div>
 </div>
-<!-- Modal: modalPeriodoEventos -->
+<!-- Modal: modalPeriodoFrequencia -->
