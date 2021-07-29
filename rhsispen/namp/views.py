@@ -283,11 +283,11 @@ Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
-	
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		periodos = list(PeriodoAcao.objects.all())
 		setores = list(Setor.objects.all())
+		escalasfrequencias = EscalaFrequencia.objects.all().values_list('fk_setor')
 	except PeriodoAcao.DoesNotExist:
 		messages.warning(request,'Não há períodos registrados até o momento.')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -300,12 +300,19 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	page_obj = paginator.get_page(page)
 
 	form = PeriodoAcaoSearchForm()
+	#Definindo as variáveis que levarão à template as unidades que submeteram escalas e frequeências
+	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=DateTime.now().month) for escala in tupla]
+	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__month=DateTime.now().month) for frequencia in tupla]
+	
 	contexto = { 
 		'form': form,
 		'setores':setores,
 		'page_obj': page_obj,
 		'servidor':servidor,
+		'escalas':escalas,
+		'frequencias': frequencias,
 	}
+
 	if request.method == 'POST':
 		form = PeriodoAcaoSearchForm(request.POST)
 		if form.is_valid():
@@ -339,13 +346,18 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 				
 				contexto = { 
 					'form': form,
+					'setores':setores,
 					'page_obj': page_obj,
 					'servidor':servidor,
+					'escalas':escalas,
+					'frequencias': frequencias,
 				}
 				return render(request, template_name, contexto)
 			else:
 				messages.warning(request, 'Período ou evento não encontrado!')
 				return render(request, template_name, contexto)
+	print(escalas)
+	print(frequencias)
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
@@ -748,7 +760,7 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 	periodo_escala = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
 	if periodo_escala:
-		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala)
+		escalas_geradas = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_escala, fk_setor=servidor.fk_setor)
 		if not escalas_geradas:
 			mensagens['mensagem_escalas'] = 'O período para gerar as escalas do seu setor para o mês de ' + meses[periodo_escala.data_inicial.replace(month=periodo_escala.data_inicial.month+1).strftime('%b')] + ' encontra-se aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M') + '. Clique no botão GERAR ESCALAS.'
 	
@@ -1120,12 +1132,10 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
-	#if request.user.groups.filter(name='Operadores').count():
-	#if request.user.is_staff or request.user.is_superuser:
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		periodo_escala = PeriodoAcao.objects.get(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today())
-		escala_gerada = EscalaFrequencia.objects.get(fk_periodo_acao=periodo_escala)
+		escala_gerada = EscalaFrequencia.objects.get(fk_periodo_acao=periodo_escala, fk_setor=servidor.fk_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -1162,10 +1172,18 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			tem_plantao48 = True
 			continue
 	
-	form = GerarJornadaRegularForm({'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
+	form = GerarJornadaRegularForm(request.POST,{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48} or {'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
 	form.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
+
+	
+	form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
+	form.fields['equipe_plantao12h'].widget.attrs['required'] = tem_plantao12
+	form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
+	form.fields['equipe_plantao24h'].widget.attrs['required'] = tem_plantao24
+	form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
+	form.fields['equipe_plantao48h'].widget.attrs['required'] = tem_plantao48
 
 	contexto = {
 		'form':form,
@@ -1175,10 +1193,12 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		'tem_plantao24': tem_plantao24,
 		'tem_plantao48': tem_plantao48,
 	}
-
-	if request.method == 'POST':
-		form = GerarJornadaRegularForm(request.POST,{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
+	#{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48}
+	if request.method=='POST':
+		print('formulário preenchido')
+		#form = GerarJornadaRegularForm(request.POST,{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
 		if form.is_valid():
+			print('formulário validado')
 			'''
 			Trecho onde se captura a equipe de 12h do formulário,
 			a data inicial para essa mesma equipe e todas as equipes
@@ -1303,11 +1323,13 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			messages.success(request, 'As escalas foram atualizadas com suceso!')
 			return redirect('namp:escala_operador_list')
 		else:
+			print('formulário inválido')
 			contexto['form'] = form
-			
 			messages.warning(request, 'Ops! Verifique os campos do formulário!')
 			return render(request, template_name, contexto)
+	print('formulário novo')
 	return render(request,template_name, contexto)
+	
 '''
 	Recuperar do banco as equipes da unidade penal escolhida no momento do cadastro de servidor e
 	as envia para a página populando o campo select fk_equipe
