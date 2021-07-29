@@ -293,4 +293,4 @@ class AddNoturnoForm(forms.Form):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['setor'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
-        self.fields['setor'].label = Setor.nome
+        #self.fields['setor'].label = Setor

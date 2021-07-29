@@ -1,6 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %}
-
-{% block javascripts %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block javascripts %}
 <script type="text/javascript">
     $(function() {
         // inspect html to check id of category select dropdown.
@@ -14,9 +12,7 @@
         });
     });
 </script>
-{% endblock javascripts %}
-
-{% block content %} 
+{% endblock javascripts %} {% block content %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -54,7 +50,7 @@
                                             {% for setor in page_obj %}
                                             <tr class="{% cycle 'row1' 'row2' %}">
                                                 <td> 'MES DE REFERENCIA'</td>
-                                                <td> {{ setor.nome |as_crispy_field}}</td>
+                                                <td> {{ setor.nome}}</td>
                                                 <td>
                                                     <i class="feather icon-download"></i> Baixar </a>
                                                 </td>
