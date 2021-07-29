@@ -1178,12 +1178,12 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
 
 	
-	form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
-	form.fields['equipe_plantao12h'].widget.attrs['required'] = tem_plantao12
-	form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
-	form.fields['equipe_plantao24h'].widget.attrs['required'] = tem_plantao24
-	form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
-	form.fields['equipe_plantao48h'].widget.attrs['required'] = tem_plantao48
+	#form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
+	#form.fields['equipe_plantao12h'].widget.attrs['required'] = tem_plantao12
+	#form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
+	#form.fields['equipe_plantao24h'].widget.attrs['required'] = tem_plantao24
+	#form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
+	#form.fields['equipe_plantao48h'].widget.attrs['required'] = tem_plantao48
 
 	contexto = {
 		'form':form,
