@@ -131,7 +131,7 @@
                             <br> 
                             {% endif %}
                             
-                            <form method="post" action="{% url 'namp:jornadas_operador' %}">{% csrf_token %}
+                            <form method="POST" action="{% url 'namp:jornadas_operador' %}">{% csrf_token %}
                                 <div class="col-md-12 row">
                                     {% if tem_plantao12 %}
                                     <div class="col-md-12 row">
@@ -162,7 +162,7 @@
                                     {% endif %}
 
                                     {% if tem_plantao48 %}
-                                        <div class="col-md-12 row">
+                                    <div class="col-md-12 row">
                                         <div class="col-md-3">
                                             {{ form.equipe_plantao48h|as_crispy_field }}
                                         </div>

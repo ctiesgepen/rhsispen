@@ -27,29 +27,31 @@ class DefinirJornadaRegularForm(forms.Form):
         #self.fields['tipo_jornada'].choices = [('', '--Selecione--')] + list(TipoJornada.objects.all().values_list('carga_horaria', 'tipificacao'))
 
 class GerarJornadaRegularForm(forms.Form):
-    equipe_plantao12h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 12H do mês:')
-    data_plantao12h = forms.DateField(required=True,label='Data de entrada:')
-    equipe_plantao24h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 24H do mês:')
-    data_plantao24h = forms.DateField(required=True,label='Data de entrada:')
-    equipe_plantao48h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 48H do mês:')
-    data_plantao48h = forms.DateField(required=True,label='Data de entrada:')
-    
+    equipe_plantao12h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 12H do mês')
+    data_plantao12h = forms.DateField(required=True,label='Data de entrada',)
+    equipe_plantao24h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 24H do mês')
+    data_plantao24h = forms.DateField(required=True,label='Data de entrada')
+    equipe_plantao48h = forms.ChoiceField(required=True,choices = [('', '--Selecione--')],label='1º PLANTÃO de 48H do mês')
+    data_plantao48h = forms.DateField(required=True,label='Data de entrada')
+
     def __init__(self, *args, **kwargs):
-        super(GerarJornadaRegularForm, self).__init__(*args, **kwargs)
-        self.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
-        self.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
-        self.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(Equipe.objects.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
+        super().__init__(*args, **kwargs)
+        self.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+        self.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
+        self.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(Equipe.objects.all().values_list('id_equipe', 'nome'))
         self.fields['data_plantao12h'].widget = DateInput()
         self.fields['data_plantao24h'].widget = DateInput()
         self.fields['data_plantao48h'].widget = DateInput()
-
-        self.fields['equipe_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-        self.fields['data_plantao12h'].required = args[len(args)-1]['tem_plantao12']
-        self.fields['equipe_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-        self.fields['data_plantao24h'].required = args[len(args)-1]['tem_plantao24']
-        self.fields['equipe_plantao48h'].required = args[len(args)-1]['tem_plantao48']
-        self.fields['data_plantao48h'].required = args[len(args)-1]['tem_plantao48']
-
+        
+        '''
+        self.fields['equipe_plantao12h'].widget.attrs['required'] = args[len(args)-1]['tem_plantao12']
+        self.fields['data_plantao12h'].widget.attrs['required'] = args[len(args)-1]['tem_plantao12']
+        self.fields['equipe_plantao24h'].widget.attrs['required'] = args[len(args)-1]['tem_plantao24']
+        self.fields['data_plantao24h'].widget.attrs['required'] = args[len(args)-1]['tem_plantao24']
+        self.fields['equipe_plantao48h'].widget.attrs['required'] = args[len(args)-1]['tem_plantao48']
+        self.fields['data_plantao48h'].widget.attrs['required'] = args[len(args)-1]['tem_plantao48']
+        '''
+        
 class ServidorFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super(ServidorFormAdmin, self).__init__(*args, **kwargs)
