@@ -1155,9 +1155,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 
 	equipes = Equipe.objects.filter(status=True).filter(fk_setor=servidor.fk_setor)
 
-	tem_plantao12 = False
-	tem_plantao24 = False
-	tem_plantao48 = False
+	tem_plantao12 = tem_plantao24 = tem_plantao48 = False
 
 	for equipe in equipes:
 		if equipe.fk_tipo_jornada.carga_horaria < 12:
@@ -1172,18 +1170,20 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			tem_plantao48 = True
 			continue
 	
-	form = GerarJornadaRegularForm(request.POST,{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48} or {'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
+	form = GerarJornadaRegularForm(request.POST or None)
 	form.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
 	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
 
-	
-	form.fields['data_plantao12h'].widget.attrs['required'] = tem_plantao12
-	form.fields['equipe_plantao12h'].widget.attrs['required'] = tem_plantao12
-	form.fields['data_plantao24h'].widget.attrs['required'] = tem_plantao24
-	form.fields['equipe_plantao24h'].widget.attrs['required'] = tem_plantao24
-	form.fields['data_plantao48h'].widget.attrs['required'] = tem_plantao48
-	form.fields['equipe_plantao48h'].widget.attrs['required'] = tem_plantao48
+	if not tem_plantao12:
+		del form.fields['data_plantao12h']#.widget.attrs['required'] = tem_plantao12
+		del form.fields['equipe_plantao12h']#.widget.attrs['required'] = tem_plantao12
+	if not tem_plantao24:
+		del form.fields['data_plantao24h']#.widget.attrs['required'] = tem_plantao24
+		del form.fields['equipe_plantao24h']#.widget.attrs['required'] = tem_plantao24
+	if not tem_plantao48:
+		del form.fields['data_plantao48h']#.widget.attrs['required'] = tem_plantao48
+		del form.fields['equipe_plantao48h']#.widget.attrs['required'] = tem_plantao48
 
 	contexto = {
 		'form':form,
@@ -1193,10 +1193,9 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		'tem_plantao24': tem_plantao24,
 		'tem_plantao48': tem_plantao48,
 	}
-	#{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48}
 	if request.method=='POST':
 		print('formulário preenchido')
-		#form = GerarJornadaRegularForm(request.POST,{'tem_plantao12': tem_plantao12,'tem_plantao24': tem_plantao24,'tem_plantao48': tem_plantao48})
+		#form = GerarJornadaRegularForm(request.POST)
 		if form.is_valid():
 			print('formulário validado')
 			'''
@@ -1204,7 +1203,8 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None:
+
+			if tem_plantao12 and form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None:
 				equipe12h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao12h'])
 				data_plantao12h = form.cleaned_data['data_plantao12h']
@@ -1235,7 +1235,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
+			if tem_plantao24 and form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
 				equipe24h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao24h'])
 				data_plantao24h = form.cleaned_data['data_plantao24h']
@@ -1266,7 +1266,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-			if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
+			if tem_plantao48 and form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
 				equipe48h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao48h'])
 				data_plantao48h = form.cleaned_data['data_plantao48h']
