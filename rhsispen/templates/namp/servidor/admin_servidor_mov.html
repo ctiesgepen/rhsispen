@@ -17,7 +17,6 @@
 
 <script type="text/javascript">
     $(function() {
-        // inspect html to check id of category select dropdown.
         $(document).on("change", "#id_servidor", function() {
             $.getJSON("/getEquipeServidor/", {
                 id_matricula: $("#id_servidor").val()
@@ -31,7 +30,6 @@
 
 <script type="text/javascript">
     $(function() {
-        // inspect html to check id of category select dropdown.
         $(document).on("change", "#id_setor_destino", function() {
             $.getJSON("/getEquipes/", {
                 id_setor: $("#id_setor_destino").val()
@@ -90,7 +88,7 @@
                             <hr>
                             <div class="submit-row">
                                 <button type="submit" class="btn  btn-dark">Salvar</button>
-                                <a href="{% url 'namp:admin_servidores' %}" class="btn  btn-dark">Cancelar</a>
+                                <a href="{% url 'namp:admin_servidor_list' %}" class="btn  btn-dark">Cancelar</a>
                             </div>
                         </form>
                     </div>
