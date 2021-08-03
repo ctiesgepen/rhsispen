@@ -50,6 +50,7 @@
                                         <td> {{ periodo.data_inicial }} </td>
                                         <td> {{ periodo.data_final }} </td>
                                         <td>
+                                        
                                         {% now 'Y-m-d H:i' as momento_atual %}
                                         {% if momento_atual < periodo.data_final|date:"Y-m-d H:i" %}
                                             {% if periodo.descricao == 'GERAR ESCALAS' %}
