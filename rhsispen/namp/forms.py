@@ -225,7 +225,7 @@ class AfastamentoSearchForm(forms.Form):
         self.fields['servidor'].label = ""
         self.fields['servidor'].widget.attrs['placeholder'] = 'Digite um nome de servidor'
 
-class EscalaFrequenciaForm(forms.ModelForm):
+class EscalaFrequenciaSearchForm(forms.ModelForm):
     class Meta:
         model = EscalaFrequencia
         fields = ('data',)

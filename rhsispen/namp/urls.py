@@ -38,7 +38,7 @@ urlpatterns = [
 	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
 	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
-	
+	path('frequencias_operador/', views.frequencias_operador, name='frequencias_operador'),
 	#Tela do SERVIDOR
 	path('servidores/<int:id_matricula>/editar/', views.servidor_att, name='servidor_att'),
 	path('servidor_escala/', views.servidor_escala, name='servidor_escala'), #falta fazer

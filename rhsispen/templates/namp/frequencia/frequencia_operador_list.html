@@ -13,14 +13,14 @@
 
                         <h5 class="mt-5">Frequências</h5>
                         <hr>
-                        <form method="POST" action="{% url 'namp:escala_operador_list' %}">{% csrf_token %}
+                        <form method="POST" action="{% url 'namp:frequencia_operador_list' %}">{% csrf_token %}
                             <div class="form-inline">
                                 <button type="input" class="btn btn-dark">
                                 <i class="fas fa-search"></i>
                                 </button>
                                 <a class=" col float-right" href="{% url 'namp:frequencia_operador_list' %}">ver todos</a> {% if mensagens.mensagem_frequencia %}
                                 <div class="float-right" style="padding: 0;">
-                                    <a href="#" class="btn btn-dark float-right"><i class="fas fa-plus"></i> Consolidar</a>
+                                    <a href="{% url 'namp:frequencias_operador' %}" class="btn btn-dark float-right"><i class="fas fa-plus"></i> Consolidar</a>
                                 </div>
                                 {% endif %}
                             </div>

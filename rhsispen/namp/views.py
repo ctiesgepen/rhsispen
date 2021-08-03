@@ -306,7 +306,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	#Definindo as variáveis que levarão à template as unidades que submeteram escalas e frequeências
 	#escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=periodo_escala_atual.data_inicial.month) for escala in tupla]
 	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__gte=periodo_escala_atual.data_inicial, data__lte=periodo_escala_atual.data_final) for escala in tupla]
-	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__month=periodo_escala_atual.data_inicial.month) for frequencia in tupla]
+	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__gte=periodo_frequencia_atual.data_inicial, data__lte=periodo_frequencia_atual.data_final) for frequencia in tupla]
 	
 	contexto = { 
 		'form': form,
@@ -777,6 +777,36 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
+def frequencias_operador(request):
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+		periodo_frequencia = PeriodoAcao.objects.filter(descricao='CONSOLIDAR FREQUENCIAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+		escala_gerada = EscalaFrequencia.objects.filter(fk_setor=servidor.fk_setor,data__month=periodo_frequencia.data_final.month-2)
+		frequencia_consolidada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia, fk_setor=servidor.fk_setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
+	if periodo_frequencia:
+		print('periodo aberto para consolidação')
+		if escala_gerada:
+			print('tem escala gerada')
+			if not frequencia_consolidada:
+				print('sem frequencia consolidada')
+				#realiza a consolidação da frequência
+				print('consolidando...')
+				frequencia = EscalaFrequencia()
+				frequencia.fk_periodo_acao = periodo_frequencia
+				frequencia.data = DateTime.today()
+				frequencia.fk_servidor = servidor
+				frequencia.fk_setor = servidor.fk_setor
+				frequencia.save()
+
+				messages.warning(request, 'Frequência consolidada!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_operador_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
@@ -813,42 +843,23 @@ def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_o
 		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
 		if not frequencia_gerada:
 			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do seu setor, referentes ao mês de ' + meses[periodo_frequencia.data_inicial.replace(month=periodo_frequencia.data_inicial.month-1).strftime('%b')] + ', encontra-se aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')	+ '. Clique no botão CONSOLIDAR.'	
-			
 	
-	form = EscalaFrequenciaForm()
+	form = EscalaFrequenciaSearchForm(request.POST or None)
+	contexto = { 
+		'servidor': servidor,
+		'mensagens': mensagens,
+		'page_obj': page_obj,
+		'form': form,
+	}
 	if request.method =='POST':
-		form = EscalaFrequenciaForm(request.POST)
 		if form.is_valid():
-
-			frequencias_operador_change(servidor, servidor.fk_setor, periodo_frequencia)
-			frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia)
-			if frequencia_gerada:
-				mensagens = []
-
-			contexto = { 
-				'servidor': servidor,
-				'mensagens': mensagens,
-				'page_obj': page_obj,
-				'form': form,
-			}
-			messages.success(request, 'Frequências consolidadas com sucesso!')
+			messages.success(request, 'Ainda vai dar certo!')
 			return HttpResponseRedirect('/frequencia_operador_list')
-	else:
-		contexto = { 
-			'servidor': servidor,
-			'mensagens': mensagens,
-			'page_obj': page_obj,
-			'form': form,
-		}
-		return render(request, template_name, contexto)
-
-def frequencias_operador_change(servidor, setor, periodo_frequencia):
-	frequencia = EscalaFrequencia()
-	frequencia.fk_periodo_acao = periodo_frequencia
-	frequencia.data = DateTime.today()
-	frequencia.fk_servidor = servidor
-	frequencia.fk_setor = setor
-	frequencia.save()
+		else:
+			messages.success(request, 'Ops! Não há frequências para a data informada!')
+			contexto['form'] = form
+			render(request, template_name, contexto)
+	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -1132,7 +1143,8 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 		'page_obj': page_obj,
 	}
 	return render(request, template_name, contexto)'''
-	
+
+
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
