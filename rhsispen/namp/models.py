@@ -315,6 +315,7 @@ class PeriodoAcao(models.Model):
 	id_periodo_acao = models.AutoField(primary_key=True)
 	data_inicial = models.DateTimeField()
 	data_final = models.DateTimeField()
+	#fk_servidor = models.ForeignKey(Servidor, on_delete=models.RESTRICT, verbose_name='Administrador')
 	CHOICES_DESCRICAO = [
 		('GERAR ESCALAS', 'GERAR ESCALAS'),
 		('CONSOLIDAR FREQUENCIAS', 'CONSOLIDAR FREQUENCIAS'),

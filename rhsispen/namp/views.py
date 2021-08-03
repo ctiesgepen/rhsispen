@@ -64,7 +64,7 @@ def admin_servidor(request):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'):
+def admin_setor_criar(request, template_name='namp/setor/admin_setor_criar.html'):
 	servidor = Servidor.objects.get(fk_user=request.user.id)
 	form = SetorForm()
 	try:
@@ -77,7 +77,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 		if form.is_valid():
 			form.save()
 			messages.success(request, 'Setor adicionada com sucesso!')
-			return redirect('namp:admin_setor')
+			return redirect('namp:admin_setor_list')
 		else:
 			contexto = {
 				'setor': setor,
@@ -96,7 +96,7 @@ def admin_setor_criar(request, template_name='namp/admin/admin_setor_criar.html'
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_setor(request, template_name='namp/admin/admin_setor.html'):
+def admin_setor_list(request, template_name='namp/setor/admin_setor_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		setores = Setor.objects.all()
@@ -181,7 +181,7 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
+def admin_servidor_list(request,template_name='namp/servidor/admin_servidor_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		servidores = list(Servidor.objects.all())
@@ -222,7 +222,7 @@ def admin_servidores(request,template_name='namp/admin/admin_servidores.html'):
 				}
 				return render(request, template_name, contexto)
 			else:
-				print('entrei no form invalid')
+				print('entrei no form invalido')
 				messages.warning(request, 'Servidor com este nome não encontrado!')
 				return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
@@ -633,7 +633,7 @@ def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def admin_servidor_mov(request, template_name='namp/admin/admin_servidor_mov.html'):
+def admin_servidor_mov(request, template_name='namp/servidor/admin_servidor_mov.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 	except Servidor.DoesNotExist:
@@ -1320,7 +1320,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			escala.fk_setor = servidor.fk_setor
 			escala.save()
 
-			messages.success(request, 'As escalas foram atualizadas com suceso!')
+			messages.success(request, 'As escalas foram atualizadas com sucesso!')
 			return redirect('namp:escala_operador_list')
 		else:
 			print('formulário inválido')
@@ -1367,13 +1367,10 @@ def get_tipo_jornada(request):
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_equipe_servidor(request):
-	print('entrei no get equipe')
 	result = list(Equipe.objects.none())
 	id_matricula = request.GET.get('id_matricula', '')
 	if (id_matricula):
-		print('achei o servidor')
 		result = list(Equipe.objects.filter(id_equipe=Servidor.objects.get(id_matricula=id_matricula).fk_equipe.id_equipe).values('id_equipe', 'nome'))
-	print('vou sair do get equipe')
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_setor_servidor(request):
@@ -1384,10 +1381,13 @@ def get_setor_servidor(request):
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def get_add_noturno(request):
+	print("entrei na função")
 	result = list(Setor.objects.none())
 	id_matricula = request.GET.get('id_matricula', '')
+	print("vou encontrar o servidor")
 	if (id_matricula):
 		result = list(Setor.objects.filter(id_setor=Servidor.objects.get(id_matricula=id_matricula).fk_setor.id_setor).values('id_setor', 'nome'))
+		print("encontrei")
 	return HttpResponse(json.dumps(result), content_type="application/json")
 
 def exportar_pdf(request):
