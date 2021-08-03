@@ -51,12 +51,17 @@
                                         <td> {{ periodo.data_inicial }} </td>
                                         <td> {{ periodo.data_final }} </td>
                                         <td>
-                                            {% now 'Y-m-d H:i' as momento_atual %} {% if momento_atual
-                                            < periodo.data_final|date: "Y-m-d H:i" %} {% if periodo.descricao=='GERAR ESCALAS' %} <a type="text" data-toggle="modal" data-target="#modalPeriodoEscalas"><i class="feather icon-eye"></i> Eventos</a>
+                                            {% now 'Y-m-d H:i' as momento_atual %} 
+                                            {% if momento_atual < periodo.data_final|date:"Y-m-d H:i" %}
+                                                {% if periodo.descricao == 'GERAR ESCALAS' %}
+                                                    <a type="text" data-toggle="modal" data-target="#modalPeriodoEscalas"><i class="feather icon-eye"></i> Eventos</a>
                                                 {% else %}
-                                                <a type="text" data-toggle="modal" data-target="#modalPeriodoFrequencia"><i class="feather icon-eye"></i> Eventos</a> {% endif %}
-                                                <a href="{% url 'namp:periodo_att' periodo.id_periodo_acao %}"><i class="feather icon-edit"></i> Editar</a> {%else%}
-                                                <i class="feather icon-eye-off"> Período Encerrado</i> {% endif %}
+                                                    <a type="text" data-toggle="modal" data-target="#modalPeriodoFrequencia"><i class="feather icon-eye"></i> Eventos</a>
+                                                {% endif %}
+                                                <a href="{% url 'namp:periodo_att' periodo.id_periodo_acao %}"><i class="feather icon-edit"></i> Editar</a> 
+                                            {%else%}
+                                                <i class="feather icon-eye-off"> Período Encerrado</i>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                     {% endfor %}
