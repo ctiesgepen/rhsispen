@@ -285,7 +285,7 @@ Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		periodos = list(PeriodoAcao.objects.all())
+		periodos = PeriodoAcao.objects.all()
 		setores = list(Setor.objects.all())
 		escalasfrequencias = EscalaFrequencia.objects.all().values_list('fk_setor')
 	except PeriodoAcao.DoesNotExist:
@@ -296,13 +296,17 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	page = request.GET.get('page')
-	paginator = Paginator(periodos, 15)
+	paginator = Paginator(list(periodos), 15)
 	page_obj = paginator.get_page(page)
 
 	form = PeriodoAcaoSearchForm()
+	#selecionando os períodos específicos mais recentes
+	periodo_escala_atual = periodos.filter(descricao='GERAR ESCALAS').order_by('-data_inicial').first()
+	periodo_frequencia_atual = periodos.filter(descricao='CONSOLIDAR FREQUENCIAS').order_by('-data_inicial').first()
 	#Definindo as variáveis que levarão à template as unidades que submeteram escalas e frequeências
-	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=DateTime.now().month) for escala in tupla]
-	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__month=DateTime.now().month) for frequencia in tupla]
+	#escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=periodo_escala_atual.data_inicial.month) for escala in tupla]
+	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__gte=periodo_escala_atual.data_inicial, data__lte=periodo_escala_atual.data_final) for escala in tupla]
+	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__month=periodo_escala_atual.data_inicial.month) for frequencia in tupla]
 	
 	contexto = { 
 		'form': form,
@@ -1204,7 +1208,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			com tipos de jornada similares.
 			'''
 
-			if tem_plantao12 and form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None:
+			if tem_plantao12 and form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None and form.cleaned_data['data_plantao12h'].month==periodo_escala.data_inicial.month+1:
 				equipe12h = equipes.get(
 					id_equipe=form.cleaned_data['equipe_plantao12h'])
 				data_plantao12h = form.cleaned_data['data_plantao12h']
@@ -1229,7 +1233,10 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					o seu tipo de jornada. Aqui o intervalo é de 24h
 					'''
 					data_plantao12h += TimeDelta(hours=equipe.fk_tipo_jornada.carga_horaria)
-
+			else:			
+				contexto['form'] = form
+				messages.warning(request, 'Ops! A data de início da equipe de 12h está fora do período válido!')
+				return render(request, template_name, contexto)
 			'''
 			Trecho onde se captura a equipe de 24h do formulário,
 			a data inicial para essa mesma equipe e todas as equipes
@@ -1260,7 +1267,10 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					o seu tipo de jornada. Aqui o intervalo é de 24h
 					'''
 					data_plantao24h += TimeDelta(hours=equipe.fk_tipo_jornada.carga_horaria)
-
+			else:			
+				contexto['form'] = form
+				messages.warning(request, 'Ops! A data de início da equipe de 24h está fora do período válido!')
+				return render(request, template_name, contexto)
 			'''--------------------------------------------------------
 			Trecho onde se captura a equipe de 48h do formulário,
 			a data inicial para essa mesma equipe e todas as equipes
@@ -1291,6 +1301,10 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					o seu tipo de jornada. Aqui o intervalo é de 48h
 					'''
 					data_plantao48h += TimeDelta(hours=equipe.fk_tipo_jornada.carga_horaria)
+			else:			
+				contexto['form'] = form
+				messages.warning(request, 'Ops! A data de início da equipe de 48h está fora do período válido!')
+				return render(request, template_name, contexto)
 
 			'''-----------------------------------------------------------
 			Trecho onde se captura as equipes de Expediente do setor atual,
