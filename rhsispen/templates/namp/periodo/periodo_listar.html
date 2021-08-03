@@ -60,8 +60,9 @@
                                                     <a type="text" data-toggle="modal" data-target="#modalPeriodoFrequencia"><i class="feather icon-eye"></i> Eventos</a>
                                                 {% endif %}
                                                 <a href="{% url 'namp:periodo_att' periodo.id_periodo_acao %}"><i class="feather icon-edit"></i> Editar</a>
+                                            {% else %}
+                                                <i class="feather icon-eye-off"> Período Encerrado</i>
                                             {% endif %}
-                                            <i class="feather icon-eye-off"> Período Encerrado</i>
                                         </td>
                                     </tr>
                                     {% endfor %}
