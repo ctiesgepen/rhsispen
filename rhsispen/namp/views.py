@@ -285,7 +285,7 @@ Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
-		periodos = list(PeriodoAcao.objects.all())
+		periodos = PeriodoAcao.objects.all()
 		setores = list(Setor.objects.all())
 		escalasfrequencias = EscalaFrequencia.objects.all().values_list('fk_setor')
 	except PeriodoAcao.DoesNotExist:
@@ -296,13 +296,16 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	page = request.GET.get('page')
-	paginator = Paginator(periodos, 15)
+	paginator = Paginator(list(periodos), 15)
 	page_obj = paginator.get_page(page)
 
 	form = PeriodoAcaoSearchForm()
+	#selecionando os períodos específicos mais recentes
+	periodo_escala_atual = periodos.filter(descricao='GERAR ESCALAS').order_by('-data_inicial').first()
+	periodo_frequencia_atual = periodos.filter(descricao='CONSOLIDAR FREQUENCIAS').order_by('-data_inicial').first()
 	#Definindo as variáveis que levarão à template as unidades que submeteram escalas e frequeências
-	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=DateTime.now().month) for escala in tupla]
-	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__month=DateTime.now().month) for frequencia in tupla]
+	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=periodo_escala_atual.data_inicial.month) for escala in tupla]
+	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__month=periodo_escala_atual.data_inicial.month) for frequencia in tupla]
 	
 	contexto = { 
 		'form': form,
