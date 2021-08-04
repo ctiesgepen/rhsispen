@@ -312,8 +312,8 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 
 	form = PeriodoAcaoSearchForm()
 	#selecionando os períodos específicos mais recentes
-	periodo_escala_atual = periodos.filter(descricao='GERAR ESCALAS').order_by('-data_inicial').first()
-	periodo_frequencia_atual = periodos.filter(descricao='CONSOLIDAR FREQUENCIAS').order_by('-data_inicial').first()
+	periodo_escala_atual = periodos.filter(descricao='GERAR ESCALAS',data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
+	periodo_frequencia_atual = periodos.filter(descricao='CONSOLIDAR FREQUENCIAS',data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	#Definindo as variáveis que levarão à template as unidades que submeteram escalas e frequeências
 	#escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=periodo_escala_atual.data_inicial.month) for escala in tupla]
 	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__gte=periodo_escala_atual.data_inicial, data__lte=periodo_escala_atual.data_final) for escala in tupla]
