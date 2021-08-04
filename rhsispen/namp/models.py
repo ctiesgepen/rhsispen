@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django import forms
 from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date
-
+from django.db.models import Q
 from django.db.models.fields import AutoField
 
 # Create your models here.
@@ -326,7 +326,8 @@ class PeriodoAcao(models.Model):
 		ordering = ["data_inicial"]
 		verbose_name = "Período"
 		verbose_name_plural = "Períodos"
-				
+
+					
 class EscalaFrequencia(models.Model):
 	id_escala_frequencia = models.AutoField(primary_key=True)
 	data = models.DateField(verbose_name='Criado Em')

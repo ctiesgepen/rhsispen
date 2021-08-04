@@ -259,7 +259,12 @@ Acionada pelo botão ADICIONAR, localizado na template de PERÍODOS.
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
-	servidor = Servidor.objects.get(fk_user=request.user.id)
+	try:
+		servidor = Servidor.objects.get(fk_user=request.user.id)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 	form = PeriodoAcaoForm()
 	contexto = {
 		'form': form,
@@ -268,15 +273,21 @@ def periodo_criar(request, template_name="namp/periodo/periodo_criar.html"):
 	if request.method == 'POST':
 		form = PeriodoAcaoForm(request.POST)		
 		if form.is_valid():
-			form.save()
-			messages.warning(request, 'Período cadastrado com sucesso!')
-			return redirect('namp:periodo_listar')
+			print(form.cleaned_data)
+			try:
+				PeriodoAcao.objects.get(descricao=form.cleaned_data['descricao'],data_inicial__month=form.cleaned_data['data_inicial'].month,data_final__month=form.cleaned_data['data_final'].month)
+			except PeriodoAcao.DoesNotExist:
+				form.save()
+				messages.success(request, 'Período cadastrado com sucesso!')
+				return redirect('namp:periodo_listar')
+			else:
+				messages.warning(request, 'Ops! Período com a descrição e o intervalo de datas informados já existe!')
+				return redirect('namp:periodo_listar')
 		else:
 			contexto['form'] = form
 			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name, contexto)
 	return render(request,template_name, contexto)
-
 '''
 Acionada pelo link PERÍODOS, localizado na aba do GESTOR.
 '''
@@ -777,7 +788,7 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def frequencias_operador(request):
+def frequencias_operador(request,template_name='namp/frequencia/frequencia_operador_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		periodo_frequencia = PeriodoAcao.objects.filter(descricao='CONSOLIDAR FREQUENCIAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
@@ -788,23 +799,26 @@ def frequencias_operador(request):
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	if periodo_frequencia:
-		print('periodo aberto para consolidação')
 		if escala_gerada:
-			print('tem escala gerada')
 			if not frequencia_consolidada:
-				print('sem frequencia consolidada')
 				#realiza a consolidação da frequência
-				print('consolidando...')
 				frequencia = EscalaFrequencia()
 				frequencia.fk_periodo_acao = periodo_frequencia
 				frequencia.data = DateTime.today()
 				frequencia.fk_servidor = servidor
 				frequencia.fk_setor = servidor.fk_setor
 				frequencia.save()
-
-				messages.warning(request, 'Frequência consolidada!')
+				messages.success(request, 'Frequência consolidada!')
 				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			else:
+				messages.warning(request, 'As frequências do período atual já foram consolidadas!')
+				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		else:
+			messages.warning(request, 'Setor sem escalas geradas para o período de consolidação atual!')
+			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	messages.warning(request, 'Período de consolidação de frequências indisponível!')
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_operador_list.html'):
