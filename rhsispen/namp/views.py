@@ -923,11 +923,18 @@ def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.
 	if request.method == 'POST':
 		form = AfastamentoForm(request.POST)
 		if form.is_valid():
-			form.save()
+			afastamento = form.save(commit=False)
+			for afastam in list(HistAfastamento.objects.filter(fk_servidor=afastamento.fk_servidor, data_inicial__month=afastamento.data_inicial.month, data_final__month=afastamento.data_final.month)):
+				if afastamento.data_inicial >= afastam.data_inicial or afastamento.data_final <= afastam.data_final:
+					messages.warning(request, 'O servidor já possui um afasamento nesse intervalo de datas!')	
+					contexto['form'] = form
+					return render(request, template_name, contexto)
+			afastamento.save()
 			messages.success(request, 'Afastamento cadastrado com sucesso!')	
-			return HttpResponseRedirect('namp:afastamento_list')
+			return redirect('namp:afastamento_list')
 		else:
 			contexto['form'] = form
+			messages.warning(request, form.errors.get_json_data(escape_html=False)['__all__'][0]['message'])
 			return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
