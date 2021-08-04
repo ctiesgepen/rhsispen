@@ -35,10 +35,10 @@ urlpatterns = [
 	path('servidor_list/', views.servidor_list, name='servidor_list'),
 	path('afastamentos/cadastrar/', views.afastamento_criar, name='afastamento_criar'), 	
 	path('afastamentos/', views.afastamento_list, name='afastamento_list'),
-	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),
+	path('escala_operador_list/', views.escala_operador_list, name='escala_operador_list'),#Finalizado
 	path('jornadas_operador/', views.jornadas_operador, name='jornadas_operador'),
-	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),
-	path('frequencias_operador/', views.frequencias_operador, name='frequencias_operador'),
+	path('frequencia_operador_list/', views.frequencia_operador_list, name='frequencia_operador_list'),#Finalizado
+	path('frequencias_operador/', views.frequencias_operador, name='frequencias_operador'),#Finalizado: consolida as frequências
 	#Tela do SERVIDOR
 	path('servidores/<int:id_matricula>/editar/', views.servidor_att, name='servidor_att'),
 	path('servidor_escala/', views.servidor_escala, name='servidor_escala'), #falta fazer
