@@ -898,7 +898,7 @@ def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_o
 			page = request.GET.get('page')
 			paginator = Paginator(frequencias2, 15)
 			page_obj = paginator.get_page(page)
-			contexto['page_obj']=  page_obj
+			contexto['page_obj'] =  page_obj
 			return render(request, template_name, contexto)
 		else:
 			messages.warning(request, 'Ops! Setor sem frequências para mês informado.')
