@@ -315,10 +315,10 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 	periodo_escala_atual = periodos.filter(descricao='GERAR ESCALAS',data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	periodo_frequencia_atual = periodos.filter(descricao='CONSOLIDAR FREQUENCIAS',data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 	#Definindo as variáveis que levarão à template as unidades que submeteram escalas e frequeências
-	#escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__month=periodo_escala_atual.data_inicial.month) for escala in tupla]
-	escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__gte=periodo_escala_atual.data_inicial, data__lte=periodo_escala_atual.data_final) for escala in tupla]
-	frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__gte=periodo_frequencia_atual.data_inicial, data__lte=periodo_frequencia_atual.data_final) for frequencia in tupla]
-	
+	if periodo_escala_atual: escalas = [escala for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='GERAR ESCALAS', data__gte=periodo_escala_atual.data_inicial, data__lte=periodo_escala_atual.data_final) for escala in tupla]
+	else: escalas = []
+	if periodo_frequencia_atual: frequencias = [frequencia for tupla in escalasfrequencias.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS', data__gte=periodo_frequencia_atual.data_inicial, data__lte=periodo_frequencia_atual.data_final) for frequencia in tupla]
+	else: frequencias = []
 	contexto = { 
 		'form': form,
 		'setores':setores,
@@ -342,7 +342,7 @@ def periodo_listar(request, template_name="namp/periodo/periodo_listar.html"):
 			'Jul':'JULHO', 
 			'Aug':'AGOSTO', 
 			'Sep':'SETEMBRO', 
-			'Out':'OUTUBRO', 
+			'Oct':'OUTUBRO', 
 			'Nov':'NOVEMBRO', 
 			'Dec':'DEZEMBRO',
 			}
@@ -500,6 +500,7 @@ def equipe_criar(request, template_name='namp/equipe/equipe_criar.html'):
 def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
+		servidores = Servidor.objects.filter(fk_setor=servidor.fk_setor)
 		equipes = Equipe.objects.filter(fk_setor=servidor.fk_setor, deleted_on=None)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
@@ -514,7 +515,8 @@ def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 	paginator = Paginator(equipes, 10)
 	page_obj = paginator.get_page(page)
 	
-	contexto = { 
+	contexto = {
+		'servidores':servidores, 
 		'servidor': servidor,
 		'form': form,
 		'page_obj': page_obj,
@@ -522,7 +524,6 @@ def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 	if request.method == 'POST':
 		if form.is_valid():
 			equipes2 = []
-			print(equipes2)
 			pattern = re.compile(form.cleaned_data['nome'].upper())
 			for equipe in equipes:
 				if pattern.search(equipe.nome.upper()):
@@ -531,12 +532,7 @@ def equipe_list(request, template_name='namp/equipe/equipe_list.html'):
 				page = request.GET.get('page')
 				paginator = Paginator(equipes2, 15)
 				page_obj = paginator.get_page(page)
-				
-				contexto = { 
-					'servidor': servidor,
-					'form': form,
-					'page_obj': page_obj,
-				}
+				contexto['page_obj']= page_obj
 				return render(request, template_name, contexto)
 			else:
 				messages.warning(request, 'Equipe com este nome não encontrada!')
@@ -760,7 +756,7 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 		'Jul':'JULHO', 
 		'Aug':'AGOSTO', 
 		'Sep':'SETEMBRO', 
-		'Out':'OUTUBRO', 
+		'Oct':'OUTUBRO', 
 		'Nov':'NOVEMBRO', 
 		'Dec':'DEZEMBRO',
 	}
@@ -861,7 +857,7 @@ def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_o
 	'Jul':'JULHO', 
 	'Aug':'AGOSTO', 
 	'Sep':'SETEMBRO', 
-	'Out':'OUTUBRO', 
+	'Oct':'OUTUBRO', 
 	'Nov':'NOVEMBRO', 
 	'Dec':'DEZEMBRO',
 	}

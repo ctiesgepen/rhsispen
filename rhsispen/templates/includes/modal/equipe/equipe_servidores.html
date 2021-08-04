@@ -11,21 +11,19 @@
                 <table class="table table-striped table-sm shadow-sm">
                     <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
                             <th>Nomes</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {% for servidor in servidores %}
+                    {% for servidor in servidores %}
+                        {% if servidor.fk_equipe.id_equipe == equipe.id_equipe %}    
                             <tr>
                                 <td>{{ servidor.nome }}</td>
-                                <td>{{ servidor.get_servidores}}</td>
                             </tr>
-                        {% endfor %}
+                        {% endif %}        
+                    {% endfor %}
                     </tbody>
-
                 </table>
-
             </div>
             <!--Footer-->
             <div class="modal-footer">
