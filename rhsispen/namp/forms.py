@@ -225,17 +225,12 @@ class AfastamentoSearchForm(forms.Form):
         self.fields['servidor'].label = ""
         self.fields['servidor'].widget.attrs['placeholder'] = 'Digite um nome de servidor'
 
-class EscalaFrequenciaSearchForm(forms.ModelForm):
-    class Meta:
-        model = EscalaFrequencia
-        fields = ('data',)
-        widgets = {
-            'data': DateInput(),
-        }
-
+class EscalaFrequenciaSearchForm(forms.Form):
+    mes = forms.CharField(max_length=25)
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.fields['data'].required = False
+        self.fields['mes'].label = ""
+        self.fields['mes'].widget.attrs['placeholder'] = 'Pesquisar por mês. (Ex. abril, agosto)'
 
 class SetorForm(forms.ModelForm):
     class Meta:
@@ -276,7 +271,7 @@ class PeriodoAcaoForm(forms.ModelForm):
     class Meta:
         model = PeriodoAcao
         fields = '__all__'
-        widgets = {
+        widgets = { 
             'data_inicial': DateTimeInput(),
             'data_final': DateTimeInput(),
         }

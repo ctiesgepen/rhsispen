@@ -18,6 +18,7 @@
                         <hr>
                         <form method="POST" action="{% url 'namp:escala_operador_list' %}">{% csrf_token %}
                             <div class="form-inline">
+                                {{ form.mes|as_crispy_field }}
                                 <button type="input" class="btn btn-dark">
                                 <i class="fas fa-search"></i>
                                 </button>

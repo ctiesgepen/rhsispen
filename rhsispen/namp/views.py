@@ -750,28 +750,28 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	
-	#form = EscalaFrequenciaSearchForm(request.POST or None)
 	meses = {
-	'Jan':'JANEIRO', 
-	'Feb':'FEVEREIRO', 
-	'Mar':'MARÇO', 
-	'Apr':'ABRIL', 
-	'May':'MAIO', 
-	'Jun':'JUNHO', 
-	'Jul':'JULHO', 
-	'Aug':'AGOSTO', 
-	'Sep':'SETEMBRO', 
-	'Out':'OUTUBRO', 
-	'Nov':'NOVEMBRO', 
-	'Dec':'DEZEMBRO',
+		'Jan':'JANEIRO', 
+		'Feb':'FEVEREIRO', 
+		'Mar':'MARÇO', 
+		'Apr':'ABRIL', 
+		'May':'MAIO', 
+		'Jun':'JUNHO', 
+		'Jul':'JULHO', 
+		'Aug':'AGOSTO', 
+		'Sep':'SETEMBRO', 
+		'Out':'OUTUBRO', 
+		'Nov':'NOVEMBRO', 
+		'Dec':'DEZEMBRO',
 	}
+
 	page = request.GET.get('page')
 	paginator = Paginator(list(escalas), 15)
 	page_obj = paginator.get_page(page)
 
 	mensagens = {}
 
-	#Verificando se tem período para consolidar escalas
+	#Verificando se tem período aberto para gerar escalas
 	periodo_escala = PeriodoAcao.objects.filter(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
 	if periodo_escala:
@@ -779,11 +779,33 @@ def escala_operador_list(request,template_name='namp/escala/escala_operador_list
 		if not escalas_geradas:
 			mensagens['mensagem_escalas'] = 'O período para gerar as escalas do seu setor para o mês de ' + meses[periodo_escala.data_inicial.replace(month=periodo_escala.data_inicial.month+1).strftime('%b')] + ' encontra-se aberto até ' + periodo_escala.data_final.strftime('%d/%m/%Y %H:%M') + '. Clique no botão GERAR ESCALAS.'
 	
+	form = EscalaFrequenciaSearchForm(request.POST or None)
+	
 	contexto = { 
 		'servidor': servidor,
 		'mensagens': mensagens,
 		'page_obj': page_obj,
+		'form': form,
 	}
+
+	if request.method == 'POST':
+		if form.is_valid():
+			escalas2 = []
+			
+		pattern = re.compile(form.cleaned_data['mes'].upper())
+		for escala in escalas:
+			if pattern.search(meses[escala.data.replace(month=escala.data.month+1).strftime('%b')]):
+				escalas2.append(escala)
+			
+		if escalas2:
+			page = request.GET.get('page')
+			paginator = Paginator(escalas2, 15)
+			page_obj = paginator.get_page(page)
+			contexto['page_obj']=  page_obj
+			return render(request, template_name, contexto)
+		else:
+			messages.warning(request, 'Ops! Setor sem escalas para mês informado.')
+			return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
@@ -809,15 +831,15 @@ def frequencias_operador(request,template_name='namp/frequencia/frequencia_opera
 				frequencia.fk_setor = servidor.fk_setor
 				frequencia.save()
 				messages.success(request, 'Frequência consolidada!')
-				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+				return HttpResponseRedirect('/frequencia_operador_list')
 			else:
 				messages.warning(request, 'As frequências do período atual já foram consolidadas!')
-				return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+				return HttpResponseRedirect('/frequencia_operador_list')
 		else:
 			messages.warning(request, 'Setor sem escalas geradas para o período de consolidação atual!')
-			return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+			return HttpResponseRedirect('/frequencia_operador_list')
 	messages.warning(request, 'Período de consolidação de frequências indisponível!')
-	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	return HttpResponseRedirect('/frequencia_operador_list')
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -850,29 +872,41 @@ def frequencia_operador_list(request,template_name='namp/frequencia/frequencia_o
 
 	mensagens = {}
 				
-	#Verificando se tem período para consolidar frequências
+	#Verificando se tem período aberto para consolidar frequências
 	periodo_frequencia = PeriodoAcao.objects.filter(descricao='CONSOLIDAR FREQUENCIAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today()).order_by('-data_inicial').first()
 
 	if periodo_frequencia:
 		frequencia_gerada = EscalaFrequencia.objects.filter(fk_periodo_acao=periodo_frequencia, fk_setor=servidor.fk_setor)
 		if not frequencia_gerada:
-			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do seu setor, referentes ao mês de ' + meses[periodo_frequencia.data_inicial.replace(month=periodo_frequencia.data_inicial.month-1).strftime('%b')] + ', encontra-se aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M')	+ '. Clique no botão CONSOLIDAR.'	
+			mensagens['mensagem_frequencia'] = 'O período para consolidar as frequências do seu setor, referentes ao mês de ' + meses[periodo_frequencia.data_inicial.replace(month=periodo_frequencia.data_inicial.month-1).strftime('%b')] + ', encontra-se aberto até ' + periodo_frequencia.data_final.strftime('%d/%m/%Y %H:%M') + '. Clique no botão CONSOLIDAR.'	
 	
 	form = EscalaFrequenciaSearchForm(request.POST or None)
+	
 	contexto = { 
 		'servidor': servidor,
 		'mensagens': mensagens,
 		'page_obj': page_obj,
 		'form': form,
 	}
-	if request.method =='POST':
+
+	if request.method == 'POST':
 		if form.is_valid():
-			messages.success(request, 'Ainda vai dar certo!')
-			return HttpResponseRedirect('/frequencia_operador_list')
+			frequencias2 = []
+			
+		pattern = re.compile(form.cleaned_data['mes'].upper())
+		for frequencia in frequencias:
+			if pattern.search(meses[frequencia.data.replace(month=frequencia.data.month-1).strftime('%b')]):
+				frequencias2.append(frequencia)
+			
+		if frequencias2:
+			page = request.GET.get('page')
+			paginator = Paginator(frequencias2, 15)
+			page_obj = paginator.get_page(page)
+			contexto['page_obj']=  page_obj
+			return render(request, template_name, contexto)
 		else:
-			messages.success(request, 'Ops! Não há frequências para a data informada!')
-			contexto['form'] = form
-			render(request, template_name, contexto)
+			messages.warning(request, 'Ops! Setor sem frequências para mês informado.')
+			return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
