@@ -28,37 +28,35 @@
                         </form>
                         <br>
                         <div class="table-responsive">
-                            <table class="table table-striped">
+                            <table class="table table-striped table-sm shadow-sm">
                                 <thead class="thead-dark">
-                                    <table class="table table-striped table-sm shadow-sm">
-                                        <thead class="thead-dark">
-                                            <tr>
-                                                <th scope="col">MÊS DE REFERÊNCIA</th>
-                                                <th scope="col">EQUIPE ATIVA</th>
-                                                <th scope="col">CATEGORIA</th>
-                                                <th scope="col">SERVIDORES</th>
-                                                <th scope="col">VISUALIZAR</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {% for equipe in page_obj %}
-                                            <tr class="{% cycle 'row1' 'row2' %}">
-                                                <td> <a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
-                                                <td class="field-status">
-                                                    {% if equipe.status %}
-                                                    <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
-                                                    <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
-                                                </td>
-                                                <td> {{equipe.categoria}} </td>
-                                                <td> {{equipe.get_servidores | default:0 }} </td>
-                                                <td>
-                                                    <a type="modalCart" data-toggle="modal" data-target="#modalEquipeServidores"><i class="feather icon-eye"></i> Servidores </a>
-                                                    <a href="{% url 'namp:equipe_att' equipe.id_equipe %}"><i class="feather icon-edit"></i> Editar </a>
-                                                </td>
-                                            </tr>
-                                            {% endfor %}
-                                        </tbody>
-                                    </table>
+                                    <tr>
+                                        <th scope="col">MÊS DE REFERÊNCIA</th>
+                                        <th scope="col">EQUIPE ATIVA</th>
+                                        <th scope="col">CATEGORIA</th>
+                                        <th scope="col">SERVIDORES</th>
+                                        <th scope="col">VISUALIZAR</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for equipe in page_obj %}
+                                    <tr class="{% cycle 'row1' 'row2' %}">
+                                        <td> <a href="{% url 'namp:equipe_att' equipe.id_equipe %}">{{equipe.nome}}</a></td>
+                                        <td class="field-status">
+                                            {% if equipe.status %}
+                                            <img src="/static/admin/img/icon-yes.svg" alt="{{equipe.status}}"> {% else %}
+                                            <img src="/static/admin/img/icon-no.svg" alt="{{equipe.status}}"> {% endif%}
+                                        </td>
+                                        <td> {{equipe.categoria}} </td>
+                                        <td> {{equipe.get_servidores|length | default:0 }} </td>
+                                        <td>
+                                            <a type="text" data-toggle="modal" data-target="#modalEquipeServidores"><i class="feather icon-eye"></i> Servidores </a>
+                                            <a href="{% url 'namp:equipe_att' equipe.id_equipe %}"><i class="feather icon-edit"></i> Editar </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                         </div>
                         <div class="pagination justify-content-center">
                             <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">

@@ -91,7 +91,7 @@ class Setor(models.Model):
 	def get_servidores(self):
 		total = 0
 		for equipe in Equipe.objects.filter(fk_setor=self):
-			total = total + equipe.get_servidores()
+			total = total + equipe.get_servidores().count()
 		return total
 
 	class Meta:
@@ -142,7 +142,8 @@ class Equipe(models.Model):
 		return self.nome
 	
 	def get_servidores(self):
-		return Servidor.objects.filter(fk_equipe=self.id_equipe).count()
+		#return Servidor.objects.filter(fk_equipe=self.id_equipe).count()
+		return Servidor.objects.filter(fk_equipe=self.id_equipe)
 
 	class Meta:
 		ordering = ["nome"]
