@@ -42,6 +42,7 @@ class Afastamento(models.Model):
 		verbose_name = "Tipo de Afastamento"
 		verbose_name_plural = "Tipos de Afastamento"
 
+
 class TipoJornada(models.Model):
 	id_tipo_jornada = models.AutoField(primary_key=True)
 	carga_horaria = models.PositiveIntegerField()
@@ -265,6 +266,7 @@ class HistAfastamento(models.Model):
 	class Meta:
 		verbose_name = "Afastamento"
 		verbose_name_plural = "Afastamentos"
+		unique_together = ('fk_servidor','data_inicial','data_final','fk_afastamento',)
 
 class HistLotacao(models.Model):
 	id_hist_lotacao = models.AutoField(primary_key=True)
@@ -340,7 +342,7 @@ class EscalaFrequencia(models.Model):
 	Atenção: esse método leva em consideração as jornadas registradas. Isso quer
 	dizer que a numérica que deve ser levada em consideração é a de servidores
 	que trabalharam de fato no período e a de equipes que tiveram escalas.
-	'''
+	
 	def qtd_servidores(self):
 		dt_inicio = Date(day=1, month=self.data.month+1, year=self.data.year)
 		dt_fim = dt_inicio + TimeDelta(days=30)
@@ -350,25 +352,35 @@ class EscalaFrequencia(models.Model):
 		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
+	'''
+
+	def qtd_servidores(self):
+		lista = []
+		for jornada in list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month+1)):
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
+		return lista
 
 	def qtd_equipes(self):
 		lista = []
-		for jornada in self.qtd_servidores():
-			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
+		for servidor in self.qtd_servidores():
+			if servidor.fk_equipe not in lista: lista.append(servidor.fk_equipe)
 		return lista
-
+	
 	def qtd_expediente(self):
 		lista = []
-		for jornada in self.qtd_servidores():
-			if jornada.fk_equipe.categoria == 'Expediente': lista.append(jornada)
+		for equipe in self.qtd_equipes():
+			if equipe.categoria == 'Expediente': lista.append(equipe)
 		return lista
+
 
 	def qtd_plantonista(self):
 		lista = []
-		for jornada in self.qtd_servidores():
-			if jornada.fk_equipe.categoria == 'Plantão': lista.append(jornada)
+		for equipe in self.qtd_equipes():
+			if equipe.categoria == 'Plantão': lista.append(equipe)
 		return lista
 
+	'''
 	def qtd_servidores_frequencia(self):
 		dt_inicio = Date(day=1, month=self.data.month-1, year=self.data.year)
 		dt_fim = dt_inicio + TimeDelta(days=30)
@@ -378,31 +390,36 @@ class EscalaFrequencia(models.Model):
 		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
-	
+	'''
+
+	def qtd_servidores_frequencia(self):
+		lista = []
+		for jornada in list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1)):
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
+		return lista
+
 	def qtd_equipes_frequencia(self):
 		lista = []
-		for jornada in self.qtd_servidores_frequencia():
-			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
+		for servidor in self.qtd_servidores_frequencia():
+			if servidor.fk_equipe not in lista: lista.append(servidor.fk_equipe)
 		return lista
 
 	def qtd_expediente_frequencia(self):
 		lista = []
-		for jornada in self.qtd_servidores_frequencia():
-			if jornada.fk_equipe.categoria == 'Expediente': lista.append(jornada)
+		for equipe in self.qtd_equipes_frequencia():
+			if equipe.categoria == 'Expediente': lista.append(equipe)
 		return lista
 
 	def qtd_plantonista_frequencia(self):
 		lista = []
-		for jornada in self.qtd_servidores_frequencia():
-			if jornada.fk_equipe.categoria == 'Plantão': lista.append(jornada)
+		for equipe in self.qtd_equipes_frequencia():
+			if equipe.categoria == 'Plantão': lista.append(equipe)
 		return lista
 
 	def qtd_afastamento_frequencia(self):
-		dt_inicio = Date(day=1, month=self.data.month-1, year=self.data.year)
-		dt_fim = dt_inicio + TimeDelta(days=30)
-		jornadas = list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
-			data_jornada__range=[dt_inicio,dt_fim]))
 		lista = []
-		for jornada in jornadas:
-			if jornada.assiduidade == None and jornada.fk_afastamento != None and jornada.fk_servidor not in lista: lista.append(jornada)
+		for jornada in list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1)):
+			if jornada.assiduidade == None and jornada.fk_afastamento != None: lista.append(jornada)
 		return lista

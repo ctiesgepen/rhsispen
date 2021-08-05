@@ -105,7 +105,8 @@
                             </a>
                         </div>
                         <ul class="pro-body">
-                            <li><a href="#" class="dropdown-item"><i class="feather icon-user"></i> Atualizar seus dados </a></li>
+                            <li><a href="{% url 'namp:servidor_att' servidor.id_matricula %}" class="dropdown-item"><i class="feather icon-user"></i> Atualizar seus dados </a></li>
+                            <li><a href="{% url 'admin:index' %}" class="dropdown-item"><i class="feather icon-user"></i> Atualizar seus dados </a></li>
                         </ul>
                     </div>
                 </div>
