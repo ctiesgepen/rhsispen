@@ -30,6 +30,8 @@ urlpatterns = [
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
+	url(r'^list/', views.EquipeServidores.as_view(), name='equipe_servidores'),
+
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
 	path('servidor_list/', views.servidor_list, name='servidor_list'),
