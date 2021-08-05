@@ -23,7 +23,7 @@
                             {% for equipe in setor.get_equipes %}
                             <tr>
                                 <td>{{ equipe.nome }} - {{setor.nome}}</td>
-                                <td>{{ equipe.get_servidores  }}</td>
+                                <td>{{ equipe.get_servidores|length}}</td>
                             </tr>
                             {% endfor%}
                         {% endif%}

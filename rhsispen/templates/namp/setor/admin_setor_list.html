@@ -53,8 +53,8 @@
                                                 <img src="/static/admin/img/icon-yes.svg" alt="{{setor.setor_sede}}"> {% else %}
                                                 <img src="/static/admin/img/icon-no.svg" alt="{{setor.setor_sede}}"> {% endif%}
                                             </td>
-                                            <td> {{ setor.get_equipes | length |default:0 }} </td>
-                                            <td> {{ setor.get_servidores |default:0 }} </td>
+                                            <td> {{ setor.get_equipes|length|default:0 }} </td>
+                                            <td> {{ setor.get_servidores|length|default:0 }} </td>
                                             <td>
                                                 <a type="text" data-toggle="modal" data-setor-id="{{setor.id_setor}}" data-target="#modalEquipeAdmin"><i class="feather icon-eye"></i> Visualizar </a>
                                                 <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i>  Editar </a>
