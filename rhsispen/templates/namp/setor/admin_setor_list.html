@@ -1,6 +1,7 @@
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %}
+{% block content %} 
+{% include 'includes/modal/modal.html' %}
 
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} 
-{% include 'includes/modal/equipe/equipe_list.html' %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -38,11 +39,12 @@
                                             <th scope="col">CÓDIGO</th>
                                             <th scope="col">NOME</th>
                                             <th scope="col">SEDE</th>
-                                            <th scope="col">QTD DE EQUIPES</th>
-                                            <th scope="col">QTD DE SERVIDORES</th>
+                                            <th scope="col">TOTAL DE EQUIPES</th>
+                                            <th scope="col">TOTAL DE SERVIDORES</th>
                                             <th scope="col">AÇÕES</th>
                                         </tr>
                                     </thead>
+                                    <!-- 
                                     <tbody>
                                         {% for setor in page_obj %}
                                         <tr>
@@ -61,7 +63,26 @@
                                             </td>                                           
                                         </tr>
                                         {% endfor %}
-
+                                    </tbody>
+                                    -->
+                                    <tbody>
+                                        {% for setor in page_obj %}
+                                        <tr>
+                                            <td> {{ setor.id_setor }} </td>
+                                            <td> {{ setor.nome }}</td>
+                                            <td class="field-status">
+                                                {% if setor.setor_sede %}
+                                                <img src="/static/admin/img/icon-yes.svg" alt="{{setor.setor_sede}}"> {% else %}
+                                                <img src="/static/admin/img/icon-no.svg" alt="{{setor.setor_sede}}"> {% endif%}
+                                            </td>
+                                            <td> {{ setor.get_equipes|length|default:0 }} </td>
+                                            <td> {{ setor.get_servidores|length|default:0 }} </td>
+                                            <td>
+                                                <a class="open-modal" href="{% url 'namp:setor_equipes' setor.id_setor  %}" data-popup-url="{{setor.id_setor}}/equipes/"><i class="feather icon-eye"></i> Equipes</a>
+                                                <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i>  Editar </a>
+                                            </td>                                           
+                                        </tr>
+                                        {% endfor %}
                                     </tbody>
                                 </table>
 
@@ -94,4 +115,15 @@
     </div>
    {% endblock %}
 
-                                                
+   {% block javascripts %}
+   <script>
+       $(document).on("click", ".open-modal", function (e) {
+           e.preventDefault();
+           var $popup = $("#popup");
+           var popup_url = $(this).data("popup-url");
+           $(".modal-content", $popup).load(popup_url, function () {
+               $popup.modal("show");
+           });
+       });
+   </script>
+   {% endblock javascripts %}

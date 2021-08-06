@@ -601,6 +601,12 @@ def equipe_servidores(request, id_equipe):
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
+def setor_equipes(request, id_setor):
+	setor = get_object_or_404(Setor, id_setor=id_setor)
+	return render(request, "includes/modal/setor/list_equipes.html", locals())
+
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
 def servidor_mov(request, template_name='namp/servidor/servidor_mov.html'):
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
@@ -1712,6 +1718,7 @@ def exportar_noturno_excel(request):
 		messages.warning(request, 'Ops! Não há jornadas registradas no mês corrente, para o cálculo do adicional noturno!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+
 
 @staff_member_required(login_url='/autenticacao/login/')
 def exportar_frequencia_excel(request):

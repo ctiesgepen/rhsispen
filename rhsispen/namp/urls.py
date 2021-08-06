@@ -17,6 +17,8 @@ urlpatterns = [
 	path('admin_setor/cadastrar/', views.admin_setor_criar, name='admin_setor_criar'),
 	path('admin_setor_list/', views.admin_setor_list, name='admin_setor_list'),
 	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
+	path('admin_setor_list/<str:id_setor>/equipes/', views.setor_equipes, name='setor_equipes'),
+
 	path('admin_servidor_list/', views.admin_servidor_list, name='admin_servidor_list'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
 	#path('admin_servidor_cadastrar/', views.admin_servidor_criar, name='admin_servidor_criar'), TEM QUE MELHORAR

@@ -1,7 +1,7 @@
 
 <!--Header-->
 <div class="modal-header">
-    <h4 class="modal-title" id="myModalLabel">Equipe: {{equipe.nome|upper}}</h4>
+    <h4 class="modal-title" id="myModalLabel">Setor: {{setor.nome|upper}}</h4>
 </div>  
 <!--Body -->
 <div class="modal-body table-responsive">
@@ -9,18 +9,20 @@
     <thead class="thead-dark">
     <tr>
         <th>Nome</th>
+        <th>Qtd de Servidores</th>
     </tr>
     </thead>
     <tbody>
-    {% if equipe.get_servidores%}
-        {% for servidor in equipe.get_servidores %}
+    {% if setor.get_equipes%}
+        {% for equipe in setor.get_equipes %}
             <tr>
-                <td>{{ servidor.nome }}</td>
+                <td>{{ equipe.nome }}</td>
+                <td>{{ equipe.get_servidores|length|default:0 }}</td>
             </tr>
         {% endfor %}
     {% else %}
         <tr>
-            <td>Equipe {{equipe.nome|upper}} não possui servidores.</td>
+            <td>Setor {{setor.nome|upper}} não possui equipes.</td>
         </tr>
     {% endif %}
     </tbody>
