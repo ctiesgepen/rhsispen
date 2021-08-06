@@ -159,7 +159,7 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 		messages.warning(request, 'Setor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-	form = AddNoturnoForm(request.POST or None)
+	form = AddNoturnoSearchForm(request.POST or None)
  
 	page = request.GET.get('page')
 	paginator = Paginator(list(setores), 15)

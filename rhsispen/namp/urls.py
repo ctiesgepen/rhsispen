@@ -17,8 +17,7 @@ urlpatterns = [
 	path('admin_setor/cadastrar/', views.admin_setor_criar, name='admin_setor_criar'),
 	path('admin_setor_list/', views.admin_setor_list, name='admin_setor_list'),
 	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
-	path('admin_setor_list/<str:id_setor>/equipes/', views.setor_equipes, name='setor_equipes'),
-
+	path('admin_setor_list/<str:id_setor>/equipes/', views.setor_equipes, name='setor_equipes'), #Modal
 	path('admin_servidor_list/', views.admin_servidor_list, name='admin_servidor_list'), 
 	path('admin_servidor_mov/', views.admin_servidor_mov, name='admin_servidor_mov'),
 	#path('admin_servidor_cadastrar/', views.admin_servidor_criar, name='admin_servidor_criar'), TEM QUE MELHORAR
@@ -32,8 +31,7 @@ urlpatterns = [
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
-	path('equipes/<int:id_equipe>/servidores/', views.equipe_servidores, name='equipe_servidores'),
-
+	path('equipes/<int:id_equipe>/servidores/', views.equipe_servidores, name='equipe_servidores'), #Modal
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
 	path('servidor_list/', views.servidor_list, name='servidor_list'),
