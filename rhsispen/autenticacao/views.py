@@ -5,7 +5,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseRedirect
 from . forms import CadastroForm
 from django.contrib import messages
-from namp.models import Servidor
+from namp.models import Servidor, Setor
 from django.contrib.auth.models import User
 from django.contrib.auth import views as auth_views
 from django.contrib.auth.views import PasswordResetForm

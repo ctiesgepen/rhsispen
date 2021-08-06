@@ -1,7 +1,6 @@
 <!-- [ Header ] start -->
 <header class="navbar pcoded-header navbar-expand-lg navbar-light headerpos-fixed header-blue">
 
-
     <div class="m-header">
         <a class="mobile-menu" id="mobile-collapse" href="#!"><span></span></a>
         <a href="#!" class="b-brand">
@@ -97,7 +96,7 @@
                             </a>
                         </div>
                         <ul class="pro-body">
-                            <li><a href="{% url 'namp:servidor_att' servidor.id_matricula %}" class="dropdown-item"><i class="feather icon-user"></i> Atualizar Perfil </a></li>
+                            <li><a href=" {% url 'autenticacao:alterar_senha' %}"class="dropdown-item"><i class="feather icon-settings"></i> Alterar Senha </a></li>
                             {% if request.user.is_superuser %}
                             <li><a href="{% url 'admin:index' %}" class="dropdown-item"><i class="feather icon-user"></i> Acesso Administrador </a></li>
                             {% endif %}

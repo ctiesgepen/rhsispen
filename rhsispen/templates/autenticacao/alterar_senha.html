@@ -1,15 +1,17 @@
-{% extends 'base.html' %}
+{% extends 'admin/login.html' %}
 {% load i18n static %}
 
-{% block breadcrumbs %}
-<div class="breadcrumbs">
-    <a href="{% url 'namp:home' %}">{% translate 'Home' %}</a> &rsaquo; {% translate 'Alterar Senha' %}
-</div>
+{% block title %}Login{% endblock %}
+
+{% block branding %}
+ 	<a href="{% url 'autenticacao:alterar_senha' %}">
+	<img style="float: left;" src="{% static 'images/logoppto.png' %}" alt="logo" width="45" height="50">
+	</a>
+	<h1>Núcleo de Apoio e Movimentação de Pessoal</h1>
 {% endblock %}
 
-{% block title %}Alterar Senha{% endblock %}
-
 {% block content %}
+<h2>Preencha os campos abaixo:</h2>
 <form method="post">
     {% csrf_token %}
 
