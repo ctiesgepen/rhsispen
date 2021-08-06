@@ -161,11 +161,13 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 
 	form = AddNoturnoSearchForm(request.POST or None)
  
+
 	page = request.GET.get('page')
 	paginator = Paginator(list(setores), 15)
 	page_obj = paginator.get_page(page)
-	setor = None
-	
+	#setor = None
+	setor = ""
+		
 	contexto = {
 		'servidor': servidor,
 		'setores': setores,
@@ -175,8 +177,32 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 
 	if request.method == 'POST':
 		if form.is_valid():
-			setores = []
-		return render(request, template_name, contexto)
+			setores2 = []
+			pattern = re.compile(form.cleaned_data['nome'].upper())
+			for setor in setores:
+				if pattern.search(setor.nome.upper()):
+					setores2.append(setor)
+			if setores2:
+				page = request.GET.get('page')
+				paginator = Paginator(setores2, 15)
+				page_obj = paginator.get_page(page)
+
+				contexto = { 
+					'setorselecionado':setor,
+					'servidor': servidor,
+					'setores': setores,
+					'form': form,
+					'page_obj': page_obj,
+				}
+				return render(request, template_name, contexto)
+			else:
+				print('entrei no form invalid')
+				messages.warning(request, 'Setor com este nome não encontrado!')
+				return render(request, template_name, contexto)
+#	if request.method == 'POST':
+#		if form.is_valid():
+#			setores = []
+#		return render(request, template_name, contexto)
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
