@@ -44,27 +44,7 @@
                                             <th scope="col">AÇÕES</th>
                                         </tr>
                                     </thead>
-                                    <!-- 
-                                    <tbody>
-                                        {% for setor in page_obj %}
-                                        <tr>
-                                            <td> {{ setor.id_setor }} </td>
-                                            <td> {{ setor.nome }}</td>
-                                            <td class="field-status">
-                                                {% if setor.setor_sede %}
-                                                <img src="/static/admin/img/icon-yes.svg" alt="{{setor.setor_sede}}"> {% else %}
-                                                <img src="/static/admin/img/icon-no.svg" alt="{{setor.setor_sede}}"> {% endif%}
-                                            </td>
-                                            <td> {{ setor.get_equipes|length|default:0 }} </td>
-                                            <td> {{ setor.get_servidores|length|default:0 }} </td>
-                                            <td>
-                                                <a type="text" data-toggle="modal" data-setor-id="{{setor.id_setor}}" data-target="#modalEquipeAdmin"><i class="feather icon-eye"></i> Visualizar </a>
-                                                <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i>  Editar </a>
-                                            </td>                                           
-                                        </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                    -->
+                                    
                                     <tbody>
                                         {% for setor in page_obj %}
                                         <tr>

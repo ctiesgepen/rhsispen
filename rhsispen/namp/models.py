@@ -11,8 +11,10 @@ from django.db.models.fields import AutoField
 class Regiao(models.Model):
 	id_regiao = models.AutoField(primary_key=True)
 	nome = models.CharField(max_length=100, unique=True)
+	
 	def __str__(self):
 		return self.nome
+	
 	class Meta:
 		ordering = ["nome"]
 		verbose_name = "Região"
@@ -22,8 +24,10 @@ class Funcao(models.Model):
 	id_funcao = models.AutoField(primary_key=True) #Cod com a secad
 	simbolo = models.CharField('Símbolo',max_length=25)
 	nome = models.CharField(max_length=150,unique=True)
+
 	def __str__(self):
 		return self.nome
+	
 	class Meta:
 		ordering = ['simbolo']
 		verbose_name = "Tipo de Função"
@@ -35,8 +39,10 @@ class Afastamento(models.Model):
 	codigo_afastamento = models.CharField('Código', max_length=10) #Cod com a secad
 	tipificacao = models.CharField('Tipo de afastamento', max_length=100, unique=True)
 	descricao = models.TextField('Descrição',max_length=100)
+
 	def __str__(self):
 		return self.tipificacao
+	
 	class Meta:
 		ordering = ['id_afastamento']
 		verbose_name = "Tipo de Afastamento"
@@ -48,8 +54,10 @@ class TipoJornada(models.Model):
 	carga_horaria = models.PositiveIntegerField()
 	tipificacao = models.CharField(max_length=100,unique=True)
 	descricao = models.TextField(max_length=100)
+
 	def __str__(self):
 		return self.tipificacao
+	
 	class Meta:
 		ordering = ["tipificacao"]
 		verbose_name = "Tipo de Jornada"
@@ -59,7 +67,8 @@ class StatusFuncional(models.Model):
 	id_status_funcional = models.AutoField(primary_key=True)
 	codigo_status_funcional = models.CharField('Código', max_length=10)
 	nome = models.CharField(max_length=50,unique=True)
-	descricao = models.TextField(max_length=100)	
+	descricao = models.TextField(max_length=100)
+
 	def __str__(self):
 		return self.nome	
 	
@@ -86,14 +95,11 @@ class Setor(models.Model):
 	def __str__(self):
 		return self.nome
 
-	def get_equipes(self, ):
-		return list(Equipe.objects.filter(fk_setor=self))
+	def get_equipes(self):
+		return self.equipes.all()
 
 	def get_servidores(self):
-		total = 0
-		for equipe in Equipe.objects.filter(fk_setor=self):
-			total = total + equipe.get_servidores().count()
-		return total
+		return self.servidor_set.all()
 
 	class Meta:
 		ordering = ['nome']
@@ -115,8 +121,10 @@ class EnderecoSetor(models.Model):
 	complemento = models.CharField(max_length=100, blank=True)
 	#CASCATE: se excluido o setor, será excluido o objeto referenciado(endereco_setor)
 	fk_setor = models.OneToOneField(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
+	
 	def __str__(self):
 		return ' - '
+	
 	class Meta:
 		ordering = ["uf","municipio", "endereco"]
 		verbose_name = "Endereço do Setor"
@@ -129,7 +137,7 @@ class Equipe(models.Model):
 	hora_inicial = models.TimeField(auto_now= False, auto_now_add=False)
 	CHOICES_CATEGORIA = [('Plantão','Plantão'),('Expediente','Expediente')]
 	categoria = models.CharField('Categoria', max_length=10, choices=CHOICES_CATEGORIA)
-	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
+	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor', related_name='equipes')
 	fk_tipo_jornada = models.ForeignKey(TipoJornada, on_delete = models.RESTRICT, verbose_name='Tipo de Jornada')
 	
 	deleted_on = models.DateTimeField(null=True, blank=True, verbose_name='Data da exclusão')
@@ -143,8 +151,7 @@ class Equipe(models.Model):
 		return self.nome
 	
 	def get_servidores(self):
-		#return Servidor.objects.filter(fk_equipe=self.id_equipe).count()
-		return Servidor.objects.filter(fk_equipe=self.id_equipe)
+		return self.servidor_set.all()
 
 	class Meta:
 		ordering = ["nome"]
@@ -167,8 +174,10 @@ class ContatoEquipe(models.Model):
 	tipificacao = models.CharField('Tipo de contato', max_length=50, choices=CONTATOS_CHOICES)
 	contato = models.CharField(max_length=50)
 	fk_equipe = models.ForeignKey(Equipe, on_delete = models.RESTRICT, verbose_name='Equipe')
+	
 	def __str__(self):
 		return self.contato + ' ' + str(self.fk_equipe)
+	
 	class Meta:
 		verbose_name = "Contato da Equipe"
 		verbose_name_plural = "Contatos da Equipe"
@@ -235,8 +244,10 @@ class EnderecoServ(models.Model):
 	bairro = models.CharField(max_length=100)
 	complemento = models.CharField(max_length=100, blank=True)
 	fk_servidor = models.OneToOneField(Servidor, on_delete = models.RESTRICT, verbose_name='Servidor')
+	
 	def __str__(self):
 		return '-'
+	
 	class Meta:
 		ordering = ["uf","municipio", "endereco"]
 		verbose_name = "Endereço do Servidor"
@@ -248,8 +259,10 @@ class HistFuncao(models.Model):
 	data_final = models.DateField(blank=True, null=True)
 	fk_funcao = models.ForeignKey(Funcao, on_delete = models.RESTRICT, verbose_name='Função')
 	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Servidor')
+	
 	def __str__(self):
 		return str(self.fk_servidor)
+	
 	class Meta:
 		verbose_name = "Função"
 		verbose_name_plural = "Funções"
@@ -261,8 +274,10 @@ class HistAfastamento(models.Model):
 	data_final = models.DateField()
 	fk_afastamento = models.ForeignKey(Afastamento, on_delete = models.RESTRICT, verbose_name='Afastamento')
 	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Servidor')
+	
 	def __str__(self):
 		return str(self.id_hist_afastamento)
+	
 	class Meta:
 		verbose_name = "Afastamento"
 		verbose_name_plural = "Afastamentos"
@@ -275,6 +290,7 @@ class HistLotacao(models.Model):
 	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Servidor')
 	fk_setor = models.ForeignKey(Setor, on_delete = models.RESTRICT, verbose_name='Setor')
 	fk_equipe = models.ForeignKey(Equipe, on_delete = models.RESTRICT, verbose_name='Equipe')
+	
 	def __str__(self):
 		return str(self.id_hist_lotacao)
 
@@ -289,8 +305,10 @@ class HistStatusFuncional(models.Model):
 	data_final = models.DateField()
 	fk_servidor = models.ForeignKey(Servidor, on_delete = models.RESTRICT, verbose_name='Servidor')
 	fk_status_funcional = models.ForeignKey(StatusFuncional, on_delete = models.RESTRICT, verbose_name='Status Funcional')
+	
 	def __str__(self):
 		return str(self.id_hist_funcional)
+	
 	class Meta:
 		verbose_name = "Status Funcional"
 		verbose_name_plural = "Status Funcional"
@@ -342,84 +360,79 @@ class EscalaFrequencia(models.Model):
 	Atenção: esse método leva em consideração as jornadas registradas. Isso quer
 	dizer que a numérica que deve ser levada em consideração é a de servidores
 	que trabalharam de fato no período e a de equipes que tiveram escalas.
-	
-	def qtd_servidores(self):
-		dt_inicio = Date(day=1, month=self.data.month+1, year=self.data.year)
-		dt_fim = dt_inicio + TimeDelta(days=30)
-		jornadas = list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
-			data_jornada__range=[dt_inicio,dt_fim]))
-		lista = []
-		for jornada in jornadas:
-			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
-		return lista
 	'''
 
 	def qtd_servidores(self):
 		lista = []
-		for jornada in list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
-			data_jornada__month=self.data.month+1)):
+		jornadas = Jornada.objects.select_related('fk_servidor').filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month+1)
+		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
 
 	def qtd_equipes(self):
 		lista = []
-		for servidor in self.qtd_servidores():
-			if servidor.fk_equipe not in lista: lista.append(servidor.fk_equipe)
+		jornadas = Jornada.objects.select_related('fk_equipe').filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month+1)
+		for jornada in jornadas:
+			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
 		return lista
 	
 	def qtd_expediente(self):
 		lista = []
-		for equipe in self.qtd_equipes():
-			if equipe.categoria == 'Expediente': lista.append(equipe)
+		jornadas = Jornada.objects.select_related('fk_servidor').filter(fk_equipe__categoria='Expediente',fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month+1)
+		for jornada in jornadas:
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
 
 
 	def qtd_plantonista(self):
 		lista = []
-		for equipe in self.qtd_equipes():
-			if equipe.categoria == 'Plantão': lista.append(equipe)
-		return lista
-
-	'''
-	def qtd_servidores_frequencia(self):
-		dt_inicio = Date(day=1, month=self.data.month-1, year=self.data.year)
-		dt_fim = dt_inicio + TimeDelta(days=30)
-		jornadas = list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
-			data_jornada__range=[dt_inicio,dt_fim]))
-		lista = []
+		jornadas = Jornada.objects.select_related('fk_servidor').filter(fk_equipe__categoria='Plantão',fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month+1)
 		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
+
+	'''
 	'''
 
 	def qtd_servidores_frequencia(self):
 		lista = []
-		for jornada in list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
-			data_jornada__month=self.data.month-1)):
+		jornadas = Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1)
+		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
 
 	def qtd_equipes_frequencia(self):
 		lista = []
-		for servidor in self.qtd_servidores_frequencia():
-			if servidor.fk_equipe not in lista: lista.append(servidor.fk_equipe)
+		jornadas = Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1)
+		for jornada in jornadas:
+			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
 		return lista
 
 	def qtd_expediente_frequencia(self):
 		lista = []
-		for equipe in self.qtd_equipes_frequencia():
-			if equipe.categoria == 'Expediente': lista.append(equipe)
+		jornadas = Jornada.objects.filter(fk_equipe__categoria='Expediente',fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1)
+		for jornada in jornadas:
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
 
 	def qtd_plantonista_frequencia(self):
 		lista = []
-		for equipe in self.qtd_equipes_frequencia():
-			if equipe.categoria == 'Plantão': lista.append(equipe)
+		jornadas = Jornada.objects.filter(fk_equipe__categoria='Plantão',fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1)
+		for jornada in jornadas:
+			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
 		return lista
 
 	def qtd_afastamento_frequencia(self):
 		lista = []
-		for jornada in list(Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
-			data_jornada__month=self.data.month-1)):
+		for jornada in Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+			data_jornada__month=self.data.month-1):
 			if jornada.assiduidade == None and jornada.fk_afastamento != None: lista.append(jornada)
 		return lista
