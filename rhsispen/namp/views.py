@@ -1814,3 +1814,45 @@ def exportar_frequencia_excel(request):
 #	context['query'] = query
 	#SearchQuery.objects.create(query=query)
 ##	return context
+
+
+
+#CALENDAR
+def getappointments(request):
+	try:
+		if request.is_ajax():
+			id=request.GET.get('id')
+			if  request.method == "PUT":
+            # used to edit/delete appointments             
+				json_data=request.read()
+				data=json.loads(json_data)
+				if id:
+                #logic to edit an appointment
+					return JSONResponse({'id': appointment.id, 'title': appointment.title,'start':data['start'],'end':data['end'],'allDay': data['allDay']})
+				return JSONResponse("")
+			elif  request.method == "GET":
+		# used to get appointments
+				appointments=None
+				appointments=appointment.objects.filter().order_by('start')
+			return JSONResponse([{'id': o.id, 'title': o.title,'start':(o.start.isoformat()),'end':(o.end.isoformat()),'allDay':IsFullDayAppointment(o.start,o.end)} for o in appointments])
+		elif  request.method == "POST":
+		#used to save new appointments                  
+			json_data=request.read()
+			data=json.loads(json_data)
+			appointment=Appointment.objects.create('your fields…')
+			appointment.save()
+			return JSONResponse({'id':appointment.id, 'title': appointment.title,'start':data['start'],'end':data['end'],'allDay': data['allDay']})
+		elif request.method == "DELETE":
+		#used to delete appointments
+			if id:
+				Appointment.objects.get(pk=id).delete()
+			return JSONResponse("")
+	except Exception:
+		return JSONResponse(e.message)
+
+def IsFullDayAppointment(startDate,endDate):
+	d = endDate - startDate
+	if d.days < 1 :
+		return False
+	else:
+		return True
