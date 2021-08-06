@@ -20,7 +20,7 @@
                         <hr>
                         <form method="POST" action="{% url 'namp:admin_add_noturno' %}">{% csrf_token %}
                             <div class="form-inline">
-                                {{ form.setor|as_crispy_field }}
+                                {{ form.nome|as_crispy_field }}
                                 <button type="input" class="btn btn-dark">
                                 <i class="fas fa-search"></i>
                                 </button>

@@ -285,10 +285,21 @@ class PeriodoAcaoSearchForm(forms.Form):
         self.fields['descricao'].label = ""
         self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
 
-class AddNoturnoSearchForm(forms.Form):
-    setor = forms.CharField(max_length=25)
+class AddNoturnoSearchForm(forms.ModelForm):
+    class Meta:
+        model = Setor
+        fields = ('nome',)
+        widgets = {
+            'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de setor'}),
+        }
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        #self.fields['setor'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
-        self.fields['setor'].label = ""
-        self.fields['setor'].widget.attrs['placeholder'] = 'Digite o nome do Setor'
+        self.fields['nome'].label = ""
+    
+#class AddNoturnoSearchForm(forms.Form):    
+#    setor = forms.CharField(max_length=25)    
+#    def __init__(self, *args, **kwargs):
+#        super().__init__(*args, **kwargs)
+#        self.fields['setor'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
+#        self.fields['setor'].label = ""
+#        self.fields['setor'].widget.attrs['placeholder'] = 'Digite o nome do Setor'
