@@ -31,10 +31,10 @@
                     <a href="{% url 'namp:admin_setor_list'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-map"></i></span><span class="pcoded-mtext">Setores</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'namp:admin_servidor_list'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Servidores</span></a>
+                    <a href="{% url 'namp:admin_servidor_list'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">Servidores</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'namp:periodo_listar'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Definir Períodos</span></a>
+                    <a href="{% url 'namp:periodo_listar'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Definir Períodos</span></a>
                 </li>
                 {% endif %} {% if request.user.is_staff %}
                 <li class="nav-item pcoded-menu-caption">
@@ -47,13 +47,13 @@
                     <a href="{% url 'namp:equipe_list' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-align-justify"></i></span><span class="pcoded-mtext">Equipes</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'namp:servidor_list' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Servidores</span></a>
+                    <a href="{% url 'namp:servidor_list' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-users"></i></span><span class="pcoded-mtext">Servidores</span></a>
                 </li>
                 <li class="nav-item">
-                    <a href="{% url 'namp:afastamento_list'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-box"></i></span><span class="pcoded-mtext">Afastamentos</span></a>
+                    <a href="{% url 'namp:afastamento_list'%}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-sidebar"></i></span><span class="pcoded-mtext">Afastamentos</span></a>
                 </li>
                 <li class="nav-item pcoded-hasmenu">
-                    <a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-pie-chart"></i></span><span class="pcoded-mtext">Períodos</span></a>
+                    <a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-clock"></i></span><span class="pcoded-mtext">Períodos</span></a>
                     <ul class="pcoded-submenu">
                         <li><a href="{% url 'namp:escala_operador_list'%}">Definir Escala</a></li>
                         <li><a href="{% url 'namp:frequencia_operador_list'%}">Definir Frequência</a></li>
@@ -64,14 +64,15 @@
                 <li class="nav-item pcoded-menu-caption">
                     <label>Servidor</label>
                 </li>
-                <li class="nav-item pcoded-hasmenu">
-                    <a href="#!" class="nav-link "><span class="pcoded-micon"><i class="feather icon-lock"></i></span><span class="pcoded-mtext">Atualizar</span></a>
-                    <ul class="pcoded-submenu">
-                        <li><a href="{% url 'namp:servidor_att' servidor.id_matricula %}">Dados Pessoais</a></li>
-                        <li><a href="{% url 'namp:servidor_escala'%}">Ver escala</a></li>
-                        <li><a href="{% url 'namp:servidor_hist'%}">Ver Histórico</a></li>
-                    </ul>
+                <li class="nav-item">
+                    <a href="{% url 'namp:servidor_att' servidor.id_matricula %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-user"></i></span><span class="pcoded-mtext">Dados Pessoais</span></a>
                 </li>
+                <li class="nav-item">
+                    <a href="{% url 'namp:servidor_escala' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-calendar"></i></span><span class="pcoded-mtext">Ver escala</span></a>
+                </li>
+                <li class="nav-item">
+                    <a href="{% url 'namp:servidor_hist' %}" class="nav-link "><span class="pcoded-micon"><i class="feather icon-clock history"></i></span><span class="pcoded-mtext">Ver Histórico</span></a>
+                </li>                
 
             </ul>
         </div>

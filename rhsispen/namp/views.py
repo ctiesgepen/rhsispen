@@ -1047,8 +1047,6 @@ def servidor_operador_change_form(request,id_matricula):
 		}
 		return render(request, 'namp/servidor/servidor_operador_change_form.html',contexto)
 
-
-
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def frequencias_admin_list(request,template_name='namp/frequencia/frequencias_admin_list.html'):
@@ -1642,6 +1640,8 @@ def exportar_jornadas_excel(request):
 @staff_member_required(login_url='/autenticacao/login/')
 def exportar_noturno_excel(request):
 	#recuperando as jornadas do banco. OBS: apenas as jornadas do mês corrente
+	servidores = list(Servidor.objects.all())
+
 	jornadas = Jornada.objects.filter(assiduidade=True).filter(fk_tipo_jornada__carga_horaria__in=[24,48]).order_by('data_jornada','fk_equipe__fk_setor__nome', 'fk_equipe__nome','fk_servidor__nome')
 	if jornadas:
 		response = HttpResponse(content_type='application/ms-excel')
@@ -1686,28 +1686,31 @@ def exportar_noturno_excel(request):
 			ws.write(row_num, 7, dt, font_style)
 			ws.write(row_num, 8, "", font_style)
 
+		#if servidores.tipo_vinculo == 'Concursado':
+		if servidores.values_list('tipo_vinculo') == 'Concursado':
 		#calculo do add
-		for jornada in jornadas:
-			if jornada.fk_tipo_jornada.carga_horaria == 24:
-				if jornada.data_jornada.month==Date.today().month:
-					row_num += 1
-					setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
-				if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==Date.today().month:
-					row_num += 1
-					setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))			
-			elif jornada.fk_tipo_jornada.carga_horaria == 48:
-				if jornada.data_jornada.month==Date.today().month:
-					row_num += 1
-					setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
-				if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==Date.today().month:
-					row_num += 1
-					setRow(jornada, 7,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))
-				if Date.fromordinal(jornada.data_jornada.toordinal()+2).month==Date.today().month:
-					row_num += 1
-					setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+2).strftime("%d/%m/%Y"))
-		wb.save(response)
-		return response
-	messages.warning(request, 'Ops! Não há jornadas registradas no mês corrente, para o cálculo do adicional noturno!')
+			for jornada in jornadas:
+				if jornada.fk_tipo_jornada.carga_horaria == 24:
+					if jornada.data_jornada.month==Date.today().month:
+						row_num += 1
+						setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
+					if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==Date.today().month:
+						row_num += 1
+						setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))			
+				elif jornada.fk_tipo_jornada.carga_horaria == 48:
+					if jornada.data_jornada.month==Date.today().month:
+						row_num += 1
+						setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
+					if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==Date.today().month:
+						row_num += 1
+						setRow(jornada, 7,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))
+					if Date.fromordinal(jornada.data_jornada.toordinal()+2).month==Date.today().month:
+						row_num += 1
+						setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+2).strftime("%d/%m/%Y"))
+			wb.save(response)
+			return response
+		messages.warning(request, 'Ops! Não há jornadas registradas no mês corrente, para o cálculo do adicional noturno!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 @staff_member_required(login_url='/autenticacao/login/')

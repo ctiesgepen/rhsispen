@@ -199,8 +199,8 @@ class Servidor(models.Model):
 	]
 	cf = models.CharField('Curso de Formação',max_length=10, choices=CHOICES_CF)
 	CHOICES_VINCULO = [
-		('Contrato', 'Contrato'),
 		('Concursado', 'Concursado'),
+		('Contrato', 'Contrato'),
 		('Estágio', 'Estágio'),
 		('Jovem Aprendiz', 'Jovem Aprendiz'),
 		('Terceirizado', 'Terceirizado'),
