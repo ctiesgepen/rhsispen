@@ -13,10 +13,8 @@
                             <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">{{ message|safe }}</div>
                             <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a>
                         {% endfor %} {% endif %}
-
                         <h5 class="mt-5">Todos os Setores</h5>
                         <hr>
-
                         <div id="toolbar">
                             <form method="POST" action="{% url 'namp:admin_setor_list' %}">{% csrf_token %}
                                 <div class="form-inline">
@@ -44,6 +42,7 @@
                                             <th scope="col">AÇÕES</th>
                                         </tr>
                                     </thead>
+                                    
                                     <tbody>
                                         {% for setor in page_obj %}
                                         <tr>

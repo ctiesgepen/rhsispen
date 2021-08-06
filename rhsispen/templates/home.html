@@ -65,7 +65,19 @@
             </div>
             {% endif %}
             <!-- order-card end -->
-            <!-- users visite start -->
+            <!-- users visite start 
+            <div class="col-md-12 col-xl-6">
+                <div class="regioesChart">
+                    <div class="card-header">
+                        <h5>REGIÕES ADMINISTRATIVAS</h5>
+                    </div>
+                    <div class="card-body pl-0 pb-0">
+                        <div id="unique-visitor-chart"></div>
+                    </div>
+                </div>
+            </div>
+            
+            -->
             {% if request.user.is_staff %}
             <div class="col-md-12 col-xl-6">
                 <div class="card">
@@ -73,7 +85,8 @@
                         <h5>REGIÕES ADMINISTRATIVAS</h5>
                     </div>
                     <div class="card-body pl-0 pb-0">
-                        <div id="unique-visitor-chart"></div>
+                        <!-- <div id="unique-visitor-chart"></div> -->
+                        <canvas id="regioesChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -205,3 +218,56 @@
     <!-- custom-chart js -->
     <script src="/static/assets/js/pages/dashboard-main.js"></script>
 {% endblock javascripts %}
+
+{% block extrahead %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.css" />
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+{{ block.super }}
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const ctx = document.getElementById('regioesChart').getContext('2d');
+        const regioes = {{ regioes | safe }};
+        const setores = {{ setores | safe }};
+
+        var regioesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: regioes,
+                datasets: [{
+                    label: 'Setores',
+                    data: setores,
+                    backgroundColor: [
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 159, 64, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)',
+                        'rgba(255, 99, 132, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255,99,132,1)'
+
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                        },
+                    }]
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

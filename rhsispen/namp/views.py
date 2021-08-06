@@ -982,7 +982,6 @@ def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.
 #SERVIDOR
 @login_required(login_url='/autenticacao/login/')
 def servidor_att(request, id_matricula):
-
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
