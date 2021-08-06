@@ -1,4 +1,4 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} {% include 'includes/modal/equipe/equipe_servidores.html' %}
+{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} {% load crispy_forms_tags %} {% block content %} {% include 'includes/modal/modal.html' %}
 <div class="pcoded-main-container">
     <div class="pcoded-content">
         <div class="row">
@@ -35,7 +35,7 @@
                                         <th scope="col">EQUIPE ATIVA</th>
                                         <th scope="col">CATEGORIA</th>
                                         <th scope="col">SERVIDORES</th>
-                                        <th scope="col">VISUALIZAR</th>
+                                        <th scope="col">AÇÕES</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -50,7 +50,7 @@
                                         <td> {{equipe.categoria}} </td>
                                         <td> {{equipe.get_servidores|length | default:0 }} </td>
                                         <td>
-                                            <a href="{% url 'namp:equipe_servidores' %}" type="text" data-toggle="modal" data-target="#modalEquipeServidores"><span class="glyphicon glyphicon-refresh" aria-hidden="true"></span><i class="feather icon-eye" id="openModal"></i> Servidores </a>
+                                            <a class="open-modal" href="{% url 'namp:equipe_servidores' equipe.id_equipe  %}" data-popup-url="{{equipe.id_equipe}}/servidores/"><i class="feather icon-eye"></i> Servidores</a>
                                             <a href="{% url 'namp:equipe_att' equipe.id_equipe %}"><i class="feather icon-edit"></i> Editar </a>
                                         </td>
                                     </tr>
@@ -84,3 +84,16 @@
     </div>
 </div>
 {% endblock %}
+
+{% block javascripts %}
+<script>
+    $(document).on("click", ".open-modal", function (e) {
+        e.preventDefault();
+        var $popup = $("#popup");
+        var popup_url = $(this).data("popup-url");
+        $(".modal-content", $popup).load(popup_url, function () {
+            $popup.modal("show");
+        });
+    });
+</script>
+{% endblock javascripts %}

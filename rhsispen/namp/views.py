@@ -592,17 +592,12 @@ def equipe_delete(request, id_equipe):
 	messages.success(request, "Equipe deletada com sucesso!")
 	return HttpResponseRedirect("/")
 	
-from django.views.generic import ListView
-class EquipeServidores(ListView):
-	def get(self,request):
-		try:
-			equipe = Equipe.objects.get(id_equipe=self)
-		except Equipe.DoesNotExist:
-			equipe = None
-		contexto = {
-			'equipe': equipe,
-		}
-		return render(request, 'includes/modal/equipe/equipe_servidores.html', contexto)
+# View para a template de modal com lista servidores de equipe
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def equipe_servidores(request, id_equipe):
+	equipe = get_object_or_404(Equipe, id_equipe=id_equipe)
+	return render(request, "includes/modal/equipe/list_servidores.html", locals())
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
