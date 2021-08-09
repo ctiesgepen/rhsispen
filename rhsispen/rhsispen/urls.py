@@ -25,6 +25,6 @@ urlpatterns = [
     path('autenticacao/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('', include('namp.urls', namespace='namp')),
-    #(r'^calendar/', include('django_bootstrap_calendar.urls')), #calendario
+    #path('', include('django_bootstrap_calendar.urls')), #calendario
 ]
 

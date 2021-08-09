@@ -1,4 +1,7 @@
-{% extends 'layouts/base.html' %} {% load i18n static %} {% load static %} 
+{% extends 'layouts/base.html' %}
+{% load i18n static %}
+{% load static %} 
+{% load bootstrap_calendar %}
 
 {% block content %}
 <!-- [ Main Content ] start -->
@@ -76,7 +79,6 @@
                     </div>
                 </div>
             </div>
-            
             -->
             {% if request.user.is_staff %}
             <div class="col-md-12 col-xl-6">
@@ -151,7 +153,9 @@
         <!-- users visite end -->
         <div class="container">
             <div>
+                {% bootstrap_controls 'teste' %}
                 <h4>Calendar Events Demo using Python Flask MySQL</h4>
+                {% bootstrap_calendar_css %}
             </div>
         </div>
         <!--    
@@ -217,6 +221,44 @@
     <script src="/static/assets/js/plugins/apexcharts.min.js"></script>
     <!-- custom-chart js -->
     <script src="/static/assets/js/pages/dashboard-main.js"></script>
+    <!--CALENDARIO -->
+    <script>
+        (function($) {
+            "use strict";
+            var options = {
+            events_source: '{{ events_url }}',
+            view: '{{ view }}',
+            language: '{{ language }}',
+            tmpl_path: '{% get_static_prefix %}tmpls/',
+            tmpl_cache: false,
+            first_day: {{ first_day }},
+               onAfterEventsLoad: function(events) {
+            if(!events) {
+                return;
+                }
+            },
+            classes: {
+                months: {
+                    general: 'label'
+                }
+            }
+        };
+        var	calendar = $('#calendar').calendar(options);
+            $('.btn-group button[data-calendar-nav]').each(function() {
+                var $this = $(this);
+                $this.click(function() {
+                    calendar.navigate($this.data('calendar-nav'));
+                });
+            });
+        
+            $('.btn-group button[data-calendar-view]').each(function() {
+                var $this = $(this);
+                $this.click(function() {
+                    calendar.view($this.data('calendar-view'));
+                });
+            });
+        }(jQuery));
+        </script>
 {% endblock javascripts %}
 
 {% block extrahead %}

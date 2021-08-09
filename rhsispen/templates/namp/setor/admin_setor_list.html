@@ -54,7 +54,7 @@
                                                 <img src="/static/admin/img/icon-no.svg" alt="{{setor.setor_sede}}"> {% endif%}
                                             </td>
                                             <td> {{ setor.get_equipes|length|default:0 }} </td>
-                                            <td> {{ setor.get_servidores|default:0 }} </td>
+                                            <td> {{ setor.get_servidores|length|default:0 }} </td>
                                             <td>
                                                 <a class="open-modal" href="{% url 'namp:setor_equipes' setor.id_setor  %}" data-popup-url="{{setor.id_setor}}/equipes/"><i class="feather icon-eye"></i> Equipes</a>
                                                 <a href="{% url 'namp:setor_att' setor.id_setor %}"><i class="feather icon-edit"></i>  Editar </a>

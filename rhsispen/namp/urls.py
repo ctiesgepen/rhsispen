@@ -1,7 +1,7 @@
 # coding=utf-8
 from namp.views import *
 from . import views
-from django.conf.urls import  url
+from django.conf.urls import  url, include
 from django.urls import path
 from django.contrib.auth import views as auth_views
 
@@ -79,4 +79,6 @@ urlpatterns = [
 	url(r'^frequencia-excel/xls/$', views.exportar_frequencia_excel, name='exportar_frequencia_excel'),
 	url(r'^jornadas-excel/xls/$', views.exportar_jornadas_excel, name='exportar_jornadas_excel'),
 	url(r'^adicional-noturno/xls/$', views.exportar_noturno_excel, name='exportar_noturno_excel'),	
+    #url(r'^calendar/', include('django_bootstrap_calendar.urls')), #calendario
+
 ]
