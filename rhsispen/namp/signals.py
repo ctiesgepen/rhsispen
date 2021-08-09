@@ -24,7 +24,6 @@ def post_save_create_histlotacao(sender, instance, created, **kargs):
 	else:
 		print('Servidor foi alterado.')	
 		try:
-			servidores = Servidor.objects.filter(id_matricula=instance.id_matricula)
 			print('Buscando lotação do servidor.')	
 			oldHistLotacao = HistLotacao.objects.filter(
 				fk_servidor=instance,
@@ -56,11 +55,11 @@ def post_save_create_histlotacao(sender, instance, created, **kargs):
 					if jornadaNovaEquipe:
 						dataFinal = jornadaNovaEquipe.data_jornada + TimeDelta(days=30)
 						dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
-						funcaogeraescalaporequipe(instance.fk_equipe, servidores, jornadaNovaEquipe.data_jornada, dataFinal)
+						funcaogeraescalaporequipe(instance.fk_equipe, jornadaNovaEquipe.data_jornada, dataFinal)
 					else:
 						dataFinal = datetime.date.today() + TimeDelta(days=30)
 						dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
-						funcaogeraescalaporequipe(instance.fk_equipe, servidores, datetime.date.today()+TimeDelta(days=1), dataFinal)
+						funcaogeraescalaporequipe(instance.fk_equipe, datetime.date.today()+TimeDelta(days=1), dataFinal)
 
 			else:
 				HistLotacao.objects.create(
@@ -82,11 +81,11 @@ def post_save_create_histlotacao(sender, instance, created, **kargs):
 				if jornadaNovaEquipe:
 					dataFinal = jornadaNovaEquipe.data_jornada + TimeDelta(days=30)
 					dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
-					funcaogeraescalaporequipe(instance.fk_equipe, servidores, jornadaNovaEquipe.data_jornada, dataFinal)
+					funcaogeraescalaporequipe(instance.fk_equipe, jornadaNovaEquipe.data_jornada, dataFinal)
 				else:
 					dataFinal = datetime.date.today() + TimeDelta(days=30)
 					dataFinal = dataFinal.replace(day=1) - TimeDelta(days=1)
-					funcaogeraescalaporequipe(instance.fk_equipe, servidores, datetime.date.today()+TimeDelta(days=1), dataFinal)
+					funcaogeraescalaporequipe(instance.fk_equipe, datetime.date.today()+TimeDelta(days=1), dataFinal)
 
 '''
 '''
@@ -164,7 +163,7 @@ def post_save_create_afastamento(sender, instance, created, **kargs):
 	Este Signal desmarca a assiduidade e lança o tipo de afastamento
 	numa jornada que esteja sendo criada dentro do período de um 
 	afastamento já existente para o servidor vinculado a ela.
-'''
+
 @receiver(post_save, sender=Jornada)
 def post_save_create_jornada(sender, instance, created, **kargs):
 	if created:
@@ -177,7 +176,7 @@ def post_save_create_jornada(sender, instance, created, **kargs):
 						instance.fk_afastamento = afastamento.fk_afastamento
 						instance.save()	
 						print('entrei aqui também! Nova Jornada')
-
+'''
 
 '''
 Att dos Historicos de funçoes
