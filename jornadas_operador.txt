@@ -1,0 +1,190 @@
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
+	try:
+		servidor = Servidor.objects.select_related('fk_setor').get(fk_user=request.user.id)
+		periodo_escala = PeriodoAcao.objects.get(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today())
+		escala_gerada = EscalaFrequencia.objects.select_related('fk_periodo_acao').get(fk_periodo_acao=periodo_escala, fk_setor=servidor.fk_setor)
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado para este usuário!')
+		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+	except PeriodoAcao.DoesNotExist:
+		#Quando não encontrado o período de gerar escala na data de acesso da template jornadas_operador, 
+		#uma mensagem de warning é retornada junto com a template de listar escalas da unidade.
+		periodo_escala = None
+		messages.warning(request, 'O prazo para gerar escala regular está encerrado!')
+		return redirect('namp:escala_operador_list')
+	except EscalaFrequencia.DoesNotExist:
+		#Quando não encontrada escala regular para o período atual 
+		escala_gerada = None
+		
+	if escala_gerada:
+		messages.warning(request, 'Seu setor já possui escala regular para o período atual!')
+		return redirect('namp:escala_operador_list')
+
+	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
+
+	tem_plantao12 = tem_plantao24 = tem_plantao48 = False
+
+	for equipe in equipes:
+		if equipe.fk_tipo_jornada.carga_horaria < 12:
+			continue
+		if equipe.fk_tipo_jornada.carga_horaria == 12:
+			tem_plantao12 = True
+			continue
+		if equipe.fk_tipo_jornada.carga_horaria == 24:
+			tem_plantao24 = True
+			continue
+		if equipe.fk_tipo_jornada.carga_horaria == 48:
+			tem_plantao48 = True
+			continue
+	
+	form = GerarJornadaRegularForm(request.POST or None)
+	form.fields['equipe_plantao12h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=12).values_list('id_equipe', 'nome'))
+	form.fields['equipe_plantao24h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=24).values_list('id_equipe', 'nome'))
+	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
+
+	if not tem_plantao12:
+		del form.fields['data_plantao12h']
+		del form.fields['equipe_plantao12h']
+	if not tem_plantao24:
+		del form.fields['data_plantao24h']
+		del form.fields['equipe_plantao24h']
+	if not tem_plantao48:
+		del form.fields['data_plantao48h']
+		del form.fields['equipe_plantao48h']
+
+	contexto = {
+		'form':form,
+		'equipes':equipes,
+		'servidor':servidor,
+		'tem_plantao12': tem_plantao12,
+		'tem_plantao24': tem_plantao24,
+		'tem_plantao48': tem_plantao48,
+	}
+	if request.method=='POST':
+		if form.is_valid():
+			print('formulário validado')
+			'''
+			Trecho onde se captura a equipe de 12h do formulário,
+			a data inicial para essa mesma equipe e todas as equipes
+			com tipos de jornada similares.
+			'''
+
+			if tem_plantao12:
+				if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None and form.cleaned_data['data_plantao12h'].month==periodo_escala.data_inicial.month+1:
+					equipe12h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao12h'])
+					data_plantao12h = form.cleaned_data['data_plantao12h']
+					equipes12h = equipes.filter(fk_tipo_jornada__carga_horaria=12,nome__gte=equipe12h) | equipes.filter(fk_tipo_jornada__carga_horaria=12,nome__lt=equipe12h)
+					fimDoMes = data_plantao12h.replace(day=1,month=data_plantao12h.month+1) - TimeDelta(days=1)
+					'''
+					Percorrendo as equipes de 24h e chamando a função
+					geradora de escalas para cada uma das equipes de plantão
+					com tipo de jornada similar do setor atual.
+					'''
+					for equipe in equipes12h:
+						funcaogeraescalaporequipe(
+							equipe,
+							data_plantao12h,
+							fimDoMes)
+						'''
+						Alterando a data inicial para cada equipe de acordo com
+						o seu tipo de jornada. Aqui o intervalo é de 24h
+						'''
+						data_plantao12h += TimeDelta(hours=equipe.fk_tipo_jornada.carga_horaria)
+				else:			
+					contexto['form'] = form
+					messages.warning(request, 'Ops! A data de início da equipe de 12h está fora do período válido!')
+					return render(request, template_name, contexto)
+			'''
+			Trecho onde se captura a equipe de 24h do formulário,
+			a data inicial para essa mesma equipe e todas as equipes
+			com tipos de jornada similares.
+			'''
+			if tem_plantao24:
+				if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
+					equipe24h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao24h'])
+					data_plantao24h = form.cleaned_data['data_plantao24h']
+					equipes24h = equipes.filter(fk_tipo_jornada__carga_horaria=24,nome__gte=equipe24h) | equipes.filter(fk_tipo_jornada__carga_horaria=24,nome__lt=equipe24h)
+					fimDoMes = data_plantao24h.replace(day=1,month=data_plantao24h.month+1) - TimeDelta(days=1)
+					'''
+					Percorrendo as equipes de 24h e chamando a função
+					geradora de escalas para cada uma das equipes de plantão
+					com tipo de jornada similar do setor atual.
+					'''
+					for equipe in equipes24h:
+						funcaogeraescalaporequipe(
+							equipe,
+							data_plantao24h,
+							fimDoMes)
+						'''
+						Alterando a data inicial para cada equipe de acordo com
+						o seu tipo de jornada. Aqui o intervalo é de 24h
+						'''
+						data_plantao24h += TimeDelta(hours=equipe.fk_tipo_jornada.carga_horaria)
+				else:			
+					contexto['form'] = form
+					messages.warning(request, 'Ops! A data de início da equipe de 24h está fora do período válido!')
+					return render(request, template_name, contexto)
+			'''--------------------------------------------------------
+			Trecho onde se captura a equipe de 48h do formulário,
+			a data inicial para essa mesma equipe e todas as equipes
+			com tipos de jornada similares.
+			'''
+			if tem_plantao48:
+				if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
+					equipe48h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao48h'])
+					data_plantao48h = form.cleaned_data['data_plantao48h']
+					equipes48h = equipes.filter(fk_tipo_jornada__carga_horaria=48,nome__gte=equipe48h) | equipes.filter(fk_tipo_jornada__carga_horaria=48,nome__lt=equipe48h)
+					fimDoMes = data_plantao48h.replace(day=1,month=data_plantao48h.month+1) - TimeDelta(days=1)
+					'''
+					Percorrendo as equipes de 48h e chamando a função
+					geradora de escalas para cada uma das equipes de plantão
+					com tipo de jornada similar do setor atual.
+					'''
+					for equipe in equipes48h:
+						funcaogeraescalaporequipe(
+							equipe,
+							data_plantao48h,
+							fimDoMes)
+						'''
+						Alterando a data inicial para cada equipe de acordo com
+						o seu tipo de jornada. Aqui o intervalo é de 48h
+						'''
+						data_plantao48h += TimeDelta(hours=equipe.fk_tipo_jornada.carga_horaria)
+				else:			
+					contexto['form'] = form
+					messages.warning(request, 'Ops! A data de início da equipe de 48h está fora do período válido!')
+					return render(request, template_name, contexto)
+
+			'''-----------------------------------------------------------
+			Trecho onde se captura as equipes de Expediente do setor atual,
+			a data inicial do mês de referência e a data final desse
+			mesmo mês.
+			'''
+			equipesExpediente = equipes.filter(fk_tipo_jornada__carga_horaria__lt=12)
+			inicioDoMes = DateTime.today().replace(day=1, month=DateTime.today().month+1)
+			fimDoMes = inicioDoMes.replace(month=inicioDoMes.month+1) - TimeDelta(days=1)
+			'''
+			Percorrendo as equipes de expediente e chamando a função
+			geradora de escalas para cada uma das equipes de expediente
+			do setor atual.
+			'''
+			for equipe in equipesExpediente:
+				funcaogeraescalaporequipe(
+					equipe,
+					inicioDoMes,#A data inicial é a mesma para todas equipes de expediente
+					fimDoMes)
+			
+			escala = EscalaFrequencia(fk_periodo_acao=periodo_escala,data=DateTime.today(),fk_servidor=servidor,fk_setor=servidor.fk_setor)
+			escala.save()
+			messages.success(request, 'As escalas foram atualizadas com sucesso!')
+			return redirect('namp:escala_operador_list')
+		else:
+			print('formulário inválido')
+			contexto['form'] = form
+			messages.warning(request, 'Ops! Verifique os campos do formulário!')
+			return render(request, template_name, contexto)
+	print('formulário novo')
+	return render(request,template_name, contexto)
+	

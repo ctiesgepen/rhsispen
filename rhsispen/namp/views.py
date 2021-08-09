@@ -16,10 +16,36 @@ from datetime import timedelta as TimeDelta, datetime as DateTime, date as Date,
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 import re
-
 from django.core.paginator import Paginator
-
 from django.contrib.admin.views.decorators import staff_member_required
+
+
+from django.db import connection, reset_queries
+import time
+import functools
+
+def query_debugger(func):
+
+    @functools.wraps(func)
+    def inner_func(*args, **kwargs):
+
+        reset_queries()
+        
+        start_queries = len(connection.queries)
+
+        start = time.perf_counter()
+        result = func(*args, **kwargs)
+        end = time.perf_counter()
+
+        end_queries = len(connection.queries)
+
+        print(f"Function : {func.__name__}")
+        print(f"Number of Queries : {end_queries - start_queries}")
+        print(f"Finished in : {(end - start):.2f}s")
+        return result
+
+    return inner_func
+
 
 @login_required(login_url='/autenticacao/login/')
 def home(request,template_name='home.html'):
@@ -1234,14 +1260,14 @@ def escalas_operador_list(request,template_name='namp/escala/escalas_operador_li
 	}
 	return render(request, template_name, contexto)'''
 
-
+@query_debugger
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html'):
 	try:
-		servidor = Servidor.objects.get(fk_user=request.user.id)
+		servidor = Servidor.objects.select_related('fk_setor').get(fk_user=request.user.id)
 		periodo_escala = PeriodoAcao.objects.get(descricao='GERAR ESCALAS', data_inicial__lte=DateTime.today(), data_final__gte=DateTime.today())
-		escala_gerada = EscalaFrequencia.objects.get(fk_periodo_acao=periodo_escala, fk_setor=servidor.fk_setor)
+		escala_gerada = EscalaFrequencia.objects.select_related('fk_periodo_acao').get(fk_periodo_acao=periodo_escala, fk_setor=servidor.fk_setor)
 	except Servidor.DoesNotExist:
 		messages.warning(request, 'Servidor não encontrado para este usuário!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
@@ -1259,7 +1285,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		messages.warning(request, 'Seu setor já possui escala regular para o período atual!')
 		return redirect('namp:escala_operador_list')
 
-	equipes = Equipe.objects.filter(status=True).filter(fk_setor=servidor.fk_setor)
+	equipes = Equipe.objects.filter(status=True,fk_setor=servidor.fk_setor)
 
 	tem_plantao12 = tem_plantao24 = tem_plantao48 = False
 
@@ -1282,14 +1308,14 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 	form.fields['equipe_plantao48h'].choices = [('', '--Selecione--')] + list(equipes.filter(fk_tipo_jornada__carga_horaria=48).values_list('id_equipe', 'nome'))
 
 	if not tem_plantao12:
-		del form.fields['data_plantao12h']#.widget.attrs['required'] = tem_plantao12
-		del form.fields['equipe_plantao12h']#.widget.attrs['required'] = tem_plantao12
+		del form.fields['data_plantao12h']
+		del form.fields['equipe_plantao12h']
 	if not tem_plantao24:
-		del form.fields['data_plantao24h']#.widget.attrs['required'] = tem_plantao24
-		del form.fields['equipe_plantao24h']#.widget.attrs['required'] = tem_plantao24
+		del form.fields['data_plantao24h']
+		del form.fields['equipe_plantao24h']
 	if not tem_plantao48:
-		del form.fields['data_plantao48h']#.widget.attrs['required'] = tem_plantao48
-		del form.fields['equipe_plantao48h']#.widget.attrs['required'] = tem_plantao48
+		del form.fields['data_plantao48h']
+		del form.fields['equipe_plantao48h']
 
 	contexto = {
 		'form':form,
@@ -1300,8 +1326,6 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 		'tem_plantao48': tem_plantao48,
 	}
 	if request.method=='POST':
-		print('formulário preenchido')
-		#form = GerarJornadaRegularForm(request.POST)
 		if form.is_valid():
 			print('formulário validado')
 			'''
@@ -1312,13 +1336,9 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 
 			if tem_plantao12:
 				if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None and form.cleaned_data['data_plantao12h'].month==periodo_escala.data_inicial.month+1:
-					equipe12h = equipes.get(
-						id_equipe=form.cleaned_data['equipe_plantao12h'])
+					equipe12h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao12h'])
 					data_plantao12h = form.cleaned_data['data_plantao12h']
-					equipes12h = list(equipes.filter(
-						fk_tipo_jornada__carga_horaria=12).filter(nome__gte=equipe12h))
-					equipes12h += list(equipes.filter(
-						fk_tipo_jornada__carga_horaria=12).filter(nome__lt=equipe12h))
+					equipes12h = equipes.filter(fk_tipo_jornada__carga_horaria=12,nome__gte=equipe12h) | equipes.filter(fk_tipo_jornada__carga_horaria=12,nome__lt=equipe12h)
 					fimDoMes = data_plantao12h.replace(day=1,month=data_plantao12h.month+1) - TimeDelta(days=1)
 					'''
 					Percorrendo as equipes de 24h e chamando a função
@@ -1326,11 +1346,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					com tipo de jornada similar do setor atual.
 					'''
 					for equipe in equipes12h:
-						funcaogeraescalaporequipe(
-							equipe,
-							Servidor.objects.filter(fk_equipe=equipe),
-							data_plantao12h,
-							fimDoMes)
+						funcaogeraescalaporequipe(equipe,data_plantao12h,fimDoMes)
 						'''
 						Alterando a data inicial para cada equipe de acordo com
 						o seu tipo de jornada. Aqui o intervalo é de 24h
@@ -1347,13 +1363,9 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			'''
 			if tem_plantao24:
 				if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
-					equipe24h = equipes.get(
-						id_equipe=form.cleaned_data['equipe_plantao24h'])
+					equipe24h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao24h'])
 					data_plantao24h = form.cleaned_data['data_plantao24h']
-					equipes24h = list(equipes.filter(
-						fk_tipo_jornada__carga_horaria=24).filter(nome__gte=equipe24h))
-					equipes24h += list(equipes.filter(
-						fk_tipo_jornada__carga_horaria=24).filter(nome__lt=equipe24h))
+					equipes24h = equipes.filter(fk_tipo_jornada__carga_horaria=24,nome__gte=equipe24h) | equipes.filter(fk_tipo_jornada__carga_horaria=24,nome__lt=equipe24h)
 					fimDoMes = data_plantao24h.replace(day=1,month=data_plantao24h.month+1) - TimeDelta(days=1)
 					'''
 					Percorrendo as equipes de 24h e chamando a função
@@ -1361,11 +1373,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					com tipo de jornada similar do setor atual.
 					'''
 					for equipe in equipes24h:
-						funcaogeraescalaporequipe(
-							equipe,
-							Servidor.objects.filter(fk_equipe=equipe),
-							data_plantao24h,
-							fimDoMes)
+						funcaogeraescalaporequipe(equipe,data_plantao24h,fimDoMes)
 						'''
 						Alterando a data inicial para cada equipe de acordo com
 						o seu tipo de jornada. Aqui o intervalo é de 24h
@@ -1382,13 +1390,9 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			'''
 			if tem_plantao48:
 				if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
-					equipe48h = equipes.get(
-						id_equipe=form.cleaned_data['equipe_plantao48h'])
+					equipe48h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao48h'])
 					data_plantao48h = form.cleaned_data['data_plantao48h']
-					equipes48h = list(equipes.filter(
-						fk_tipo_jornada__carga_horaria=48).filter(nome__gte=equipe48h))
-					equipes48h += list(equipes.filter(
-						fk_tipo_jornada__carga_horaria=48).filter(nome__lt=equipe48h))
+					equipes48h = equipes.filter(fk_tipo_jornada__carga_horaria=48,nome__gte=equipe48h) | equipes.filter(fk_tipo_jornada__carga_horaria=48,nome__lt=equipe48h)
 					fimDoMes = data_plantao48h.replace(day=1,month=data_plantao48h.month+1) - TimeDelta(days=1)
 					'''
 					Percorrendo as equipes de 48h e chamando a função
@@ -1396,11 +1400,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 					com tipo de jornada similar do setor atual.
 					'''
 					for equipe in equipes48h:
-						funcaogeraescalaporequipe(
-							equipe,
-							Servidor.objects.filter(fk_equipe=equipe),
-							data_plantao48h,
-							fimDoMes)
+						funcaogeraescalaporequipe(equipe,data_plantao48h,fimDoMes)
 						'''
 						Alterando a data inicial para cada equipe de acordo com
 						o seu tipo de jornada. Aqui o intervalo é de 48h
@@ -1416,9 +1416,8 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial do mês de referência e a data final desse
 			mesmo mês.
 			'''
-			equipesExpediente = list(equipes.filter(
-				fk_tipo_jornada__carga_horaria__lt=24))
-			inicioDoMes = DateTime.today().replace(day=1, month=DateTime.today().month+1)
+			equipesExpediente = equipes.filter(fk_tipo_jornada__carga_horaria__lt=12)
+			inicioDoMes = Date.today().replace(day=1, month=Date.today().month+1)
 			fimDoMes = inicioDoMes.replace(month=inicioDoMes.month+1) - TimeDelta(days=1)
 			'''
 			Percorrendo as equipes de expediente e chamando a função
@@ -1426,19 +1425,10 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			do setor atual.
 			'''
 			for equipe in equipesExpediente:
-				funcaogeraescalaporequipe(
-					equipe,
-					Servidor.objects.filter(fk_equipe=equipe),
-					inicioDoMes,#A data inicial é a mesma para todas equipes de expediente
-					fimDoMes)
-			
-			escala = EscalaFrequencia()
-			escala.fk_periodo_acao = periodo_escala
-			escala.data = DateTime.today()
-			escala.fk_servidor = servidor
-			escala.fk_setor = servidor.fk_setor
-			escala.save()
+				funcaogeraescalaporequipe(equipe,inicioDoMes,fimDoMes)
 
+			escala = EscalaFrequencia(fk_periodo_acao=periodo_escala,data=DateTime.today(),fk_servidor=servidor,fk_setor=servidor.fk_setor)
+			escala.save()
 			messages.success(request, 'As escalas foram atualizadas com sucesso!')
 			return redirect('namp:escala_operador_list')
 		else:
@@ -1575,20 +1565,36 @@ def datasportipodejornada(data_inicial, data_final, tipo_jornada):
 			data_inicial+= intervalo
 		return datas
 
-def funcaogeraescalaporequipe(equipe, servidores, data_inicial, data_final):
-	print('Fui chamada para gerar as escalas')
-	for servidor in servidores:
+def funcaogeraescalaporequipe(equipe, data_inicial, data_final):
+	print('Gerando escaladas da equipe: {} do setor: {}'.format(equipe.nome, equipe.fk_setor.nome))
+	#lista para guardar todas as jornadas da equipe atual
+	jornadas_da_equipe = []
+	afastamento_na_data = None
+	jornada_existe = None
+	for servidor in equipe.get_servidores():
 		#Verifica se o servidor está ativo
 		if servidor.situacao:
 			my_inicial = Date.fromordinal(min(data_inicial.toordinal(), data_final.toordinal()))
 			my_final = Date.fromordinal(max(data_inicial.toordinal(), data_final.toordinal()))
 			datas = datasportipodejornada(my_inicial, my_final, equipe.fk_tipo_jornada.carga_horaria)
 			for data in datas:
-				jornada = Jornada(data_jornada=data, assiduidade=1, fk_servidor=servidor, fk_equipe=equipe, fk_tipo_jornada=equipe.fk_tipo_jornada)
-				jornadas = Jornada.objects.filter(fk_servidor=jornada.fk_servidor,data_jornada=jornada.data_jornada)
-				if jornadas:
-					continue
-				jornada.save()
+				try:
+					jornada_existe = Jornada.objects.get(fk_servidor=servidor,data_jornada=data)
+				except Jornada.DoesNotExist:
+					jornada_existe = None	
+				
+				try:
+					afastamento_na_data = HistAfastamento.objects.get(fk_servidor=servidor,data_inicial__lte=data, data_final__gte=data)
+				except HistAfastamento.DoesNotExist:
+					afastamento_na_data = None	
+				
+				if not jornada_existe and not afastamento_na_data:
+					jornadas_da_equipe.append(Jornada(data_jornada=data, assiduidade=1, fk_servidor=servidor, fk_equipe=equipe, fk_tipo_jornada=equipe.fk_tipo_jornada))
+				elif not jornada_existe and afastamento_na_data:
+					print('Servidor com afastamento na data - Afastamento existe')
+					jornadas_da_equipe.append(Jornada(data_jornada=data, assiduidade=0, fk_servidor=servidor, fk_afastamento=afastamento_na_data.fk_afastamento, fk_equipe=equipe, fk_tipo_jornada=equipe.fk_tipo_jornada))
+	#criando múltiplas instâncias de Jornada no banco.
+	Jornada.objects.bulk_create(jornadas_da_equipe)
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -1596,14 +1602,13 @@ def gerarescalaregular(request):
 	if request.method == "POST":
 		form = DefinirJornadaRegularForm(request.POST)
 		if form.is_valid():
-			#Verifica se a equipe está ativa
-			if Equipe.objects.get(id_equipe=form.cleaned_data['equipe']).status:
-				funcaogeraescalaporequipe(
-					Equipe.objects.get(id_equipe=form.cleaned_data['equipe']),
-					Servidor.objects.filter(fk_equipe=Equipe.objects.get(id_equipe=form.cleaned_data['equipe'])),
-					form.cleaned_data['data_inicial'],
-					form.cleaned_data['data_final'])
-				messages.success(request, 'As jornadas da equipe ' + Equipe.objects.get(id_equipe=form.cleaned_data['equipe']).nome.upper() + ' foram atualizadas com suceso!')
+			try:
+				equipe = Equipe.objects.get(id_equipe=form.cleaned_data['equipe'])
+			except Equipe.DoesNotExist:
+				equipe = None
+			if equipe!=None and equipe.status:
+				funcaogeraescalaporequipe(equipe,form.cleaned_data['data_inicial'],form.cleaned_data['data_final'])
+				messages.success(request, 'As jornadas da equipe ' + equipe.nome.upper() + ' foram atualizadas com suceso!')
 				return HttpResponseRedirect('/admin/namp/setor/'+ form.cleaned_data['setor'] + '/change/')
 		else:
 			messages.warning(request, 'Ops! Verifique os campos do formulário!')

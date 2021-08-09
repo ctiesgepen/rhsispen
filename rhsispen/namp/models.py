@@ -400,7 +400,7 @@ class EscalaFrequencia(models.Model):
 
 	def qtd_servidores_frequencia(self):
 		lista = []
-		jornadas = Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+		jornadas = Jornada.objects.select_related('fk_servidor').filter(fk_equipe__fk_setor=self.fk_setor,
 			data_jornada__month=self.data.month-1)
 		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
@@ -408,7 +408,7 @@ class EscalaFrequencia(models.Model):
 
 	def qtd_equipes_frequencia(self):
 		lista = []
-		jornadas = Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+		jornadas = Jornada.objects.select_related('fk_equipe').filter(fk_equipe__fk_setor=self.fk_setor,
 			data_jornada__month=self.data.month-1)
 		for jornada in jornadas:
 			if jornada.fk_equipe not in lista: lista.append(jornada.fk_equipe)
@@ -416,7 +416,7 @@ class EscalaFrequencia(models.Model):
 
 	def qtd_expediente_frequencia(self):
 		lista = []
-		jornadas = Jornada.objects.filter(fk_equipe__categoria='Expediente',fk_equipe__fk_setor=self.fk_setor,
+		jornadas = Jornada.objects.select_related('fk_servidor').filter(fk_equipe__categoria='Expediente',fk_equipe__fk_setor=self.fk_setor,
 			data_jornada__month=self.data.month-1)
 		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
@@ -424,7 +424,7 @@ class EscalaFrequencia(models.Model):
 
 	def qtd_plantonista_frequencia(self):
 		lista = []
-		jornadas = Jornada.objects.filter(fk_equipe__categoria='Plantão',fk_equipe__fk_setor=self.fk_setor,
+		jornadas = Jornada.objects.select_related('fk_servidor').filter(fk_equipe__categoria='Plantão',fk_equipe__fk_setor=self.fk_setor,
 			data_jornada__month=self.data.month-1)
 		for jornada in jornadas:
 			if jornada.fk_servidor not in lista: lista.append(jornada.fk_servidor)
@@ -432,7 +432,7 @@ class EscalaFrequencia(models.Model):
 
 	def qtd_afastamento_frequencia(self):
 		lista = []
-		for jornada in Jornada.objects.filter(fk_equipe__fk_setor=self.fk_setor,
+		for jornada in Jornada.objects.select_related('fk_afastamento').filter(fk_equipe__fk_setor=self.fk_setor,
 			data_jornada__month=self.data.month-1):
 			if jornada.assiduidade == None and jornada.fk_afastamento != None: lista.append(jornada)
 		return lista
