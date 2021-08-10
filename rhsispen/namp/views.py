@@ -1366,7 +1366,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			com tipos de jornada similares.
 			'''
 			if tem_plantao24:
-				if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None:
+				if form.cleaned_data['equipe_plantao24h'] != '' and form.cleaned_data['data_plantao24h'] is not None and form.cleaned_data['data_plantao24h'].month==periodo_escala.data_inicial.month+1:
 					equipe24h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao24h'])
 					data_plantao24h = form.cleaned_data['data_plantao24h']
 					equipes24h = equipes.filter(fk_tipo_jornada__carga_horaria=24,nome__gte=equipe24h) | equipes.filter(fk_tipo_jornada__carga_horaria=24,nome__lt=equipe24h)
@@ -1393,7 +1393,7 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			com tipos de jornada similares.
 			'''
 			if tem_plantao48:
-				if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None:
+				if form.cleaned_data['equipe_plantao48h'] != '' and form.cleaned_data['data_plantao48h'] is not None and form.cleaned_data['data_plantao48h'].month==periodo_escala.data_inicial.month+1:
 					equipe48h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao48h'])
 					data_plantao48h = form.cleaned_data['data_plantao48h']
 					equipes48h = equipes.filter(fk_tipo_jornada__carga_horaria=48,nome__gte=equipe48h) | equipes.filter(fk_tipo_jornada__carga_horaria=48,nome__lt=equipe48h)
