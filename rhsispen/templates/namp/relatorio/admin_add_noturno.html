@@ -20,18 +20,16 @@
                         <hr>
                         <form method="POST" action="{% url 'namp:admin_add_noturno' %}">{% csrf_token %}
                             <div class="form-inline">
-                                <div class="col">
                                 {{ form.nome|as_crispy_field }}
-                                </div>
-
-                                <div class="col">
+                                <div style="padding: 0 5px 0 5px;">
                                 {{ form.data|as_crispy_field }}
                                 </div>
-
                                 <button type="input" class="btn btn-dark">
                                 <i class="fas fa-search"></i>
                                 </button>
-                                <a class=" col float-right" href="{% url 'namp:admin_add_noturno' %}">ver todos</a>
+                                <div style="padding: 0 5px 0 5px;">
+                                <a href="{% url 'namp:admin_add_noturno' %}">ver todos</a>
+                                </div>
                             </div>
                         </form>
                         <br>
