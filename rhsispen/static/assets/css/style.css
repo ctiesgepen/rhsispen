@@ -7,6 +7,8 @@ File: style.css
 
 NOME DO CSS PARA MEXER NA PÁG INICIAL .pcoded-header.header-blue
 cor original:4099ff
+
+CARDS DO HOME: bg-c-blue
 =========================================================================
 =================================================================================== */
 
@@ -273,7 +275,7 @@ cor original:4099ff
  */
 
 :root {
-    --blue: #222222;
+    --blue: #4099ff;
     --indigo: #6610f2;
     --purple: #6f42c1;
     --pink: #e83e8c;
@@ -19414,7 +19416,7 @@ pre[class*=language-]:before {
 /*====== text-color, background & border css starts ======*/
 
 .bg-c-blue {
-    background: linear-gradient(45deg, #222222, #73b4ff);
+    background: linear-gradient(45deg, #4099ff, #4099ff);
 }
 
 .text-c-blue {
@@ -19426,7 +19428,7 @@ pre[class*=language-]:before {
 }
 
 .bg-c-red {
-    background: linear-gradient(45deg, #FF5370, #ff869a);
+    background: linear-gradient(45deg, #FF5370, #FF5370);
 }
 
 .text-c-red {
@@ -19438,7 +19440,7 @@ pre[class*=language-]:before {
 }
 
 .bg-c-green {
-    background: linear-gradient(45deg, #2ed8b6, #59e0c5);
+    background: linear-gradient(45deg, #2ed8b6, #2ed8b6);
 }
 
 .text-c-green {
@@ -19450,7 +19452,7 @@ pre[class*=language-]:before {
 }
 
 .bg-c-yellow {
-    background: linear-gradient(45deg, #FFB64D, #ffcb80);
+    background: linear-gradient(45deg, #FFB64D, #FFB64D);
 }
 
 .text-c-yellow {
@@ -19480,7 +19482,7 @@ pre[class*=language-]:before {
 /*====== [ overrides bootstrap color ]text-color, background & border css starts ======*/
 
 .bg-primary {
-    background: linear-gradient(45deg, #222222, #73b4ff) !important;
+    background: linear-gradient(45deg, #4099ff, #73b4ff) !important;
 }
 
 .text-primary {

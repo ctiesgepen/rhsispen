@@ -17,6 +17,7 @@
                         {% if messages %} {% for message in messages %}
                         <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}">
                             <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a> {{ message|safe }}
+                            <a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>
                         </div>
                         {% endfor %} {% endif %}
 

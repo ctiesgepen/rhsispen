@@ -24,6 +24,10 @@ from django.db import connection, reset_queries
 import time
 import functools
 
+#CALENDAR
+from django.views.generic import ListView, TemplateView
+
+
 def query_debugger(func):
 
     @functools.wraps(func)
@@ -181,28 +185,26 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 	try:
 		servidor = Servidor.objects.get(fk_user=request.user.id)
 		setores = Setor.objects.all()
-	except Setor.DoesNotExist:
-		messages.warning(request, 'Setor não encontrado!')
+	except Servidor.DoesNotExist:
+		messages.warning(request, 'Servidor não encontrado!')
 		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 	form = AddNoturnoSearchForm(request.POST or None)
  
-
 	page = request.GET.get('page')
-	paginator = Paginator(list(setores), 15)
+	paginator = Paginator([], 15)
 	page_obj = paginator.get_page(page)
-	#setor = None
 	setor = ""
 		
 	contexto = {
 		'servidor': servidor,
-		'setores': setores,
 		'form': form,
 		'page_obj': page_obj,
 	}
 
 	if request.method == 'POST':
 		if form.is_valid():
+			print(type(form.cleaned_data.get('data')))
 			setores2 = []
 			pattern = re.compile(form.cleaned_data['nome'].upper())
 			for setor in setores:
@@ -213,22 +215,14 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 				paginator = Paginator(setores2, 15)
 				page_obj = paginator.get_page(page)
 
-				contexto = { 
-					'setorselecionado':setor,
-					'servidor': servidor,
-					'setores': setores,
-					'form': form,
-					'page_obj': page_obj,
-				}
+				contexto['page_obj'] =  page_obj
+				
 				return render(request, template_name, contexto)
 			else:
-				print('entrei no form invalid')
 				messages.warning(request, 'Setor com este nome não encontrado!')
 				return render(request, template_name, contexto)
-#	if request.method == 'POST':
-#		if form.is_valid():
-#			setores = []
-#		return render(request, template_name, contexto)
+		messages.warning(request, 'Ops! Preencha os campos corretamente.')
+		return render(request, template_name, contexto)			
 	return render(request, template_name, contexto)
 
 @login_required(login_url='/autenticacao/login/')
@@ -1008,7 +1002,6 @@ def afastamento_criar(request,template_name='namp/afastamento/afastamento_criar.
 #SERVIDOR
 @login_required(login_url='/autenticacao/login/')
 def servidor_att(request, id_matricula):
-
 	try:
 		user = Servidor.objects.get(fk_user=request.user.id)
 		servidor = Servidor.objects.get(id_matricula=id_matricula)
@@ -1813,3 +1806,37 @@ def exportar_frequencia_excel(request):
 #	context['query'] = query
 	#SearchQuery.objects.create(query=query)
 ##	return context
+
+
+
+#CALENDAR
+class CalendarJsonListView(ListView):
+    template_name = 'django_bootstrap_calendar/calendar_events.html'
+
+    def get_queryset(self):
+        queryset = CalendarEvent.objects.filter()
+        from_date = self.request.GET.get('from', False)
+        to_date = self.request.GET.get('to', False)
+
+        if from_date and to_date:
+            queryset = queryset.filter(
+                start__range=(
+                    timestamp_to_datetime(from_date) + datetime.timedelta(-30),
+                    timestamp_to_datetime(to_date)
+                    )
+            )
+        elif from_date:
+            queryset = queryset.filter(
+                start__gte=timestamp_to_datetime(from_date)
+            )
+        elif to_date:
+            queryset = queryset.filter(
+                end__lte=timestamp_to_datetime(to_date)
+            )
+
+        return event_serializer(queryset)
+
+
+class CalendarView(TemplateView):
+
+    template_name = 'django_bootstrap_calendar/calendar.html'

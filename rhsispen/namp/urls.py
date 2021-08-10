@@ -1,7 +1,7 @@
 # coding=utf-8
 from namp.views import *
 from . import views
-from django.conf.urls import  url
+from django.conf.urls import  url, include
 from django.urls import path
 from django.contrib.auth import views as auth_views
 

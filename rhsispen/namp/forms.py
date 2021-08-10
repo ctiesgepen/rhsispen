@@ -5,7 +5,6 @@ from django.forms import ModelForm
 from django.forms import DateTimeInput, DateInput
 
 DateInput = partial(forms.DateInput, {'class': 'datepicker'})
-
 DateTimeInput = partial(forms.DateTimeInput, {'class':'datepicker'})
 
 class DefinirJornadaRegularForm(forms.Form):   
@@ -65,7 +64,6 @@ class ServidorFormAdmin(forms.ModelForm):
         #    else:
          #   self.fields['contato'].widget.attrs={"placeholder": "(00) 0000-0000"}
           #  self.fields['contato'].widget.attrs['class'] = 'mask-contato'
-
 
 class EnderecoFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):
@@ -131,6 +129,9 @@ class TimeInput(forms.TimeInput):
 
 class DateInput(forms.DateInput):
     input_type = 'date'
+
+class MonthInput(forms.DateInput):
+    input_type = 'month'
 
 class DateTimeInput(forms.DateTimeInput):
     input_type = 'datetime-local'
@@ -286,20 +287,17 @@ class PeriodoAcaoSearchForm(forms.Form):
         self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
 
 class AddNoturnoSearchForm(forms.ModelForm):
+    data = forms.CharField()
     class Meta:
         model = Setor
         fields = ('nome',)
         widgets = {
             'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de setor'}),
+            'data': MonthInput(),
         }
+        
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['nome'].label = ""
-    
-#class AddNoturnoSearchForm(forms.Form):    
-#    setor = forms.CharField(max_length=25)    
-#    def __init__(self, *args, **kwargs):
-#        super().__init__(*args, **kwargs)
-#        self.fields['setor'].choices = [('', '--Selecione--')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
-#        self.fields['setor'].label = ""
-#        self.fields['setor'].widget.attrs['placeholder'] = 'Digite o nome do Setor'
+        self.fields['data'].label = ""
+        self.fields['data'].widget = MonthInput()
