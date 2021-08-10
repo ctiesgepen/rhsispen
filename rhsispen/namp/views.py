@@ -1334,7 +1334,6 @@ def jornadas_operador(request,template_name='namp/jornada/jornadas_operador.html
 			a data inicial para essa mesma equipe e todas as equipes
 			com tipos de jornada similares.
 			'''
-
 			if tem_plantao12:
 				if form.cleaned_data['equipe_plantao12h'] != '' and form.cleaned_data['data_plantao12h'] is not None and form.cleaned_data['data_plantao12h'].month==periodo_escala.data_inicial.month+1:
 					equipe12h = equipes.get(id_equipe=form.cleaned_data['equipe_plantao12h'])
@@ -1570,8 +1569,7 @@ def funcaogeraescalaporequipe(equipe, data_inicial, data_final):
 	print('Gerando escaladas da equipe: {} do setor: {}'.format(equipe.nome, equipe.fk_setor.nome))
 	#lista para guardar todas as jornadas da equipe atual
 	jornadas_da_equipe = []
-	afastamento_na_data = None
-	jornada_existe = None
+	#afastamento_na_data = None
 	for servidor in equipe.get_servidores():
 		#Verifica se o servidor está ativo
 		if servidor.situacao:
@@ -1580,15 +1578,11 @@ def funcaogeraescalaporequipe(equipe, data_inicial, data_final):
 			datas = datasportipodejornada(my_inicial, my_final, equipe.fk_tipo_jornada.carga_horaria)
 			for data in datas:
 				try:
-					jornada_existe = Jornada.objects.get(fk_servidor=servidor,data_jornada=data)
-				except Jornada.DoesNotExist:
-					jornada_existe = None	
-				
-				try:
+					jornada_existe = Jornada.objects.filter(fk_servidor=servidor,data_jornada=data).exists()
 					afastamento_na_data = HistAfastamento.objects.get(fk_servidor=servidor,data_inicial__lte=data, data_final__gte=data)
 				except HistAfastamento.DoesNotExist:
-					afastamento_na_data = None	
-				
+					afastamento_na_data = None
+
 				if not jornada_existe and not afastamento_na_data:
 					jornadas_da_equipe.append(Jornada(data_jornada=data, assiduidade=1, fk_servidor=servidor, fk_equipe=equipe, fk_tipo_jornada=equipe.fk_tipo_jornada))
 				elif not jornada_existe and afastamento_na_data:
