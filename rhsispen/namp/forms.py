@@ -5,7 +5,6 @@ from django.forms import ModelForm
 from django.forms import DateTimeInput, DateInput
 
 DateInput = partial(forms.DateInput, {'class': 'datepicker'})
-
 DateTimeInput = partial(forms.DateTimeInput, {'class':'datepicker'})
 
 class DefinirJornadaRegularForm(forms.Form):   
@@ -65,7 +64,6 @@ class ServidorFormAdmin(forms.ModelForm):
         #    else:
          #   self.fields['contato'].widget.attrs={"placeholder": "(00) 0000-0000"}
           #  self.fields['contato'].widget.attrs['class'] = 'mask-contato'
-
 
 class EnderecoFormAdmin(forms.ModelForm):
     def __init__(self, *args, **kwargs):

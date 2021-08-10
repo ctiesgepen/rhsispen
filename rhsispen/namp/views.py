@@ -24,6 +24,10 @@ from django.db import connection, reset_queries
 import time
 import functools
 
+#CALENDAR
+from django.views.generic import ListView, TemplateView
+
+
 def query_debugger(func):
 
     @functools.wraps(func)
@@ -1822,41 +1826,33 @@ def exportar_frequencia_excel(request):
 
 
 #CALENDAR
-def getappointments(request):
-	try:
-		if request.is_ajax():
-			id=request.GET.get('id')
-			if  request.method == "PUT":
-            # used to edit/delete appointments             
-				json_data=request.read()
-				data=json.loads(json_data)
-				if id:
-                #logic to edit an appointment
-					return JSONResponse({'id': appointment.id, 'title': appointment.title,'start':data['start'],'end':data['end'],'allDay': data['allDay']})
-				return JSONResponse("")
-			elif  request.method == "GET":
-		# used to get appointments
-				appointments=None
-				appointments=appointment.objects.filter().order_by('start')
-			return JSONResponse([{'id': o.id, 'title': o.title,'start':(o.start.isoformat()),'end':(o.end.isoformat()),'allDay':IsFullDayAppointment(o.start,o.end)} for o in appointments])
-		elif  request.method == "POST":
-		#used to save new appointments                  
-			json_data=request.read()
-			data=json.loads(json_data)
-			appointment=Appointment.objects.create('your fields…')
-			appointment.save()
-			return JSONResponse({'id':appointment.id, 'title': appointment.title,'start':data['start'],'end':data['end'],'allDay': data['allDay']})
-		elif request.method == "DELETE":
-		#used to delete appointments
-			if id:
-				Appointment.objects.get(pk=id).delete()
-			return JSONResponse("")
-	except Exception:
-		return JSONResponse(e.message)
+class CalendarJsonListView(ListView):
+    template_name = 'django_bootstrap_calendar/calendar_events.html'
 
-def IsFullDayAppointment(startDate,endDate):
-	d = endDate - startDate
-	if d.days < 1 :
-		return False
-	else:
-		return True
+    def get_queryset(self):
+        queryset = CalendarEvent.objects.filter()
+        from_date = self.request.GET.get('from', False)
+        to_date = self.request.GET.get('to', False)
+
+        if from_date and to_date:
+            queryset = queryset.filter(
+                start__range=(
+                    timestamp_to_datetime(from_date) + datetime.timedelta(-30),
+                    timestamp_to_datetime(to_date)
+                    )
+            )
+        elif from_date:
+            queryset = queryset.filter(
+                start__gte=timestamp_to_datetime(from_date)
+            )
+        elif to_date:
+            queryset = queryset.filter(
+                end__lte=timestamp_to_datetime(to_date)
+            )
+
+        return event_serializer(queryset)
+
+
+class CalendarView(TemplateView):
+
+    template_name = 'django_bootstrap_calendar/calendar.html'
