@@ -2,6 +2,7 @@
 {% load i18n static %}
 {% load static %}
 {% load crispy_forms_tags %} 
+{% load namp_extras %}
 
 {% block content %}
 <div class="pcoded-main-container">
@@ -27,60 +28,62 @@
                                 <button type="input" class="btn btn-dark">
                                 <i class="fas fa-search"></i>
                                 </button>
-                                <div style="padding: 0 5px 0 5px;">
-                                <a href="{% url 'namp:admin_add_noturno' %}">ver todos</a>
-                                </div>
                             </div>
                         </form>
                         <br>
                         <div class="table-responsive">
                             {% if not page_obj %}
-                                <div class="submit-row">
-                                    <div class="alert alert-warning" role="alert" id="alert-prazo">Digite o nome do SETOR e selecione o mês de referência.<a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>
-
-                                </div>                                
+                            <div class="submit-row">
+                                <!--<div class="alert alert-warning" role="alert" id="alert-prazo">Digite o nome do SETOR e selecione o mês de referência.<a class="close" data-dismiss="alert" aria-hidden="true"><i class="feather icon-x"></i></a></div>-->
+                                <p>Digite o nome de um SETOR e selecione o mês de referência para visualizar as informações sobre o adicional noturno.</p>
+                            </div>                                
                             {% else %}
-                                <table class="table table-striped table-sm shadow-sm">
-                                    <thead class="thead-dark">
-                                        <tr>
-                                            <th scope="col">MÊS DE REFERÊNCIA</th>
-                                            <th scope="col">UNIDADE</th>
-                                            <th scope="col">AÇÕES</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for setor in page_obj %}
-                                        <tr class="{% cycle 'row1' 'row2' %}">
-                                            <td> Referente ha... </td>
-                                            <td> {{ setor.nome }}</td>
-                                            <td> <a href="{% url 'namp:exportar_noturno_excel'%}">
-                                                <i class="feather icon-download"></i> Baixar </a>
-                                            </td>
-                                        </tr>
+                            <table class="table table-striped table-sm shadow-sm">
+                                <thead class="thead-dark">
+                                    <tr>
+                                        <th scope="col">MÊS DE REFERÊNCIA</th>
+                                        <th scope="col">UNIDADE</th>
+                                        <th scope="col">AÇÕES</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for setor in page_obj %}
+                                    <tr class="{% cycle 'row1' 'row2' %}">
+                                        {% for frequencia in adicional_noturno %}
+                                            {% if frequencia.fk_setor == setor %}
+                                                <td> {{ frequencia.data|less_month|date:"F"|upper}} </td>
+                                            {% endif %}
                                         {% endfor %}
-                                    </tbody>
-                                </table>
-                            {% endif %}
-                        </div>
-                        <div class="pagination justify-content-center">
-                            <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
-                                <div class="btn-group mr-2 mb-1" role="group" aria-label="First group">
-                                    <span class="step-links">
-                                        {% if page_obj.has_previous %}
-                                            <a href="?page=1"><button type="button" class="btn btn-dark" >&laquo;</button></a>       
-                                            <a href="?page={{ page_obj.previous_page_number }}"><button type="button" class="btn btn-dark" >&lt;</button></a>
-                                        {% endif %}
+                                        <td> {{ setor.nome }}</td>
+                                        <td> 
+                                            <a href="#"><i class="feather icon-eye"></i> Visualizar </a>
+                                            <a href="#"><i class="feather icon-download"></i> Baixar </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
                             
-                                        <span class="current">
-                                            <button border-color="ffff" type="button" class="btn btn-dark">{{ page_obj.number  }}</button>
-                                        </span> {% if page_obj.has_next %}
-                                    <a href="?page={{ page_obj.next_page_number }}"><button type="button" class="btn btn-dark" >&gt;</button></a>
-                                    <a href="?page={{ page_obj.paginator.num_pages }}"><button type="button" class="btn btn-dark">&raquo;</button></a> {% endif %}
-                                    </span>
+                            <div class="pagination justify-content-center">
+                                <div class="btn-toolbar" role="toolbar" aria-label="Toolbar with button groups">
+                                    <div class="btn-group mr-2 mb-1" role="group" aria-label="First group">
+                                        <span class="step-links">
+                                            {% if page_obj.has_previous %}
+                                                <a href="?page=1"><button type="button" class="btn btn-dark" >&laquo;</button></a>       
+                                                <a href="?page={{ page_obj.previous_page_number }}"><button type="button" class="btn btn-dark" >&lt;</button></a>
+                                            {% endif %}
+                                
+                                            <span class="current">
+                                                <button border-color="ffff" type="button" class="btn btn-dark">{{ page_obj.number  }}</button>
+                                            </span> {% if page_obj.has_next %}
+                                        <a href="?page={{ page_obj.next_page_number }}"><button type="button" class="btn btn-dark" >&gt;</button></a>
+                                        <a href="?page={{ page_obj.paginator.num_pages }}"><button type="button" class="btn btn-dark">&raquo;</button></a> {% endif %}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
+                            {% endif %}
                         </div>
-
                     </div>
                 </div>
             </div>

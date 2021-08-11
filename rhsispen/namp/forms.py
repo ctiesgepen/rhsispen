@@ -286,7 +286,9 @@ class PeriodoAcaoSearchForm(forms.Form):
         self.fields['descricao'].label = ""
         self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
 
+
 class AddNoturnoSearchForm(forms.ModelForm):
+    """Classe para o formulário da template de adicional noturno."""
     data = forms.CharField()
     class Meta:
         model = Setor

@@ -194,7 +194,6 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 	page = request.GET.get('page')
 	paginator = Paginator([], 15)
 	page_obj = paginator.get_page(page)
-	setor = ""
 		
 	contexto = {
 		'servidor': servidor,
@@ -211,15 +210,29 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 				if pattern.search(setor.nome.upper()):
 					setores2.append(setor)
 			if setores2:
-				page = request.GET.get('page')
-				paginator = Paginator(setores2, 15)
-				page_obj = paginator.get_page(page)
-
-				contexto['page_obj'] =  page_obj
-				
-				return render(request, template_name, contexto)
+				data = DateTime.strptime(form.cleaned_data['data']+'-01', '%Y-%m-%d')
+				setores3 = []
+				adicional_noturno = []
+				for setor in setores2:
+					for frequencia in setor.escalafrequencia_set.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS'):
+						if frequencia.data.replace(month=frequencia.data.month-1).strftime('%b') == data.strftime('%b'):
+							print(frequencia.data.replace(month=frequencia.data.month-1).strftime('%b') == data.strftime('%b'))
+							print(setor.nome + ' pode ter noturno em ' + frequencia.data.replace(month=frequencia.data.month-1).strftime('%b'))
+							setores3.append(setor)
+							adicional_noturno.append(frequencia)
+							break
+				if setores3:
+					page = request.GET.get('page')
+					paginator = Paginator(setores3, 15)
+					page_obj = paginator.get_page(page)
+					contexto['page_obj'] =  page_obj
+					contexto['adicional_noturno'] = adicional_noturno
+					return render(request, template_name, contexto)
+				else:				
+					messages.warning(request, 'Sem adicional noturno para o setor ou mês informados.')
+					return render(request, template_name, contexto)
 			else:
-				messages.warning(request, 'Setor com este nome não encontrado!')
+				messages.warning(request, 'Setor não encontrado com o trecho informado.')
 				return render(request, template_name, contexto)
 		messages.warning(request, 'Ops! Preencha os campos corretamente.')
 		return render(request, template_name, contexto)			
