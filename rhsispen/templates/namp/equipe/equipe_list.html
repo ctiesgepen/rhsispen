@@ -52,7 +52,7 @@
                                         <td> {{equipe.categoria}} </td>
                                         <td> {{equipe.get_servidores|length | default:0 }} </td>
                                         <td>
-                                            <a class="open-modal" href="{% url 'namp:equipe_servidores' equipe.id_equipe  %}" data-popup-url="{{equipe.id_equipe}}/servidores/"><i class="feather icon-eye"></i> Servidores</a>
+                                            <a class="open-modal" href="{% url 'namp:equipe_servidores' equipe.id_equipe %}" data-popup-url="{{equipe.id_equipe}}/servidores/"><i class="feather icon-eye"></i> Servidores</a>
                                             <a href="{% url 'namp:equipe_att' equipe.id_equipe %}"><i class="feather icon-edit"></i> Editar </a>
                                         </td>
                                     </tr>

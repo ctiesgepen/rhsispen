@@ -1,0 +1,42 @@
+<!--Header-->
+<div class="modal-header">
+    <h4 class="modal-title" id="myModalLabel">Adicional Noturno</h4>
+</div>  
+<!--Body -->
+<div class="modal-body table-responsive">
+  <table class="table table-striped table-sm shadow-sm">
+    <thead class="thead-dark">
+    <tr>
+        <th>NUMFUNC</th>
+        <th>NUMVINC</th>
+        <th>CARGO</th>
+        <th>CPF</th>
+        <th>NOME</th>
+        <th>QUANT(HORAS)</th>
+        <th>DINI</th>
+        <th>DTFIM</th>
+        <th>OBS</th> 
+    </tr>
+    </thead>
+    <tbody>
+    {% for jornada in jornadas %}
+        <tr>
+            <td>{{ jornada.fk_servidor.id_matricula }}</td>
+            <td>{{ jornada.fk_servidor.vinculo }}</td>
+            <td>{{ jornada.fk_servidor.cargo }}</td>
+            <td>{{ jornada.fk_servidor.cpf }}</td>
+            <td>{{ jornada.fk_servidor.nome }}</td>
+            <td>{{ jornada.fk_equipe.fk_tipo_jornada.carga_horaria }}</td>
+            <td>{{ jornada.inicio }}</td>
+            <td>{{ jornada.fim }}</td>
+            <td>Sem Informações</td>
+        </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
+<!--Footer-->
+<div class="modal-footer">
+    <button type="button" class="btn btn-outline-primary" data-dismiss="modal">Fechar</button>
+</div>
+

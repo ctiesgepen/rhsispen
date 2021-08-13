@@ -13,7 +13,7 @@ urlpatterns = [
 	#Tela do GESTOR
 	path('admin_afastamento/', views.admin_afastamento, name='admin_afastamento'),
 	path('admin_servidor/', views.admin_servidor, name='admin_servidor'), #falta fazer
-	path('admin_add_noturno/', views.admin_add_noturno, name='admin_add_noturno'), 
+	path('adicional_noturno/', views.admin_add_noturno, name='admin_add_noturno'), 
 	path('admin_setor/cadastrar/', views.admin_setor_criar, name='admin_setor_criar'),
 	path('admin_setor_list/', views.admin_setor_list, name='admin_setor_list'),
 	path('admin_setor/<str:id_setor>/editar/', views.setor_att, name='setor_att'),
@@ -28,10 +28,12 @@ urlpatterns = [
 	
 	#Tela do OPERADOR
 	path('setor/<str:id_setor>/editar', views.setor_att, name='setor_att'),
+	path('adicional_noturno/<id_escala_frequencia>/relatorio/', views.setor_add_noturno, name='setor_add_noturno'), #Para o modal de listar o adicional noturno do setor
+
 	path('equipes/<int:id_equipe>/editar/', views.equipe_att, name='equipe_att'),
 	path('equipes/cadastrar/', views.equipe_criar, name='equipe_criar'),
 	path('equipes/', views.equipe_list, name='equipe_list'),
-	path('equipes/<int:id_equipe>/servidores/', views.equipe_servidores, name='equipe_servidores'), #Modal
+	path('equipes/<int:id_equipe>/servidores/', views.equipe_servidores, name='equipe_servidores'), #Para o modal de listar servidores da equipe
 	path('equipe_delete/<int:id_equipe>/delete', views.equipe_delete, name='equipe_delete'),
 	path('servidor_mov/', views.servidor_mov, name='servidor_mov'), 
 	path('servidor_list/', views.servidor_list, name='servidor_list'),

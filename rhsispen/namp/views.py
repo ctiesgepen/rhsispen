@@ -1673,6 +1673,26 @@ def exportar_jornadas_excel(request):
 	messages.warning(request, 'Ops! Não há jornadas registradas no mês corrente!')
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
+
+# View para a template de modal com lista equipes do setor e jornadas da frequencia
+@login_required(login_url='/autenticacao/login/')
+@staff_member_required(login_url='/autenticacao/login/')
+def setor_add_noturno(request, id_escala_frequencia):
+	frequencia = get_object_or_404(EscalaFrequencia, id_escala_frequencia=id_escala_frequencia)
+	jornadas = Jornada.objects.select_related('fk_servidor').filter(
+		assiduidade=True,
+		data_jornada__month=frequencia.data.replace(month=frequencia.data.month-1).month,
+		fk_equipe__fk_setor=frequencia.fk_setor, 
+		fk_tipo_jornada__carga_horaria__in=[24,48])
+	jornadas = jornadas | Jornada.objects.select_related('fk_servidor').filter(
+		assiduidade=True,
+		data_jornada__month=frequencia.data.replace(month=frequencia.data.month-1).month,
+		fk_equipe__fk_setor=frequencia.fk_setor, 
+		fk_equipe__hora_inicial__gte=DateTime.now().replace(hour=18).strftime("%H:%M:%S"),
+		fk_tipo_jornada__carga_horaria=12)
+	return render(request, "includes/modal/setor/add_noturno.html", locals())
+
+
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def exportar_noturno_excel(request):
