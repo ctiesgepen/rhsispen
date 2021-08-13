@@ -6,7 +6,7 @@
 
 {% block content %}
 
-{% include 'includes/modal/modal.html' %}
+{% include 'includes/modal/modal-xl.html' %}
 
 <div class="pcoded-main-container">
     <div class="pcoded-content">
@@ -50,18 +50,14 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {% for setor in page_obj %}
+                                    {% for frequencia in page_obj %}
                                     <tr class="{% cycle 'row1' 'row2' %}">
-                                        <td> {{ setor.nome }}</td>
-                                        {% for frequencia in adicional_noturno %}
-                                            {% if frequencia.fk_setor == setor %}
-                                                <td> {{ frequencia.data|less_month|date:"F"|upper}} / {{ frequencia.data|date:"Y"}}</td>
-                                                <td>
-                                                    <a class="open-modal" href="{% url 'namp:setor_add_noturno' frequencia.id_escala_frequencia %}" data-popup-url="{{frequencia.id_escala_frequencia}}/relatorio/"><i class="feather icon-eye"></i> Visualizar</a>
-                                                    <a href="#"><i class="feather icon-download"></i> Baixar </a>
-                                                </td>
-                                            {% endif %}
-                                        {% endfor %}
+                                        <td>{{frequencia.fk_setor.nome}}</td>
+                                        <td> {{ frequencia.data|less_month|date:"F"|upper}} / {{ frequencia.data|date:"Y"}}</td>
+                                        <td>
+                                            <a class="open-modal" href="{% url 'namp:setor_add_noturno' frequencia.id_escala_frequencia %}" data-popup-url="{{frequencia.id_escala_frequencia}}/relatorio/"><i class="feather icon-eye"></i> Visualizar</a>
+                                            <a href="{% url 'namp:exportar_noturno_excel' frequencia.id_escala_frequencia %}"><i class="feather icon-download"></i> Baixar </a>
+                                        </td>
                                     </tr>
                                     {% endfor %}
                                 </tbody>

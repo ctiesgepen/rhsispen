@@ -287,19 +287,15 @@ class PeriodoAcaoSearchForm(forms.Form):
         self.fields['descricao'].widget.attrs['placeholder'] = 'Digite mês ou evento. (Ex. abril, escala)'
 
 
-class AddNoturnoSearchForm(forms.ModelForm):
+class AddNoturnoSearchForm(forms.Form):
     """Classe para o formulário da template de adicional noturno."""
     data = forms.CharField()
-    class Meta:
-        model = Setor
-        fields = ('nome',)
-        widgets = {
-            'nome': forms.TextInput(attrs={'placeholder': 'Digite um nome de setor'}),
-            'data': MonthInput(),
-        }
-        
+    nome = forms.ChoiceField()
+           
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.fields['nome'].label = ""
+        self.fields['nome'].choices = [('', '--Selecione--'),('040.TODOS', 'Todos os Setores')] + list(Setor.objects.all().values_list('id_setor', 'nome'))
         self.fields['data'].label = ""
+        self.fields['data'].widget.attrs['placeholder'] = 'Selecione o mês'
         self.fields['data'].widget = MonthInput()

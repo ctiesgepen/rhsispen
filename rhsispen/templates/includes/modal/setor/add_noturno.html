@@ -19,17 +19,17 @@
     </tr>
     </thead>
     <tbody>
-    {% for jornada in jornadas %}
+    {% for jornada in jornadas_noturnas %}
         <tr>
-            <td>{{ jornada.fk_servidor.id_matricula }}</td>
-            <td>{{ jornada.fk_servidor.vinculo }}</td>
-            <td>{{ jornada.fk_servidor.cargo }}</td>
-            <td>{{ jornada.fk_servidor.cpf }}</td>
-            <td>{{ jornada.fk_servidor.nome }}</td>
-            <td>{{ jornada.fk_equipe.fk_tipo_jornada.carga_horaria }}</td>
+            <td>{{ jornada.numfunc }}</td>
+            <td>{{ jornada.numvinc }}</td>
+            <td>{{ jornada.cargo }}</td>
+            <td>{{ jornada.cpf }}</td>
+            <td>{{ jornada.nome }}</td>
+            <td>{{ jornada.horas }}</td>
             <td>{{ jornada.inicio }}</td>
             <td>{{ jornada.fim }}</td>
-            <td>Sem Informações</td>
+            <td>{{ jornada.obs }}</td>
         </tr>
     {% endfor %}
     </tbody>

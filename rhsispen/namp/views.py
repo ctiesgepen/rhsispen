@@ -199,39 +199,46 @@ def admin_add_noturno(request, template_name='namp/relatorio/admin_add_noturno.h
 		'servidor': servidor,
 		'form': form,
 		'page_obj': page_obj,
+		'frequencias': [],
 	}
 
 	if request.method == 'POST':
 		if form.is_valid():
 			print(type(form.cleaned_data.get('data')))
 			setores2 = []
+			'''
 			pattern = re.compile(form.cleaned_data['nome'].upper())
 			for setor in setores:
 				if pattern.search(setor.nome.upper()):
 					setores2.append(setor)
+			'''
+			if form.cleaned_data['nome']=="040.TODOS":
+				setores2 = list(setores)
+			else:
+				setores2.append(Setor.objects.get(id_setor=form.cleaned_data['nome']))
 			if setores2:
 				data = DateTime.strptime(form.cleaned_data['data']+'-01', '%Y-%m-%d')
-				setores3 = []
 				adicional_noturno = []
 				for setor in setores2:
 					for frequencia in setor.escalafrequencia_set.filter(fk_periodo_acao__descricao='CONSOLIDAR FREQUENCIAS'):
 						if frequencia.data.replace(month=frequencia.data.month-1).strftime('%b') == data.strftime('%b'):
-							print(frequencia.data.replace(month=frequencia.data.month-1).strftime('%b') == data.strftime('%b'))
 							print(setor.nome + ' pode ter noturno em ' + frequencia.data.replace(month=frequencia.data.month-1).strftime('%b'))
-							setores3.append(setor)
 							adicional_noturno.append(frequencia)
 							break
-				if setores3:
+				if adicional_noturno:
 					page = request.GET.get('page')
-					paginator = Paginator(setores3, 15)
+					paginator = Paginator(adicional_noturno, 15)
 					page_obj = paginator.get_page(page)
+					contexto['form'] = AddNoturnoSearchForm()
 					contexto['page_obj'] =  page_obj
-					contexto['adicional_noturno'] = adicional_noturno
+					contexto['frequencias'] = adicional_noturno
 					return render(request, template_name, contexto)
-				else:				
+				else:
+					contexto['form'] = AddNoturnoSearchForm()				
 					messages.warning(request, 'Sem adicional noturno para o setor ou mês informados.')
 					return render(request, template_name, contexto)
 			else:
+				contexto['form'] = AddNoturnoSearchForm()
 				messages.warning(request, 'Setor não encontrado com o trecho informado.')
 				return render(request, template_name, contexto)
 		messages.warning(request, 'Ops! Preencha os campos corretamente.')
@@ -1690,19 +1697,100 @@ def setor_add_noturno(request, id_escala_frequencia):
 		fk_equipe__fk_setor=frequencia.fk_setor, 
 		fk_equipe__hora_inicial__gte=DateTime.now().replace(hour=18).strftime("%H:%M:%S"),
 		fk_tipo_jornada__carga_horaria=12)
+	
+	jornadas_noturnas = []
+
+	for jornada in jornadas:
+		if jornada.fk_tipo_jornada.carga_horaria == 12 or jornada.fk_tipo_jornada.carga_horaria == 24:
+			jornadas_noturnas.append(
+				{
+					'numfunc':jornada.fk_servidor.id_matricula,
+					'numvinc':jornada.fk_servidor.vinculo,
+					'cargo':jornada.fk_servidor.cargo,
+					'cpf':jornada.fk_servidor.cpf,
+					'nome':jornada.fk_servidor.nome,
+					'horas':2,
+					'inicio':jornada.data_jornada,
+					'fim':jornada.data_jornada,
+					'obs':"",
+				})
+			print(Date.fromordinal(jornada.data_jornada.toordinal()+1))
+			if (jornada.data_jornada+TimeDelta(days=1)).month==frequencia.data.month-1:
+				print('Entrei no if do dia seguinte! - Jornada 24h')
+				jornadas_noturnas.append(
+				{
+					'numfunc':jornada.fk_servidor.id_matricula,
+					'numvinc':jornada.fk_servidor.vinculo,
+					'cargo':jornada.fk_servidor.cargo,
+					'cpf':jornada.fk_servidor.cpf,
+					'nome':jornada.fk_servidor.nome,
+					'horas':5,
+					'inicio':jornada.data_jornada+TimeDelta(days=1),
+					'fim':jornada.data_jornada+TimeDelta(days=1),
+					'obs':"",
+				})
+
+		elif jornada.fk_tipo_jornada.carga_horaria == 48:
+			print('Entrei no if do dia seguinte! - Jornada 24h')
+			jornadas_noturnas.append(
+				{
+					'numfunc':jornada.fk_servidor.id_matricula,
+					'numvinc':jornada.fk_servidor.vinculo,
+					'cargo':jornada.fk_servidor.cargo,
+					'cpf':jornada.fk_servidor.cpf,
+					'nome':jornada.fk_servidor.nome,
+					'horas':2,
+					'inicio':jornada.data_jornada,
+					'fim':jornada.data_jornada,
+					'obs':"",
+				})
+			if (jornada.data_jornada+TimeDelta(days=1)).month==frequencia.data.month-1:
+				jornadas_noturnas.append(
+				{
+					'numfunc':jornada.fk_servidor.id_matricula,
+					'numvinc':jornada.fk_servidor.vinculo,
+					'cargo':jornada.fk_servidor.cargo,
+					'cpf':jornada.fk_servidor.cpf,
+					'nome':jornada.fk_servidor.nome,
+					'horas':7,
+					'inicio':jornada.data_jornada+TimeDelta(days=1),
+					'fim':jornada.data_jornada+TimeDelta(days=1),
+					'obs':"",
+				})
+			if (jornada.data_jornada+TimeDelta(days=1)).month==frequencia.data.month-1:
+				jornadas_noturnas.append(
+				{
+					'numfunc':jornada.fk_servidor.id_matricula,
+					'numvinc':jornada.fk_servidor.vinculo,
+					'cargo':jornada.fk_servidor.cargo,
+					'cpf':jornada.fk_servidor.cpf,
+					'nome':jornada.fk_servidor.nome,
+					'horas':5,
+					'inicio':jornada.data_jornada+TimeDelta(days=2),
+					'fim':jornada.data_jornada+TimeDelta(days=2),
+					'obs':"",
+				})
 	return render(request, "includes/modal/setor/add_noturno.html", locals())
 
 
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
-def exportar_noturno_excel(request):
-	#recuperando as jornadas do banco. OBS: apenas as jornadas do mês corrente
-	servidores = list(Servidor.objects.all())
+def exportar_noturno_excel(request, id_escala_frequencia):
+	frequencia = get_object_or_404(EscalaFrequencia, id_escala_frequencia=id_escala_frequencia)
+	jornadas = Jornada.objects.select_related('fk_servidor').filter(
+		assiduidade=True,
+		data_jornada__month=frequencia.data.replace(month=frequencia.data.month-1).month,
+		fk_equipe__fk_setor=frequencia.fk_setor, 
+		fk_tipo_jornada__carga_horaria__in=[24,48]) | Jornada.objects.select_related('fk_servidor').filter(
+		assiduidade=True,
+		data_jornada__month=frequencia.data.replace(month=frequencia.data.month-1).month,
+		fk_equipe__fk_setor=frequencia.fk_setor, 
+		fk_equipe__hora_inicial__gte=DateTime.now().replace(hour=18).strftime("%H:%M:%S"),
+		fk_tipo_jornada__carga_horaria=12)
 
-	jornadas = Jornada.objects.filter(assiduidade=True).filter(fk_tipo_jornada__carga_horaria__in=[24,48]).order_by('data_jornada','fk_equipe__fk_setor__nome', 'fk_equipe__nome','fk_servidor__nome')
 	if jornadas:
 		response = HttpResponse(content_type='application/ms-excel')
-		response['Content-Disposition'] = 'attachment; filename="adicional-noturno.xls"'
+		response['Content-Disposition'] = 'attachment; filename="{}_0{}_{}_Adicional_Noturno.xls"'.format(frequencia.fk_setor.nome.replace(' ','_'),frequencia.data.month-1, frequencia.data.year)
 
 		wb = xlwt.Workbook(encoding='utf-8')
 		ws = wb.add_sheet('Adicional')
@@ -1743,31 +1831,26 @@ def exportar_noturno_excel(request):
 			ws.write(row_num, 7, dt, font_style)
 			ws.write(row_num, 8, "", font_style)
 
-		#if servidores.tipo_vinculo == 'Concursado':
-		if servidores.values_list('tipo_vinculo') == 'Concursado':
-		#calculo do add
-			for jornada in jornadas:
-				if jornada.fk_tipo_jornada.carga_horaria == 24:
-					if jornada.data_jornada.month==Date.today().month:
-						row_num += 1
-						setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
-					if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==Date.today().month:
-						row_num += 1
-						setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))			
-				elif jornada.fk_tipo_jornada.carga_horaria == 48:
-					if jornada.data_jornada.month==Date.today().month:
-						row_num += 1
-						setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
-					if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==Date.today().month:
-						row_num += 1
-						setRow(jornada, 7,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))
-					if Date.fromordinal(jornada.data_jornada.toordinal()+2).month==Date.today().month:
-						row_num += 1
-						setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+2).strftime("%d/%m/%Y"))
-			wb.save(response)
-			return response
-		messages.warning(request, 'Ops! Não há jornadas registradas no mês corrente, para o cálculo do adicional noturno!')
-		return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
+		for jornada in jornadas:
+			if jornada.fk_tipo_jornada.carga_horaria == 12 or jornada.fk_tipo_jornada.carga_horaria == 24:
+				if jornada.data_jornada.month==frequencia.data.month-1:
+					row_num += 1
+					setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
+				if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==frequencia.data.month-1:
+					row_num += 1
+					setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))			
+			elif jornada.fk_tipo_jornada.carga_horaria == 48:
+				if jornada.data_jornada.month==frequencia.data.month-1:
+					row_num += 1
+					setRow(jornada, 2,jornada.data_jornada.strftime("%d/%m/%Y"))
+				if Date.fromordinal(jornada.data_jornada.toordinal()+1).month==frequencia.data.month-1:
+					row_num += 1
+					setRow(jornada, 7,Date.fromordinal(jornada.data_jornada.toordinal()+1).strftime("%d/%m/%Y"))
+				if Date.fromordinal(jornada.data_jornada.toordinal()+2).month==frequencia.data.month-1:
+					row_num += 1
+					setRow(jornada, 5,Date.fromordinal(jornada.data_jornada.toordinal()+2).strftime("%d/%m/%Y"))
+		wb.save(response)
+		return response
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
 

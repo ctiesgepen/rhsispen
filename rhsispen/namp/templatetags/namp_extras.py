@@ -9,5 +9,5 @@ def add_month(value):
 
 @register.filter(name='less_month')
 def less_month(value):
-    return value + TimeDelta(days=-30)
-
+	#print('Foi selecionada a frequencia de {} do tipo {}'.format(value, type(value)))
+	return value + TimeDelta(days=-30)
