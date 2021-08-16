@@ -1680,7 +1680,6 @@ def exportar_jornadas_excel(request):
 	messages.warning(request, 'Ops! Não há jornadas registradas no mês corrente!')
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
 
-
 # View para a template de modal com lista equipes do setor e jornadas da frequencia
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
@@ -1772,7 +1771,6 @@ def setor_add_noturno(request, id_escala_frequencia):
 				})
 	return render(request, "includes/modal/setor/add_noturno.html", locals())
 
-
 @login_required(login_url='/autenticacao/login/')
 @staff_member_required(login_url='/autenticacao/login/')
 def exportar_noturno_excel(request, id_escala_frequencia):
@@ -1852,7 +1850,6 @@ def exportar_noturno_excel(request, id_escala_frequencia):
 		wb.save(response)
 		return response
 	return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
-
 
 @staff_member_required(login_url='/autenticacao/login/')
 def exportar_frequencia_excel(request):
